@@ -1,0 +1,733 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>TOPCIT 기출 퀴즈</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #f7f4ee;
+      --surface: #ffffff;
+      --text: #1a1a1a;
+      --muted: #6b7280;
+      --border: rgba(0,0,0,0.08);
+      --radius: 16px;
+      --shadow: 0 2px 12px rgba(0,0,0,0.07), 0 1px 3px rgba(0,0,0,0.05);
+      --hdr: 60px;
+      --font: 'Pretendard Variable', 'Noto Sans KR', -apple-system, sans-serif;
+    }
+
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      padding-top: var(--hdr);
+    }
+
+    /* ── Header ── */
+    #hdr {
+      position: fixed; top: 0; left: 0; right: 0;
+      height: var(--hdr);
+      background: rgba(255,255,255,0.96);
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; gap: 10px;
+      padding: 0 18px;
+      z-index: 200;
+      box-shadow: 0 1px 8px rgba(0,0,0,0.06);
+    }
+    .hdr-l { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+    .back-link {
+      color: var(--muted); text-decoration: none;
+      font-size: 13px; font-weight: 600;
+      padding: 5px 9px; border-radius: 8px;
+      transition: background .15s;
+    }
+    .back-link:hover { background: rgba(0,0,0,0.06); }
+    .site-title { font-size: 14px; font-weight: 700; white-space: nowrap; }
+
+    .hdr-c {
+      flex: 1; display: flex; align-items: center; gap: 8px;
+      overflow: hidden;
+    }
+    .pb-wrap {
+      flex: 1; height: 6px; max-width: 280px;
+      background: rgba(0,0,0,0.08); border-radius: 3px; overflow: hidden;
+    }
+    .pb-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #2563eb, #7c3aed);
+      border-radius: 3px; transition: width .4s ease; width: 0%;
+    }
+    .pb-label { font-size: 12px; font-weight: 700; color: var(--muted); white-space: nowrap; }
+
+    .hdr-r { display: flex; align-items: center; gap: 5px; flex-shrink: 0; }
+    .mode-btn {
+      padding: 5px 11px; border: 1.5px solid var(--border);
+      border-radius: 8px; background: transparent;
+      font-size: 12px; font-weight: 600; cursor: pointer;
+      color: var(--muted); transition: all .15s; font-family: inherit;
+    }
+    .mode-btn.active { background: var(--text); color: white; border-color: var(--text); }
+    .mode-btn:hover:not(.active) { background: rgba(0,0,0,0.05); }
+    .reset-btn {
+      padding: 5px 11px; border: 1.5px solid rgba(220,38,38,.3);
+      border-radius: 8px; background: transparent;
+      font-size: 12px; font-weight: 600; cursor: pointer;
+      color: #dc2626; transition: all .15s; font-family: inherit;
+    }
+    .reset-btn:hover { background: rgba(220,38,38,.08); }
+
+    /* ── Views ── */
+    .view { max-width: 820px; margin: 0 auto; padding: 22px 16px 72px; }
+    .hidden { display: none !important; }
+    .loading { text-align: center; padding: 80px 20px; color: var(--muted); font-size: 15px; }
+
+    /* ── Topic Tabs (flashcard) ── */
+    .topic-tabs {
+      display: flex; gap: 7px; overflow-x: auto;
+      padding-bottom: 4px; margin-bottom: 18px;
+      scrollbar-width: none;
+    }
+    .topic-tabs::-webkit-scrollbar { display: none; }
+    .topic-tab {
+      flex-shrink: 0; padding: 6px 13px; border-radius: 20px;
+      border: 2px solid transparent; background: white;
+      font-size: 12px; font-weight: 700; cursor: pointer;
+      transition: all .15s; font-family: inherit; white-space: nowrap;
+    }
+    .topic-tab.active { color: white !important; }
+    .tab-sub { opacity: .7; font-weight: 500; }
+
+    /* ── Flashcard Nav ── */
+    .fc-nav {
+      display: flex; align-items: center; justify-content: center;
+      gap: 14px; margin-bottom: 18px; flex-wrap: wrap;
+    }
+    .nav-btn {
+      padding: 7px 16px; border: 1.5px solid var(--border);
+      border-radius: 10px; background: white;
+      font-size: 13px; font-weight: 700; cursor: pointer;
+      color: var(--text); transition: all .15s;
+      font-family: inherit; box-shadow: var(--shadow);
+    }
+    .nav-btn:hover:not(:disabled) { background: #f0f0f0; }
+    .nav-btn:disabled { opacity: .3; cursor: not-allowed; }
+    .fc-dots { display: flex; gap: 5px; align-items: center; }
+    .fc-dot {
+      width: 7px; height: 7px; border-radius: 4px;
+      background: rgba(0,0,0,.15); cursor: pointer;
+      transition: all .2s;
+    }
+    .fc-dot.active { width: 18px; }
+    .fc-counter { font-size: 12px; font-weight: 700; color: var(--muted); min-width: 38px; text-align: center; }
+
+    /* ── Question Card ── */
+    .q-card {
+      background: white; border-radius: var(--radius);
+      box-shadow: var(--shadow); overflow: hidden;
+      border: 1px solid var(--border);
+    }
+    .q-head {
+      padding: 12px 18px; display: flex; align-items: center;
+      gap: 7px; border-bottom: 1px solid var(--border);
+      flex-wrap: wrap;
+    }
+    .badge {
+      display: inline-flex; align-items: center;
+      padding: 3px 9px; border-radius: 20px;
+      font-size: 11px; font-weight: 700;
+    }
+    .badge-g { color: white; }
+    .badge-t { background: rgba(0,0,0,.07); color: var(--muted); }
+    .q-id { font-size: 11px; color: var(--muted); font-weight: 600; margin-left: auto; }
+
+    .q-body { padding: 18px 20px; }
+    .q-topic { font-size: 11px; color: var(--muted); font-weight: 600; margin-bottom: 8px; text-transform: uppercase; letter-spacing: .03em; }
+    .q-text { font-size: 15px; line-height: 1.75; white-space: pre-wrap; word-break: keep-all; margin-bottom: 16px; }
+
+    /* Images */
+    .q-imgs { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
+    .img-thumb {
+      max-width: 100%; max-height: 240px;
+      border-radius: 8px; cursor: zoom-in;
+      border: 1px solid var(--border);
+      object-fit: contain; background: #f5f5f5;
+      transition: opacity .15s;
+    }
+    .img-thumb:hover { opacity: .88; }
+
+    /* Choices */
+    .choices { display: flex; flex-direction: column; gap: 7px; margin-bottom: 16px; }
+    .choice-btn {
+      padding: 9px 13px; border: 1.5px solid var(--border);
+      border-radius: 10px; background: #fafafa;
+      text-align: left; font-size: 14px; line-height: 1.5;
+      cursor: pointer; transition: all .18s;
+      font-family: inherit; color: var(--text);
+    }
+    .choice-btn:hover:not(:disabled) { border-color: #bbb; background: #f0f0f0; }
+    .choice-btn.correct { border-color: #16a34a; background: #f0fdf4; color: #15803d; font-weight: 600; }
+    .choice-btn.wrong   { border-color: #dc2626; background: #fef2f2; color: #dc2626; }
+    .choice-btn:disabled { cursor: default; }
+
+    /* Reveal */
+    .reveal-btn {
+      padding: 9px 18px; border: 1.5px solid var(--border);
+      border-radius: 10px; background: #fafafa;
+      font-size: 13px; font-weight: 600; cursor: pointer;
+      font-family: inherit; color: var(--muted);
+      transition: all .15s;
+    }
+    .reveal-btn:hover:not(.done) { background: #f0f0f0; border-color: #bbb; }
+    .reveal-btn.done { background: #f0fdf4; border-color: #16a34a; color: #15803d; cursor: default; }
+
+    /* Answer */
+    .answer-wrap { border-top: 1px solid var(--border); padding-top: 16px; margin-top: 16px; }
+    .ans-label { font-size: 10px; font-weight: 800; letter-spacing: .06em; color: #16a34a; margin-bottom: 5px; text-transform: uppercase; }
+    .ans-text {
+      font-size: 14px; line-height: 1.7; white-space: pre-wrap;
+      background: #f0fdf4; border: 1px solid rgba(22,163,74,.2);
+      border-radius: 8px; padding: 11px 13px; margin-bottom: 11px;
+      color: #166534; font-weight: 500;
+    }
+    .exp-label { font-size: 10px; font-weight: 800; letter-spacing: .06em; color: var(--muted); margin-bottom: 5px; text-transform: uppercase; }
+    .exp-text {
+      font-size: 13px; line-height: 1.7; white-space: pre-wrap;
+      color: var(--muted); background: #f9fafb;
+      border: 1px solid var(--border); border-radius: 8px;
+      padding: 11px 13px;
+    }
+
+    /* ── List Mode ── */
+    .list-group {
+      margin-bottom: 10px; border-radius: var(--radius);
+      overflow: hidden; box-shadow: var(--shadow);
+      border: 1px solid var(--border);
+    }
+    .lg-head {
+      display: flex; align-items: center; gap: 9px;
+      padding: 13px 17px; background: white;
+      cursor: pointer; transition: background .12s;
+      user-select: none;
+    }
+    .lg-head:hover { background: #f9fafb; }
+    .lg-arrow { font-size: 11px; color: var(--muted); transition: transform .2s; flex-shrink: 0; }
+    .lg-arrow.open { transform: rotate(90deg); }
+    .lg-name { font-size: 14px; font-weight: 700; }
+    .lg-stats { margin-left: auto; display: flex; align-items: center; gap: 7px; }
+    .lg-cnt { font-size: 12px; color: var(--muted); }
+    .lg-pct { font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 10px; }
+
+    .lg-body { background: white; display: none; }
+    .lg-body.open { display: block; }
+
+    .lq-item { border-top: 1px solid var(--border); }
+    .lq-row {
+      display: flex; align-items: center; gap: 9px;
+      padding: 11px 17px; cursor: pointer;
+      transition: background .1s;
+    }
+    .lq-row:hover { background: #f9fafb; }
+    .lq-dot {
+      width: 18px; height: 18px; border-radius: 50%;
+      border: 2px solid var(--border); flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 10px; font-weight: 700;
+    }
+    .lq-dot.done { background: #16a34a; border-color: #16a34a; color: white; }
+    .lq-id { font-size: 11px; color: var(--muted); font-weight: 700; flex-shrink: 0; }
+    .lq-topic { font-size: 13px; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .lq-type { font-size: 11px; color: var(--muted); background: rgba(0,0,0,.05); padding: 2px 7px; border-radius: 10px; flex-shrink: 0; }
+    .lq-arr { font-size: 11px; color: var(--muted); flex-shrink: 0; transition: transform .2s; }
+    .lq-arr.open { transform: rotate(90deg); }
+
+    .lq-card { display: none; padding: 4px 14px 14px; }
+    .lq-card.open { display: block; }
+    .lq-card .q-card { border-color: rgba(0,0,0,.06); }
+
+    /* ── Lightbox ── */
+    #lightbox {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,.88); z-index: 999;
+      align-items: center; justify-content: center;
+      padding: 20px; cursor: zoom-out;
+    }
+    #lightbox.open { display: flex; }
+    #lb-img {
+      max-width: 100%; max-height: 90vh;
+      border-radius: 8px; cursor: default;
+      box-shadow: 0 8px 40px rgba(0,0,0,.5);
+    }
+    #lb-close {
+      position: absolute; top: 14px; right: 18px;
+      background: rgba(255,255,255,.18); border: none;
+      color: white; font-size: 18px; width: 34px; height: 34px;
+      border-radius: 50%; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: background .15s;
+    }
+    #lb-close:hover { background: rgba(255,255,255,.3); }
+
+    @media (max-width: 560px) {
+      .site-title { display: none; }
+      .pb-wrap { max-width: none; }
+      .mode-btn, .reset-btn { padding: 4px 8px; font-size: 11px; }
+      .q-text { font-size: 14px; }
+    }
+  </style>
+</head>
+<body>
+
+<header id="hdr">
+  <div class="hdr-l">
+    <a href="./index.html" class="back-link">← 목록</a>
+    <span class="site-title">TOPCIT 기출 퀴즈</span>
+  </div>
+  <div class="hdr-c">
+    <div class="pb-wrap"><div class="pb-fill" id="pb-fill"></div></div>
+    <span class="pb-label" id="pb-label">0 / 0</span>
+  </div>
+  <div class="hdr-r">
+    <button class="mode-btn active" id="btn-fc"   onclick="setMode('flashcard')">▶ 플래시카드</button>
+    <button class="mode-btn"        id="btn-list" onclick="setMode('list')">≡ 목록</button>
+    <button class="reset-btn" onclick="doReset()">리셋</button>
+  </div>
+</header>
+
+<div id="fc-view" class="view">
+  <p class="loading" id="loading-msg">문제를 불러오는 중…</p>
+</div>
+<div id="list-view" class="view hidden"></div>
+
+<div id="lightbox" onclick="lbClose(event)">
+  <button id="lb-close" onclick="lbClose(event)">✕</button>
+  <img id="lb-img" src="" alt="문제 이미지">
+</div>
+
+<script>
+/* ─────────────────────────────────────────────────────
+   Constants
+───────────────────────────────────────────────────── */
+const GC = [
+  { label: '프로젝트 관리',         color: '#2563eb', bg: '#eff6ff' },
+  { label: 'IT 비즈니스',           color: '#16a34a', bg: '#f0fdf4' },
+  { label: '시스템 아키텍처',        color: '#7c3aed', bg: '#f5f3ff' },
+  { label: '데이터베이스',           color: '#d97706', bg: '#fffbeb' },
+  { label: '정보보안',              color: '#dc2626', bg: '#fef2f2' },
+  { label: '소프트웨어 개발',        color: '#0891b2', bg: '#ecfeff' },
+  { label: '테크니컬 커뮤니케이션', color: '#9333ea', bg: '#faf5ff' },
+];
+const IMG_BASE = '/topcit_exam_images/';
+
+/* ─────────────────────────────────────────────────────
+   State
+───────────────────────────────────────────────────── */
+let ST = { revealed: [], chosen: {}, mode: 'flashcard', fc_g: 0, fc_q: 0 };
+let GROUPS = [];   // [{cfg, qs:[...]}]
+let ALL_QS = [];
+let saveTimer = null;
+
+/* ─────────────────────────────────────────────────────
+   Topic → Group index
+───────────────────────────────────────────────────── */
+function gIdx(topic) {
+  if (topic.startsWith('프로젝트 관리'))               return 0;
+  if (topic.startsWith('IT 비즈니스'))                  return 1;
+  if (topic.startsWith('시스템 아키텍처'))               return 2;
+  if (topic.startsWith('데이터베이스') || topic.startsWith('데이터 /')) return 3;
+  if (topic.startsWith('정보보안'))                      return 4;
+  if (topic.startsWith('소프트웨어 개발'))               return 5;
+  if (topic.startsWith('테크니컬 커뮤니케이션') || topic.startsWith('웹 접근성')) return 6;
+  return 6;
+}
+
+/* ─────────────────────────────────────────────────────
+   Load & init
+───────────────────────────────────────────────────── */
+async function init() {
+  try {
+    const [eRes, pRes] = await Promise.all([
+      fetch('/topcit_json_v2/topcit_exam.json'),
+      fetch('/api/progress'),
+    ]);
+    const exam = await eRes.json();
+    const prog = await pRes.json();
+
+    for (const yr of exam.years)
+      for (const q of yr.questions) ALL_QS.push(q);
+
+    const buckets = GC.map(() => []);
+    for (const q of ALL_QS) buckets[gIdx(q.topic)].push(q);
+    GROUPS = GC.map((cfg, i) => ({ cfg, qs: buckets[i] }));
+
+    if (Array.isArray(prog.revealed)) ST.revealed = prog.revealed;
+    if (prog.chosen && typeof prog.chosen === 'object') ST.chosen = prog.chosen;
+    if (prog.mode) ST.mode = prog.mode;
+    if (typeof prog.fc_g === 'number') ST.fc_g = Math.min(prog.fc_g, GROUPS.length - 1);
+    if (typeof prog.fc_q === 'number') {
+      const g = GROUPS[ST.fc_g];
+      ST.fc_q = g ? Math.min(prog.fc_q, g.qs.length - 1) : 0;
+    }
+
+    document.getElementById('loading-msg')?.remove();
+    buildFC();
+    buildList();
+    updatePB();
+    applyMode(ST.mode);
+  } catch (e) {
+    const el = document.getElementById('loading-msg');
+    if (el) el.textContent = '오류: ' + e.message;
+  }
+}
+
+/* ─────────────────────────────────────────────────────
+   Persistence
+───────────────────────────────────────────────────── */
+function save() {
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(() => {
+    fetch('/api/progress', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        revealed: ST.revealed, chosen: ST.chosen,
+        mode: ST.mode, fc_g: ST.fc_g, fc_q: ST.fc_q
+      }),
+    });
+  }, 600);
+}
+
+/* ─────────────────────────────────────────────────────
+   Helpers
+───────────────────────────────────────────────────── */
+function isRevealed(qid)  { return ST.revealed.includes(qid); }
+function markRevealed(qid){ if (!isRevealed(qid)) ST.revealed.push(qid); }
+function correctIdx(q)    { return '①②③④'.indexOf((q.answer || '').trim()[0]); }
+
+function esc(s) {
+  return (s || '')
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+function updatePB() {
+  const done = ST.revealed.length, total = ALL_QS.length;
+  const pct = total ? done / total * 100 : 0;
+  document.getElementById('pb-fill').style.width = pct + '%';
+  document.getElementById('pb-label').textContent = done + ' / ' + total;
+}
+
+/* ─────────────────────────────────────────────────────
+   Card HTML
+───────────────────────────────────────────────────── */
+function cardHTML(q) {
+  const gi = gIdx(q.topic);
+  const { color } = GC[gi];
+  const revealed = isRevealed(q.id);
+  const chosen   = ST.chosen[q.id];
+  const isMCQ    = q.type === '객관식';
+  const ci       = isMCQ ? correctIdx(q) : -1;
+
+  const imgsHTML = (q.image_paths || []).length
+    ? `<div class="q-imgs">${q.image_paths.map(p =>
+        `<img class="img-thumb" src="${IMG_BASE}${esc(p)}" data-src="${IMG_BASE}${esc(p)}" alt="문제 이미지" loading="lazy">`
+      ).join('')}</div>`
+    : '';
+
+  let interact = '';
+  if (isMCQ) {
+    interact = `<div class="choices">${(q.choices || []).map((c, i) => {
+      let cls = 'choice-btn';
+      if (revealed) cls += (i === ci ? ' correct' : (i === chosen ? ' wrong' : ''));
+      return `<button class="${cls}" data-qid="${esc(q.id)}" data-idx="${i}"${revealed ? ' disabled' : ''}>${esc(c)}</button>`;
+    }).join('')}</div>`;
+  } else {
+    interact = `<button class="reveal-btn${revealed ? ' done' : ''}" data-qid="${esc(q.id)}" data-action="reveal">${revealed ? '✓ 정답 확인됨' : '정답 확인하기'}</button>`;
+  }
+
+  const ansHTML = revealed ? `
+    <div class="answer-wrap">
+      <div class="ans-label">정답</div>
+      <div class="ans-text">${esc(q.answer)}</div>
+      ${q.explanation ? `<div class="exp-label">해설</div><div class="exp-text">${esc(q.explanation)}</div>` : ''}
+    </div>` : '';
+
+  return `<article class="q-card" data-qid="${esc(q.id)}">
+  <div class="q-head">
+    <span class="badge badge-g" style="background:${color}">${esc(GC[gi].label)}</span>
+    <span class="badge badge-t">${esc(q.type)}</span>
+    <span class="q-id">${esc(q.id)}</span>
+  </div>
+  <div class="q-body">
+    <div class="q-topic">${esc(q.topic)}</div>
+    <div class="q-text">${esc(q.question)}</div>
+    ${imgsHTML}${interact}${ansHTML}
+  </div>
+</article>`;
+}
+
+/* ─────────────────────────────────────────────────────
+   Flashcard — build / rebuild
+───────────────────────────────────────────────────── */
+function buildFC() {
+  const g = GROUPS[ST.fc_g];
+  if (!g || !g.qs.length) return;
+
+  const tabs = GROUPS.map((gr, i) => {
+    const done   = gr.qs.filter(q => isRevealed(q.id)).length;
+    const active = i === ST.fc_g;
+    const style  = active
+      ? `background:${gr.cfg.color};color:white;border-color:${gr.cfg.color}`
+      : `border-color:${gr.cfg.color};color:${gr.cfg.color};background:white`;
+    return `<button class="topic-tab${active ? ' active' : ''}" style="${style}" data-action="tab" data-gi="${i}">${esc(gr.cfg.label)} <span class="tab-sub">${done}/${gr.qs.length}</span></button>`;
+  }).join('');
+
+  const dots = g.qs.map((_, i) => {
+    const active = i === ST.fc_q;
+    return `<div class="fc-dot${active ? ' active' : ''}" style="${active ? `background:${g.cfg.color}` : ''}" data-action="dot" data-i="${i}"></div>`;
+  }).join('');
+
+  const q = g.qs[ST.fc_q];
+
+  document.getElementById('fc-view').innerHTML = `
+    <div class="topic-tabs">${tabs}</div>
+    <div class="fc-nav">
+      <button class="nav-btn" data-action="fc-prev"${ST.fc_q === 0 ? ' disabled' : ''}>← 이전</button>
+      <div class="fc-dots">${dots}</div>
+      <span class="fc-counter">${ST.fc_q + 1} / ${g.qs.length}</span>
+      <button class="nav-btn" data-action="fc-next"${ST.fc_q >= g.qs.length - 1 ? ' disabled' : ''}>다음 →</button>
+    </div>
+    <div class="fc-card-wrap">${cardHTML(q)}</div>`;
+}
+
+/* ─────────────────────────────────────────────────────
+   List — build once on init
+───────────────────────────────────────────────────── */
+function buildList() {
+  const html = GROUPS.map((g, gi) => {
+    const done  = g.qs.filter(q => isRevealed(q.id)).length;
+    const total = g.qs.length;
+    const pct   = total ? Math.round(done / total * 100) : 0;
+
+    const rows = g.qs.map((q, qi) => {
+      const rv = isRevealed(q.id);
+      return `
+        <div class="lq-item">
+          <div class="lq-row" data-action="lq-row" data-gi="${gi}" data-qi="${qi}">
+            <div class="lq-dot${rv ? ' done' : ''}" id="lq-dot-${esc(q.id)}">${rv ? '✓' : ''}</div>
+            <span class="lq-id">${esc(q.id)}</span>
+            <span class="lq-topic">${esc(q.topic)}</span>
+            <span class="lq-type">${esc(q.type)}</span>
+            <span class="lq-arr" id="lq-arr-${esc(q.id)}">▶</span>
+          </div>
+          <div class="lq-card" id="lq-card-${esc(q.id)}">
+            ${cardHTML(q)}
+          </div>
+        </div>`;
+    }).join('');
+
+    return `
+      <div class="list-group">
+        <div class="lg-head" data-action="lg-head" data-gi="${gi}">
+          <span class="lg-arrow" id="lg-arr-${gi}">▶</span>
+          <span class="lg-name" style="color:${g.cfg.color}">${esc(g.cfg.label)}</span>
+          <div class="lg-stats">
+            <span class="lg-cnt">${total}문제</span>
+            <span class="lg-pct" id="lg-pct-${gi}" style="background:${g.cfg.bg};color:${g.cfg.color}">${done}/${total} (${pct}%)</span>
+          </div>
+        </div>
+        <div class="lg-body" id="lg-body-${gi}">${rows}</div>
+      </div>`;
+  }).join('');
+
+  document.getElementById('list-view').innerHTML = html;
+}
+
+/* ─────────────────────────────────────────────────────
+   Patch list after a reveal (no full re-render)
+───────────────────────────────────────────────────── */
+function patchList(qid) {
+  const q = ALL_QS.find(x => x.id === qid);
+  if (!q) return;
+
+  // Patch card
+  const cardEl = document.getElementById('lq-card-' + qid);
+  if (cardEl) cardEl.innerHTML = cardHTML(q);
+
+  // Patch dot
+  const dot = document.getElementById('lq-dot-' + qid);
+  if (dot) { dot.classList.add('done'); dot.textContent = '✓'; }
+
+  // Patch group progress
+  const gi = gIdx(q.topic);
+  const g  = GROUPS[gi];
+  const done  = g.qs.filter(x => isRevealed(x.id)).length;
+  const total = g.qs.length;
+  const pctEl = document.getElementById('lg-pct-' + gi);
+  if (pctEl) pctEl.textContent = `${done}/${total} (${Math.round(done / total * 100)}%)`;
+}
+
+/* ─────────────────────────────────────────────────────
+   After state change
+───────────────────────────────────────────────────── */
+function afterReveal(qid) {
+  updatePB();
+  if (ST.mode === 'flashcard') {
+    buildFC();   // re-renders tab counters + current card
+  } else {
+    patchList(qid);
+  }
+}
+
+/* ─────────────────────────────────────────────────────
+   Mode toggle
+───────────────────────────────────────────────────── */
+function setMode(mode) {
+  ST.mode = mode;
+  save();
+  applyMode(mode);
+}
+
+function applyMode(mode) {
+  document.getElementById('fc-view').classList.toggle('hidden',   mode !== 'flashcard');
+  document.getElementById('list-view').classList.toggle('hidden', mode !== 'list');
+  document.getElementById('btn-fc').classList.toggle('active',   mode === 'flashcard');
+  document.getElementById('btn-list').classList.toggle('active', mode === 'list');
+}
+
+/* ─────────────────────────────────────────────────────
+   Event delegation
+───────────────────────────────────────────────────── */
+document.addEventListener('click', function(e) {
+
+  // MCQ choice
+  const choiceBtn = e.target.closest('.choice-btn:not([disabled])');
+  if (choiceBtn) {
+    const qid = choiceBtn.dataset.qid;
+    const idx = parseInt(choiceBtn.dataset.idx);
+    ST.chosen[qid] = idx;
+    markRevealed(qid);
+    save();
+    afterReveal(qid);
+    return;
+  }
+
+  // Reveal button (non-MCQ)
+  const revealBtn = e.target.closest('[data-action="reveal"]:not(.done)');
+  if (revealBtn) {
+    const qid = revealBtn.dataset.qid;
+    markRevealed(qid);
+    save();
+    afterReveal(qid);
+    return;
+  }
+
+  // Topic tab
+  const tab = e.target.closest('[data-action="tab"]');
+  if (tab) {
+    ST.fc_g = parseInt(tab.dataset.gi);
+    ST.fc_q = 0;
+    save();
+    buildFC();
+    return;
+  }
+
+  // Dot nav
+  const dot = e.target.closest('[data-action="dot"]');
+  if (dot) {
+    ST.fc_q = parseInt(dot.dataset.i);
+    save();
+    buildFC();
+    return;
+  }
+
+  // FC prev / next
+  if (e.target.closest('[data-action="fc-prev"]')) {
+    if (ST.fc_q > 0) { ST.fc_q--; save(); buildFC(); }
+    return;
+  }
+  if (e.target.closest('[data-action="fc-next"]')) {
+    const g = GROUPS[ST.fc_g];
+    if (g && ST.fc_q < g.qs.length - 1) { ST.fc_q++; save(); buildFC(); }
+    return;
+  }
+
+  // List group header toggle
+  const lgHead = e.target.closest('[data-action="lg-head"]');
+  if (lgHead) {
+    const gi   = lgHead.dataset.gi;
+    const body = document.getElementById('lg-body-' + gi);
+    const arr  = document.getElementById('lg-arr-'  + gi);
+    if (!body) return;
+    const nowOpen = body.classList.toggle('open');
+    if (arr) arr.classList.toggle('open', nowOpen);
+    return;
+  }
+
+  // List question row toggle
+  const lqRow = e.target.closest('[data-action="lq-row"]');
+  if (lqRow) {
+    const gi  = parseInt(lqRow.dataset.gi);
+    const qi  = parseInt(lqRow.dataset.qi);
+    const q   = GROUPS[gi]?.qs[qi];
+    if (!q) return;
+    const cardEl = document.getElementById('lq-card-' + q.id);
+    const arrEl  = document.getElementById('lq-arr-'  + q.id);
+    if (!cardEl) return;
+    const nowOpen = cardEl.classList.toggle('open');
+    if (arrEl) arrEl.classList.toggle('open', nowOpen);
+    return;
+  }
+
+  // Image lightbox
+  const imgEl = e.target.closest('.img-thumb');
+  if (imgEl) { lbOpen(imgEl.dataset.src); return; }
+});
+
+/* ─────────────────────────────────────────────────────
+   Lightbox
+───────────────────────────────────────────────────── */
+function lbOpen(src) {
+  document.getElementById('lb-img').src = src;
+  document.getElementById('lightbox').classList.add('open');
+}
+function lbClose(e) {
+  if (!e || e.target === document.getElementById('lightbox') || e.target.id === 'lb-close') {
+    document.getElementById('lightbox').classList.remove('open');
+    document.getElementById('lb-img').src = '';
+  }
+}
+
+/* ─────────────────────────────────────────────────────
+   Reset
+───────────────────────────────────────────────────── */
+function doReset() {
+  if (!confirm('모든 진행 상황을 초기화하시겠습니까?')) return;
+  ST.revealed = []; ST.chosen = {}; ST.fc_g = 0; ST.fc_q = 0;
+  save();
+  buildFC();
+  buildList();
+  updatePB();
+}
+
+/* ─────────────────────────────────────────────────────
+   Keyboard shortcuts
+───────────────────────────────────────────────────── */
+document.addEventListener('keydown', function(e) {
+  if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+  if (ST.mode === 'flashcard') {
+    if (e.key === 'ArrowLeft')  document.querySelector('[data-action="fc-prev"]:not([disabled])')?.click();
+    if (e.key === 'ArrowRight') document.querySelector('[data-action="fc-next"]:not([disabled])')?.click();
+  }
+  if (e.key === 'Escape') document.getElementById('lightbox').classList.remove('open');
+});
+
+init();
+</script>
+</body>
+</html>

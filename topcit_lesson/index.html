@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>TOPCIT 레슨</title>
+<style>
+:root{--font-sans:"Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",system-ui,sans-serif;--font-serif:"NanumMyeongjo","Nanum Myeongjo","Batang","Apple SD Gothic Neo",serif}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-sans);background:#f7f8fb;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:2.5rem 1.25rem;color:#1f2937}
+h1{font-size:1.6rem;font-weight:800;margin-bottom:.4rem;font-family:var(--font-serif);text-align:center}
+.sub{color:#6b7280;font-size:.88rem;margin-bottom:2rem;text-align:center}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:.85rem;width:100%;max-width:780px}
+@media(min-width:600px){.grid{grid-template-columns:repeat(3,1fr)}}
+.subj-card{background:#fff;border-radius:.85rem;padding:1.3rem 1rem;text-decoration:none;border:2px solid var(--main);transition:all .18s;display:flex;flex-direction:column;gap:.2rem;position:relative;overflow:hidden;color:inherit}
+.subj-card::before{content:'';position:absolute;top:0;left:0;right:0;height:5px;background:var(--main)}
+.subj-card:hover{transform:translateY(-3px);box-shadow:0 8px 24px rgba(0,0,0,.12)}
+.subj-card.pending{opacity:.45;cursor:not-allowed;border-color:#bbb;pointer-events:none}
+.subj-card.pending::before{background:#bbb}
+.subj-emoji{font-size:1.8rem;margin-bottom:.15rem}
+.subj-num{font-size:.7rem;font-weight:800;color:var(--sub);letter-spacing:.07em}
+.subj-title{font-size:.95rem;font-weight:800;line-height:1.35;font-family:var(--font-serif)}
+.subj-status{font-size:.7rem;color:#6b7280;margin-top:.3rem}
+.subj-card:not(.pending) .subj-status{color:var(--main);font-weight:700}
+.back{margin-bottom:1.5rem;font-size:.85rem;color:#6b7280;text-decoration:none}
+.back:hover{color:#111827}
+.footer{margin-top:3rem;font-size:.75rem;color:#9ca3af;text-align:center;line-height:1.6}
+</style>
+</head>
+<body>
+<a href="../" class="back">← 메인으로</a>
+<h1>📘 TOPCIT 레슨</h1>
+<p class="sub">6과목 개념 학습 — 카드 → 풀스크린 레슨</p>
+<div class="grid"><a href="./01/" class="subj-card " style="--main:#2563eb;--sub:#1d4ed8"><div class="subj-emoji">💻</div><div class="subj-num">01</div><div class="subj-title">소프트웨어 개발</div><div class="subj-status">104개 개념</div></a><a href="./02/" class="subj-card " style="--main:#0e9488;--sub:#115e59"><div class="subj-emoji">📊</div><div class="subj-num">02</div><div class="subj-title">데이터 이해와 활용</div><div class="subj-status">167개 개념</div></a><a href="./03/" class="subj-card " style="--main:#7c3aed;--sub:#5b21b6"><div class="subj-emoji">🏗️</div><div class="subj-num">03</div><div class="subj-title">시스템 아키텍처</div><div class="subj-status">152개 개념</div></a><a href="./04/" class="subj-card " style="--main:#dc2626;--sub:#991b1b"><div class="subj-emoji">🔒</div><div class="subj-num">04</div><div class="subj-title">정보보안</div><div class="subj-status">70개 개념</div></a><a href="./05/" class="subj-card " style="--main:#b45309;--sub:#78350f"><div class="subj-emoji">💼</div><div class="subj-num">05</div><div class="subj-title">IT 비즈니스와 윤리</div><div class="subj-status">87개 개념</div></a><a href="./06/" class="subj-card " style="--main:#475569;--sub:#1e293b"><div class="subj-emoji">📝</div><div class="subj-num">06</div><div class="subj-title">테크니컬 커뮤니케이션·PM</div><div class="subj-status">100개 개념</div></a></div>
+<div class="footer">총 680개 개념</div>
+</body>
+</html>

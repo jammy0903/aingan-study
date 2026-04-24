@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>한국사능력검정시험 심화 1급</title>
+<style>
+:root{--font-sans:"Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",system-ui,sans-serif;--font-serif:"NanumMyeongjo","Nanum Myeongjo","Batang","Apple SD Gothic Neo",serif}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-sans);background:#faf6f0;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:2.5rem 1.25rem;color:#2c2416}
+h1{font-size:1.6rem;font-weight:800;margin-bottom:.4rem;font-family:var(--font-serif);text-align:center}
+.sub{color:#888;font-size:.88rem;margin-bottom:2rem;text-align:center}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:.85rem;width:100%;max-width:780px}
+@media(min-width:600px){.grid{grid-template-columns:repeat(3,1fr)}}
+@media(min-width:900px){.grid{grid-template-columns:repeat(4,1fr)}}
+.era-card{background:#fff;border-radius:.85rem;padding:1.3rem 1rem;text-decoration:none;border:2px solid var(--main);transition:all .18s;display:flex;flex-direction:column;gap:.2rem;position:relative;overflow:hidden;color:inherit}
+.era-card::before{content:'';position:absolute;top:0;left:0;right:0;height:5px;background:var(--main)}
+.era-card:hover{transform:translateY(-3px);box-shadow:0 8px 24px rgba(0,0,0,.12)}
+.era-card.pending{opacity:.45;cursor:not-allowed;border-color:#bbb;pointer-events:none}
+.era-card.pending::before{background:#bbb}
+.era-emoji{font-size:1.8rem;margin-bottom:.15rem}
+.era-num{font-size:.7rem;font-weight:800;color:var(--sub);letter-spacing:.07em}
+.era-title{font-size:.95rem;font-weight:800;line-height:1.35;font-family:var(--font-serif)}
+.era-status{font-size:.7rem;color:#888;margin-top:.3rem}
+.era-card:not(.pending) .era-status{color:var(--main);font-weight:700}
+.footer{margin-top:3rem;font-size:.75rem;color:#aaa;text-align:center;line-height:1.6}
+.nav-pill{position:fixed;top:1rem;right:1rem;background:#2563eb;color:#fff;font-size:.8rem;font-weight:700;padding:.45rem .9rem;border-radius:2rem;text-decoration:none;box-shadow:0 2px 8px rgba(37,99,235,.3);transition:all .18s;z-index:100}
+.nav-pill:hover{background:#1d4ed8;transform:translateY(-1px);box-shadow:0 4px 12px rgba(37,99,235,.4)}
+</style>
+</head>
+<body>
+<a href="../" class="nav-pill">💻 TOPCIT →</a>
+<h1>📖 한국사능력검정시험</h1>
+<p class="sub">심화 1급 — 시대별 레슨</p>
+<div class="grid"><a href="/hankuksa/01/" class="era-card " style="--main:#8b6f47;--sub:#5d4a30"><div class="era-emoji">🪨</div><div class="era-num">01</div><div class="era-title">선사·고조선</div><div class="era-status">16개 개념</div></a><a href="/hankuksa/02/" class="era-card " style="--main:#c9a14d;--sub:#7a5e2a"><div class="era-emoji">👑</div><div class="era-num">02</div><div class="era-title">고대 (삼국·남북국)</div><div class="era-status">19개 개념</div></a><a href="/hankuksa/03/" class="era-card " style="--main:#4a7d6d;--sub:#2e5a4a"><div class="era-emoji">🏺</div><div class="era-num">03</div><div class="era-title">고려</div><div class="era-status">22개 개념</div></a><a href="/hankuksa/04/" class="era-card " style="--main:#a23244;--sub:#6e1f2c"><div class="era-emoji">🏯</div><div class="era-num">04</div><div class="era-title">조선</div><div class="era-status">21개 개념</div></a><a href="/hankuksa/05/" class="era-card " style="--main:#6b4226;--sub:#3e2616"><div class="era-emoji">⚓</div><div class="era-num">05</div><div class="era-title">근대</div><div class="era-status">30개 개념</div></a><a href="/hankuksa/06/" class="era-card " style="--main:#3e3e3e;--sub:#1a1a1a"><div class="era-emoji">🕯️</div><div class="era-num">06</div><div class="era-title">일제강점기</div><div class="era-status">24개 개념</div></a><a href="/hankuksa/07/" class="era-card " style="--main:#2c5fa8;--sub:#1a3d6e"><div class="era-emoji">🇰🇷</div><div class="era-num">07</div><div class="era-title">현대</div><div class="era-status">21개 개념</div></a></div>
+<div class="footer">총 153개 개념</div>
+</body>
+</html>
