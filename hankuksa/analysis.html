@@ -85,6 +85,14 @@ section p, section li{font-size:.92rem}
 .caveat ul{margin-top:.4rem;padding-left:1.2rem}
 .caveat li{margin-bottom:.4rem;font-size:.88rem;color:#555}
 
+
+/* 분석 리포트 뱃지 → 레슨 페이지 딥링크 */
+a.hit{text-decoration:none;cursor:pointer}
+a.hit:visited{color:var(--ink)}
+a.hit:hover{background:#f8f0e0;border-color:#d4a76a;transform:translateY(-1px);transition:all .12s}
+.top-table .label a{color:var(--ink);text-decoration:none;border-bottom:1px dashed #c9a14d}
+.top-table .label a:hover{color:var(--c-red);border-bottom-color:var(--c-red)}
+
 /* Nav pill */
 .nav-pill{position:fixed;top:1rem;right:1rem;background:var(--main);color:#fff;font-size:.78rem;font-weight:700;padding:.45rem .9rem;border-radius:2rem;text-decoration:none;box-shadow:0 2px 8px rgba(139,111,71,.3);transition:all .18s;z-index:100}
 .nav-pill:hover{background:var(--sub);transform:translateY(-1px)}
@@ -159,14 +167,14 @@ section p, section li{font-size:.92rem}
 <table class="top-table">
   <thead><tr><th class="n">빈도</th><th>항목</th><th>단원·개념</th></tr></thead>
   <tbody>
-    <tr><td class="n">17</td><td class="label">정우회 선언</td><td><span class="chap chap-일제">일제</span> <span class="concept">민족 유일당 운동과 신간회</span></td></tr>
-    <tr><td class="n">14</td><td class="label">계백</td><td><span class="chap chap-고대">고대</span> <span class="concept">삼국 통일 과정</span></td></tr>
-    <tr><td class="n">12</td><td class="label">중추원 개편 요구</td><td><span class="chap chap-근대">근대</span> <span class="concept">독립협회와 만민공동회</span></td></tr>
-    <tr><td class="n">11</td><td class="label">가락바퀴</td><td><span class="chap chap-선사">선사</span> <span class="concept">신석기 농경과 정착 생활</span></td></tr>
-    <tr><td class="n">11</td><td class="label">진흥왕</td><td><span class="chap chap-고대">고대</span> <span class="concept">진흥왕의 영토 확장</span></td></tr>
-    <tr><td class="n">11</td><td class="label">화랑도</td><td><span class="chap chap-고대">고대</span> <span class="concept">골품제·화백회의·화랑도</span></td></tr>
-    <tr><td class="n">11</td><td class="label">과거(科擧)</td><td><span class="chap chap-고려">고려</span> <span class="concept">광종의 왕권 강화</span></td></tr>
-    <tr><td class="n">11</td><td class="label">대한매일신보</td><td><span class="chap chap-근대">근대</span> <span class="concept">국채보상운동(1907)</span></td></tr>
+    <tr><td class="n">17</td><td class="label"><a href="./06/?q=정우회 선언">정우회 선언</a></td><td><span class="chap chap-일제">일제</span> <span class="concept">민족 유일당 운동과 신간회</span></td></tr>
+    <tr><td class="n">14</td><td class="label"><a href="./02/?q=계백">계백</a></td><td><span class="chap chap-고대">고대</span> <span class="concept">삼국 통일 과정</span></td></tr>
+    <tr><td class="n">12</td><td class="label"><a href="./05/?q=중추원 개편 요구">중추원 개편 요구</a></td><td><span class="chap chap-근대">근대</span> <span class="concept">독립협회와 만민공동회</span></td></tr>
+    <tr><td class="n">11</td><td class="label"><a href="./01/?q=가락바퀴">가락바퀴</a></td><td><span class="chap chap-선사">선사</span> <span class="concept">신석기 농경과 정착 생활</span></td></tr>
+    <tr><td class="n">11</td><td class="label"><a href="./02/?q=진흥왕">진흥왕</a></td><td><span class="chap chap-고대">고대</span> <span class="concept">진흥왕의 영토 확장</span></td></tr>
+    <tr><td class="n">11</td><td class="label"><a href="./02/?q=화랑도">화랑도</a></td><td><span class="chap chap-고대">고대</span> <span class="concept">골품제·화백회의·화랑도</span></td></tr>
+    <tr><td class="n">11</td><td class="label"><a href="./03/?q=과거">과거(科擧)</a></td><td><span class="chap chap-고려">고려</span> <span class="concept">광종의 왕권 강화</span></td></tr>
+    <tr><td class="n">11</td><td class="label"><a href="./05/?q=대한매일신보">대한매일신보</a></td><td><span class="chap chap-근대">근대</span> <span class="concept">국채보상운동(1907)</span></td></tr>
   </tbody>
 </table>
 </section>
@@ -175,24 +183,24 @@ section p, section li{font-size:.92rem}
 <section>
 <h2><span class="emoji">⭐</span> 2순위 — 중빈출 샘플 (6-10회, 전 137개 중)</h2>
 <div style="margin-top:.3rem">
-  <span class="hit"><span class="n">10</span> <span class="l">고인돌</span> <span class="c">선사</span></span>
-  <span class="hit"><span class="n">10</span> <span class="l">을지문덕</span> <span class="c">고대</span></span>
-  <span class="hit"><span class="n">10</span> <span class="l">흑창</span> <span class="c">고려</span></span>
-  <span class="hit"><span class="n">10</span> <span class="l">과거제</span> <span class="c">고려</span></span>
-  <span class="hit"><span class="n">10</span> <span class="l">묘청</span> <span class="c">고려</span></span>
-  <span class="hit"><span class="n">10</span> <span class="l">삼별초</span> <span class="c">고려</span></span>
-  <span class="hit"><span class="n">10</span> <span class="l">개경</span> <span class="c">고려</span></span>
-  <span class="hit"><span class="n">10</span> <span class="l">노비</span> <span class="c">고려</span></span>
-  <span class="hit"><span class="n">10</span> <span class="l">장용영</span> <span class="c">조선</span></span>
-  <span class="hit"><span class="n">10</span> <span class="l">태형</span> <span class="c">일제</span></span>
-  <span class="hit"><span class="n">10</span> <span class="l">국가총동원법</span> <span class="c">일제</span></span>
-  <span class="hit"><span class="n">9</span> <span class="l">서희</span> <span class="c">고려</span></span>
-  <span class="hit"><span class="n">9</span> <span class="l">신돈</span> <span class="c">고려</span></span>
-  <span class="hit"><span class="n">9</span> <span class="l">서인</span> <span class="c">조선</span></span>
-  <span class="hit"><span class="n">8</span> <span class="l">의병</span> <span class="c">조선</span></span>
-  <span class="hit"><span class="n">8</span> <span class="l">인조</span> <span class="c">조선</span></span>
-  <span class="hit"><span class="n">8</span> <span class="l">규장각</span> <span class="c">조선</span></span>
-  <span class="hit"><span class="n">8</span> <span class="l">공인</span> <span class="c">조선</span></span>
+  <a class="hit" href="./01/?q=고인돌"><span class="n">10</span> <span class="l">고인돌</span> <span class="c">선사</span></a>
+  <a class="hit" href="./02/?q=을지문덕"><span class="n">10</span> <span class="l">을지문덕</span> <span class="c">고대</span></a>
+  <a class="hit" href="./03/?q=흑창"><span class="n">10</span> <span class="l">흑창</span> <span class="c">고려</span></a>
+  <a class="hit" href="./03/?q=과거제"><span class="n">10</span> <span class="l">과거제</span> <span class="c">고려</span></a>
+  <a class="hit" href="./03/?q=묘청"><span class="n">10</span> <span class="l">묘청</span> <span class="c">고려</span></a>
+  <a class="hit" href="./03/?q=삼별초"><span class="n">10</span> <span class="l">삼별초</span> <span class="c">고려</span></a>
+  <a class="hit" href="./03/?q=개경"><span class="n">10</span> <span class="l">개경</span> <span class="c">고려</span></a>
+  <a class="hit" href="./03/?q=노비"><span class="n">10</span> <span class="l">노비</span> <span class="c">고려</span></a>
+  <a class="hit" href="./04/?q=장용영"><span class="n">10</span> <span class="l">장용영</span> <span class="c">조선</span></a>
+  <a class="hit" href="./06/?q=태형"><span class="n">10</span> <span class="l">태형</span> <span class="c">일제</span></a>
+  <a class="hit" href="./06/?q=국가총동원법"><span class="n">10</span> <span class="l">국가총동원법</span> <span class="c">일제</span></a>
+  <a class="hit" href="./03/?q=서희"><span class="n">9</span> <span class="l">서희</span> <span class="c">고려</span></a>
+  <a class="hit" href="./03/?q=신돈"><span class="n">9</span> <span class="l">신돈</span> <span class="c">고려</span></a>
+  <a class="hit" href="./04/?q=서인"><span class="n">9</span> <span class="l">서인</span> <span class="c">조선</span></a>
+  <a class="hit" href="./04/?q=의병"><span class="n">8</span> <span class="l">의병</span> <span class="c">조선</span></a>
+  <a class="hit" href="./04/?q=인조"><span class="n">8</span> <span class="l">인조</span> <span class="c">조선</span></a>
+  <a class="hit" href="./04/?q=규장각"><span class="n">8</span> <span class="l">규장각</span> <span class="c">조선</span></a>
+  <a class="hit" href="./04/?q=공인"><span class="n">8</span> <span class="l">공인</span> <span class="c">조선</span></a>
 </div>
 </section>
 
@@ -203,19 +211,19 @@ section p, section li{font-size:.92rem}
   최근 시험(77회=2025 최신)에 나왔으면서 이전에도 3회 이상 반복된 항목들. 다음 회 출제 확률 가장 높음.
 </p>
 <div>
-  <span class="hit"><span class="n">77</span> <span class="l">계백</span> <span class="c">14회</span></span>
-  <span class="hit"><span class="n">77</span> <span class="l">가락바퀴</span> <span class="c">11회</span></span>
-  <span class="hit"><span class="n">77</span> <span class="l">고인돌</span> <span class="c">10회</span></span>
-  <span class="hit"><span class="n">77</span> <span class="l">을지문덕</span> <span class="c">10회</span></span>
-  <span class="hit"><span class="n">77</span> <span class="l">삼별초</span> <span class="c">10회</span></span>
-  <span class="hit"><span class="n">77</span> <span class="l">국가총동원법</span> <span class="c">10회</span></span>
-  <span class="hit"><span class="n">77</span> <span class="l">국내 진공 준비</span> <span class="c">10회</span></span>
-  <span class="hit"><span class="n">77</span> <span class="l">정우회 선언</span> <span class="c">17회</span></span>
-  <span class="hit"><span class="n">76</span> <span class="l">진흥왕</span> <span class="c">11회</span></span>
-  <span class="hit"><span class="n">76</span> <span class="l">과거(科擧)</span> <span class="c">11회</span></span>
-  <span class="hit"><span class="n">76</span> <span class="l">대한매일신보</span> <span class="c">11회</span></span>
-  <span class="hit"><span class="n">76</span> <span class="l">화랑도</span> <span class="c">11회</span></span>
-  <span class="hit"><span class="n">76</span> <span class="l">중추원 개편 요구</span> <span class="c">12회</span></span>
+  <a class="hit" href="./02/?q=계백"><span class="n">77</span> <span class="l">계백</span> <span class="c">14회</span></a>
+  <a class="hit" href="./01/?q=가락바퀴"><span class="n">77</span> <span class="l">가락바퀴</span> <span class="c">11회</span></a>
+  <a class="hit" href="./01/?q=고인돌"><span class="n">77</span> <span class="l">고인돌</span> <span class="c">10회</span></a>
+  <a class="hit" href="./02/?q=을지문덕"><span class="n">77</span> <span class="l">을지문덕</span> <span class="c">10회</span></a>
+  <a class="hit" href="./03/?q=삼별초"><span class="n">77</span> <span class="l">삼별초</span> <span class="c">10회</span></a>
+  <a class="hit" href="./06/?q=국가총동원법"><span class="n">77</span> <span class="l">국가총동원법</span> <span class="c">10회</span></a>
+  <a class="hit" href="./06/?q=국내 진공 준비"><span class="n">77</span> <span class="l">국내 진공 준비</span> <span class="c">10회</span></a>
+  <a class="hit" href="./06/?q=정우회 선언"><span class="n">77</span> <span class="l">정우회 선언</span> <span class="c">17회</span></a>
+  <a class="hit" href="./02/?q=진흥왕"><span class="n">76</span> <span class="l">진흥왕</span> <span class="c">11회</span></a>
+  <a class="hit" href="./03/?q=과거"><span class="n">76</span> <span class="l">과거(科擧)</span> <span class="c">11회</span></a>
+  <a class="hit" href="./05/?q=대한매일신보"><span class="n">76</span> <span class="l">대한매일신보</span> <span class="c">11회</span></a>
+  <a class="hit" href="./02/?q=화랑도"><span class="n">76</span> <span class="l">화랑도</span> <span class="c">11회</span></a>
+  <a class="hit" href="./05/?q=중추원 개편 요구"><span class="n">76</span> <span class="l">중추원 개편 요구</span> <span class="c">12회</span></a>
 </div>
 </section>
 
@@ -226,16 +234,16 @@ section p, section li{font-size:.92rem}
   본문/정답 아니라 <b>반복 선지</b>로 등장. 알면 혼동 방지에 결정적.
 </p>
 <div>
-  <span class="hit"><span class="n">10</span> <span class="l">2·8 독립선언</span> <span class="c">일제 · 3·1운동 배경</span></span>
-  <span class="hit"><span class="n">8</span> <span class="l">간도 참변(1920)</span> <span class="c">일제</span></span>
-  <span class="hit"><span class="n">7</span> <span class="l">쌍성보 전투</span> <span class="c">일제</span></span>
-  <span class="hit"><span class="n">6</span> <span class="l">관민공동회</span> <span class="c">근대</span></span>
-  <span class="hit"><span class="n">6</span> <span class="l">영국</span> <span class="c">근대 · 거문도 사건</span></span>
-  <span class="hit"><span class="n">5</span> <span class="l">척화비</span> <span class="c">근대</span></span>
-  <span class="hit"><span class="n">5</span> <span class="l">김기수·영선사·메가타</span> <span class="c">근대 · 사절단</span></span>
-  <span class="hit"><span class="n">5</span> <span class="l">배재학당</span> <span class="c">근대</span></span>
-  <span class="hit"><span class="n">5</span> <span class="l">소론</span> <span class="c">조선</span></span>
-  <span class="hit"><span class="n">5</span> <span class="l">신해통공</span> <span class="c">조선</span></span>
+  <a class="hit" href="./06/?q=2"><span class="n">10</span> <span class="l">2·8 독립선언</span> <span class="c">일제 · 3·1운동 배경</span></a>
+  <a class="hit" href="./06/?q=간도 참변"><span class="n">8</span> <span class="l">간도 참변(1920)</span> <span class="c">일제</span></a>
+  <a class="hit" href="./06/?q=쌍성보 전투"><span class="n">7</span> <span class="l">쌍성보 전투</span> <span class="c">일제</span></a>
+  <a class="hit" href="./05/?q=관민공동회"><span class="n">6</span> <span class="l">관민공동회</span> <span class="c">근대</span></a>
+  <a class="hit" href="./05/?q=영국"><span class="n">6</span> <span class="l">영국</span> <span class="c">근대 · 거문도 사건</span></a>
+  <a class="hit" href="./05/?q=척화비"><span class="n">5</span> <span class="l">척화비</span> <span class="c">근대</span></a>
+  <a class="hit" href="./05/?q=김기수"><span class="n">5</span> <span class="l">김기수·영선사·메가타</span> <span class="c">근대 · 사절단</span></a>
+  <a class="hit" href="./05/?q=배재학당"><span class="n">5</span> <span class="l">배재학당</span> <span class="c">근대</span></a>
+  <a class="hit" href="./04/?q=소론"><span class="n">5</span> <span class="l">소론</span> <span class="c">조선</span></a>
+  <a class="hit" href="./04/?q=신해통공"><span class="n">5</span> <span class="l">신해통공</span> <span class="c">조선</span></a>
 </div>
 </section>
 
