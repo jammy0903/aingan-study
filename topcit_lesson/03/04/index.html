@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>TOPCIT 03-04 시스템 아키텍처 & 고가용성</title>
+<style>
+:root{--font-sans:"Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",system-ui,sans-serif;--font-serif:"NanumMyeongjo","Nanum Myeongjo","Batang","Apple SD Gothic Neo",serif}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{overflow-x:hidden}
+body{font-family:var(--font-sans);background:#f7f8fb;color:#1f2937;min-height:100vh}
+
+.header{background:#7c3aed;color:#fff;padding:.85rem 1.25rem;display:flex;align-items:center;gap:.75rem;position:sticky;top:0;z-index:20;box-shadow:0 2px 10px rgba(0,0,0,.15)}
+.header-back{color:#fff;text-decoration:none;font-size:1.2rem;opacity:.85}
+.header h1{font-size:1rem;font-weight:800;flex:1;font-family:var(--font-serif)}
+.header-cnt{font-size:.75rem;opacity:.8;white-space:nowrap}
+
+.search-wrap{padding:.7rem 1.25rem .3rem}
+.search{width:100%;padding:.6rem 1rem;border:2px solid #e2e8f0;border-radius:2rem;font-size:.88rem;outline:none;background:#fff;transition:border .2s}
+.search:focus{border-color:#7c3aed}
+
+.tabs{display:flex;gap:.35rem;padding:.4rem 1.25rem .3rem;overflow-x:auto;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tab{flex-shrink:0;padding:.32rem .8rem;border-radius:2rem;border:1.5px solid #7c3aed;background:#fff;color:#7c3aed;font-size:.74rem;font-weight:700;cursor:pointer;white-space:nowrap;transition:all .15s;font-family:inherit}
+.tab.active,.tab:hover{background:#7c3aed;color:#fff}
+
+.prio-bar{display:flex;gap:.3rem;padding:.2rem 1.25rem .6rem;overflow-x:auto;scrollbar-width:none}
+.prio-bar::-webkit-scrollbar{display:none}
+.pchip{flex-shrink:0;padding:.28rem .7rem;border-radius:2rem;border:1.5px solid #e5e7eb;background:#fff;color:#475569;font-size:.72rem;font-weight:700;cursor:pointer;white-space:nowrap;transition:all .15s;font-family:inherit}
+.pchip:hover{border-color:var(--pc,#9ca3af);color:#111827}
+.pchip.active{background:var(--pc,#7c3aed);border-color:var(--pc,#7c3aed);color:#fff}
+.pchip[data-prio="all"].active{background:#7c3aed;border-color:#7c3aed;color:#fff}
+
+.section-group{padding:.3rem 1.25rem .8rem}
+.section-group.hidden{display:none}
+.section-label{font-size:.72rem;font-weight:800;color:#5b21b6;letter-spacing:.04em;padding:.4rem 0 .35rem;border-bottom:2px solid #7c3aed33;margin-bottom:.55rem;font-family:var(--font-serif)}
+.card-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:.55rem}
+@media(min-width:540px){.card-grid{grid-template-columns:repeat(3,1fr)}}
+@media(min-width:900px){.card-grid{grid-template-columns:repeat(4,1fr)}}
+@media(min-width:1200px){.card-grid{grid-template-columns:repeat(5,1fr)}}
+.card{background:#fff;border-radius:.7rem;padding:.85rem .8rem .65rem;cursor:pointer;border:1.5px solid #e5e7eb;transition:all .18s;box-shadow:0 1px 3px rgba(0,0,0,.04);position:relative;display:flex;flex-direction:column;gap:.35rem;min-height:9rem}
+.card:hover{border-color:#7c3aed;box-shadow:0 4px 14px #7c3aed33;transform:translateY(-2px)}
+.card-badges{position:absolute;top:.45rem;right:.5rem;display:flex;gap:.2rem;font-size:.64rem}
+.card-badges span{padding:.1rem .42rem;border-radius:.4rem;font-weight:700;line-height:1.4;white-space:nowrap}
+.b-prio-1{background:#fee2e2;color:#991b1b}
+.b-prio-2{background:#fef3c7;color:#92400e}
+.b-prio-3{background:#dcfce7;color:#166534}
+.b-prio-4{background:#f1f5f9;color:#475569}
+.b-mn{background:#ede9fe;color:#5b21b6}
+.card-title{font-size:.86rem;font-weight:700;color:#111827;line-height:1.35;padding-right:4.5rem;font-family:var(--font-serif)}
+.card-preview{font-size:.7rem;color:#6b7280;line-height:1.5;flex:1}
+.card-cta{font-size:.68rem;color:#7c3aed;font-weight:700;text-align:right;margin-top:.25rem}
+.card.hidden-card{display:none!important}
+
+/* ───────── 레슨 모드 (풀스크린) ───────── */
+.lesson{display:none;position:fixed;inset:0;background:#f7f8fb;z-index:1000;flex-direction:column}
+.lesson.show{display:flex}
+.l-head{background:#7c3aed;color:#fff;padding:.7rem 1rem;display:flex;align-items:center;gap:.7rem;flex-shrink:0}
+.l-back{background:none;border:none;color:#fff;font-size:1.3rem;cursor:pointer;padding:0;line-height:1;opacity:.9}
+.l-title{flex:1;font-size:.92rem;font-weight:800;font-family:var(--font-serif);line-height:1.3;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.l-page-ind{font-size:.78rem;font-weight:700;background:rgba(0,0,0,.18);padding:.18rem .55rem;border-radius:1rem;flex-shrink:0}
+.l-progress{height:4px;background:rgba(0,0,0,.15);flex-shrink:0}
+.l-progress-bar{height:100%;background:#fff;width:0%;transition:width .3s ease}
+.l-body{flex:1;overflow-y:auto;padding:1.2rem 1.25rem 5rem;display:flex;flex-direction:column;gap:1rem;align-items:center}
+.l-page{width:100%;max-width:680px;animation:slideIn .25s ease}
+@keyframes slideIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+.l-page-title{font-size:1.5rem;font-weight:800;color:#5b21b6;margin-bottom:.5rem;font-family:var(--font-serif);line-height:1.3}
+.l-page-meta{display:flex;flex-wrap:wrap;gap:.35rem;margin-bottom:.85rem}
+.l-page-meta .chip{padding:.18rem .55rem;border-radius:1rem;font-size:.7rem;font-weight:700}
+.chip-prio-1{background:#fee2e2;color:#991b1b}
+.chip-prio-2{background:#fef3c7;color:#92400e}
+.chip-prio-3{background:#dcfce7;color:#166534}
+.chip-prio-4{background:#f1f5f9;color:#475569}
+.l-page-kw{display:flex;flex-wrap:wrap;gap:.3rem;margin-bottom:1.2rem}
+.l-page-kw span{background:#7c3aed22;color:#5b21b6;border:1px solid #7c3aed55;border-radius:1rem;padding:.18rem .65rem;font-size:.72rem;font-weight:700}
+
+.sec{border-radius:.7rem;padding:1rem 1.1rem;line-height:1.65;margin-bottom:.85rem}
+.sec-summary{background:#7c3aed11;border-left:5px solid #7c3aed;font-size:.95rem;color:#111827;font-weight:600}
+.sec-bg{background:#fef7ec;border-left:5px solid #d97706}
+.sec-expl{background:#eef2ff;border-left:5px solid #4f46e5}
+.sec-why{background:#ecfdf5;border-left:5px solid #059669}
+.sec-term{background:#faf5ff;border-left:5px solid #7c3aed}
+.sec-link{background:#fff7ed;border-left:5px solid #c2410c}
+.sec-mn{background:linear-gradient(145deg,#fffef5 0%,#fff7d6 56%,#7c3aed20 100%);color:#1f2937;font-weight:600;border:1.5px solid #7c3aed33;border-left:5px solid #7c3aed;box-shadow:0 10px 26px #7c3aed14}
+.sec-trap{background:#fff1f2;border:1.5px solid #fda4af;border-left:5px solid #e11d48;color:#881337}
+.sec-src{background:#fff;border:1.5px solid #e5e7eb;border-left:5px solid #475569}
+.sec-types{background:#f0f9ff;border:1.5px solid #bae6fd;border-left:5px solid #0284c7}
+.sec-types .sec-label{color:#075985}
+.types-caption{font-size:.8rem;color:#334155;margin-bottom:.6rem;line-height:1.55}
+.types-list{display:flex;flex-direction:column;gap:.55rem;counter-reset:tc}
+.type-item{display:grid;grid-template-columns:2rem 1fr;gap:.55rem;align-items:start;background:#fff;border:1px solid #e0f2fe;border-radius:.7rem;padding:.7rem .78rem;counter-increment:tc;position:relative}
+.type-item::before{content:counter(tc);display:inline-flex;align-items:center;justify-content:center;width:1.7rem;height:1.7rem;border-radius:.5rem;background:#7c3aed16;color:#5b21b6;font-size:.8rem;font-weight:800;line-height:1}
+.type-body{min-width:0}
+.type-head{display:flex;flex-wrap:wrap;gap:.35rem;align-items:center;margin-bottom:.2rem}
+.type-name{font-size:.92rem;font-weight:800;color:#0f172a;font-family:var(--font-serif)}
+.type-en{font-size:.72rem;color:#64748b;font-weight:700}
+.type-tier{display:inline-flex;align-items:center;padding:.08rem .42rem;border-radius:999px;font-size:.62rem;font-weight:800;letter-spacing:.04em}
+.tier-strong{background:#fee2e2;color:#991b1b}
+.tier-mid{background:#fef3c7;color:#92400e}
+.tier-weak{background:#dcfce7;color:#166534}
+.type-note{font-size:.86rem;line-height:1.68;color:#334155;word-break:keep-all}
+.types-scale{display:flex;align-items:center;gap:.45rem;margin-top:.65rem;padding:.5rem .7rem;background:rgba(255,255,255,.7);border:1px dashed #bae6fd;border-radius:.6rem;font-size:.72rem;color:#475569;font-weight:700}
+.types-scale .scale-arrow{flex:1;height:6px;border-radius:999px;background:linear-gradient(90deg,#16a34a,#d97706,#dc2626)}
+.types-scale.reverse .scale-arrow{background:linear-gradient(90deg,#dc2626,#d97706,#16a34a)}
+.sec-label{font-size:.7rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;margin-bottom:.5rem}
+.sec-bg .sec-label{color:#92400e}
+.sec-expl .sec-label{color:#3730a3}
+.sec-why .sec-label{color:#065f46}
+.sec-term .sec-label{color:#5b21b6}
+.sec-link .sec-label{color:#9a3412}
+.sec-mn .sec-label{color:#5b21b6}
+.sec-trap .sec-label{color:#9f1239}
+.sec-summary .sec-label{color:#7c3aed}
+.sec-src .sec-label{color:#334155}
+.sec p{font-size:.92rem;line-height:1.7}
+.sec-mn p{font-size:.98rem}
+.fact-list{display:flex;flex-direction:column;gap:.65rem}
+.fact-item{background:rgba(255,255,255,.85);border:1px solid rgba(0,0,0,.06);border-radius:.85rem;padding:.78rem .85rem}
+.fact-term{font-size:.86rem;font-weight:800;color:#111827;margin-bottom:.22rem}
+.fact-note{font-size:.9rem;line-height:1.72;color:#374151;word-break:keep-all}
+.fact-link-label{display:inline-flex;align-items:center;padding:.12rem .45rem;border-radius:999px;background:#7c3aed14;color:#5b21b6;font-size:.64rem;font-weight:800;letter-spacing:.04em;margin-bottom:.38rem}
+.src-list{display:flex;flex-direction:column;gap:.5rem}
+.src-link{display:flex;align-items:flex-start;gap:.45rem;text-decoration:none;color:#111827;background:#f9fafb;border:1px solid #e5e7eb;border-radius:.8rem;padding:.72rem .82rem;transition:border-color .15s,transform .15s}
+.src-link:hover{border-color:#7c3aed;transform:translateY(-1px)}
+.src-bullet{flex-shrink:0;color:#7c3aed;font-weight:800}
+.src-text{font-size:.85rem;line-height:1.55}
+.src-host{display:block;font-size:.72rem;color:#6b7280;margin-top:.1rem}
+.mn-list{display:flex;flex-direction:column;gap:.55rem}
+.mn-line{display:flex;align-items:flex-start;gap:.72rem;background:rgba(255,255,255,.82);border:1px solid #7c3aed22;border-radius:.9rem;padding:.72rem .8rem .68rem;box-shadow:0 4px 12px rgba(0,0,0,.04)}
+.mn-picto{flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;width:1.6rem;height:1.6rem;border-radius:.45rem;background:#7c3aed16;border:1px solid #7c3aed26;font-size:.76rem;font-weight:800;line-height:1;color:#5b21b6}
+.mn-main{display:flex;flex-direction:column;gap:.28rem;min-width:0}
+.mn-tag{display:inline-flex;align-items:center;width:fit-content;padding:.12rem .45rem;border-radius:999px;background:#7c3aed18;color:#5b21b6;font-size:.64rem;font-weight:800;letter-spacing:.05em}
+.mn-text{font-size:.95rem;line-height:1.76;color:#1f2937;word-break:keep-all}
+.mn-text strong{color:#7c3aed;font-weight:800}
+
+.ctable{width:100%;border-collapse:collapse;font-size:.82rem;background:#fff;border-radius:.5rem;overflow:hidden;margin-top:.4rem}
+.ctable th{background:#7c3aed;color:#fff;padding:.55rem .65rem;text-align:left;font-weight:700;font-size:.78rem}
+.ctable td{padding:.55rem .65rem;border-top:1px solid #e5e7eb;vertical-align:top;line-height:1.55}
+.ctable tr:nth-child(even) td{background:#f9fafb}
+
+.done-page{text-align:center;padding:2.5rem 1rem}
+.done-emoji{font-size:4.5rem;margin-bottom:1rem;animation:pop .4s ease}
+@keyframes pop{from{transform:scale(0)}80%{transform:scale(1.2)}to{transform:scale(1)}}
+.done-title{font-size:1.5rem;font-weight:800;color:#5b21b6;margin-bottom:.5rem;font-family:var(--font-serif)}
+.done-sub{font-size:.95rem;color:#6b7280;margin-bottom:2rem}
+.done-actions{display:flex;flex-direction:column;gap:.6rem;max-width:300px;margin:0 auto}
+.done-btn{padding:.85rem 1.4rem;border-radius:.7rem;font-size:.95rem;font-weight:700;cursor:pointer;border:none;font-family:inherit;transition:all .15s}
+.done-btn-primary{background:#7c3aed;color:#fff}
+.done-btn-primary:hover{transform:translateY(-2px);box-shadow:0 4px 14px #7c3aed55}
+.done-btn-sub{background:#fff;color:#7c3aed;border:1.5px solid #7c3aed}
+.done-btn-sub:hover{background:#7c3aed11}
+
+.l-foot{position:fixed;bottom:0;left:0;right:0;background:#fff;padding:.7rem 1rem;display:flex;gap:.5rem;border-top:1px solid #e5e7eb;z-index:1010}
+.l-nav-btn{flex:1;padding:.7rem;border-radius:.55rem;border:1.5px solid #7c3aed;background:#fff;color:#7c3aed;font-size:.88rem;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s}
+.l-nav-btn:hover:not(:disabled){background:#7c3aed11}
+.l-nav-btn:disabled{opacity:.35;cursor:not-allowed}
+.l-nav-btn.primary{background:#7c3aed;color:#fff;border-color:#7c3aed}
+.l-nav-btn.primary:hover:not(:disabled){background:#5b21b6;border-color:#5b21b6}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <a href="../" class="header-back">←</a>
+  <span style="font-size:1.2rem">🏗️</span>
+  <h1><span style="opacity:.7;font-size:.85em">03</span> &nbsp;시스템 아키텍처 &amp; 고가용성</h1>
+  <span class="header-cnt">20개</span>
+</div>
+
+<div class="search-wrap">
+  <input class="search" type="text" placeholder="🔍  개념 검색..." oninput="applyFilters()">
+</div>
+
+<div class="tabs" id="tab-bar"><button class="tab active" onclick="filterTab(this,'all')">전체</button><button class="tab" onclick="filterTab(this,'0')">시스템아키텍처의 개념</button><button class="tab" onclick="filterTab(this,'1')">시스템아키텍처 유형</button><button class="tab" onclick="filterTab(this,'2')">정보시스템의 구조</button><button class="tab" onclick="filterTab(this,'3')">정보시스템 용량 산정</button><button class="tab" onclick="filterTab(this,'4')">고가용성(HA, High Availa</button><button class="tab" onclick="filterTab(this,'5')">결함 허용 시스템</button><button class="tab" onclick="filterTab(this,'6')">재난복구시스템</button></div>
+<div class="prio-bar"><button class="pchip active" data-prio="all" onclick="filterPrio(this)">전체</button><button class="pchip" data-prio="1" onclick="filterPrio(this)" style="--pc:#dc2626">🔴 P1 최우선</button><button class="pchip" data-prio="2" onclick="filterPrio(this)" style="--pc:#d97706">🟡 P2 중요</button><button class="pchip" data-prio="3" onclick="filterPrio(this)" style="--pc:#16a34a">🟢 P3 보통</button><button class="pchip" data-prio="4" onclick="filterPrio(this)" style="--pc:#9ca3af">⚪ P4 보조</button></div>
+
+<div id="card-content"><div class="section-group" data-chapter="0"><div class="section-label">시스템아키텍처의 개념</div><div class="card-grid"><div class="card" data-prio="3" onclick="startLesson(0)"><div class="card-badges"><span class="b-prio b-prio-3" title="보통">🟢 P3</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">시스템아키텍처의 이해</div><div class="card-preview">옛날에는 컴퓨터 시스템을 만들 때 설계도 없이 막 조립하다 보니 나중에 고치거나 확장하기가…</div><div class="card-cta">레슨 시작 →</div></div><div class="card" data-prio="3" onclick="startLesson(1)"><div class="card-badges"><span class="b-prio b-prio-3" title="보통">🟢 P3</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">정보시스템의 구성요소</div><div class="card-preview">옛날에 컴퓨터 시스템을 만들 때 뭐가 필요한지 체계 없이 막 갖다 쓰다 보니 빠진 게 생기…</div><div class="card-cta">레슨 시작 →</div></div></div></div><div class="section-group" data-chapter="1"><div class="section-label">시스템아키텍처 유형</div><div class="card-grid"><div class="card" data-prio="2" onclick="startLesson(2)"><div class="card-badges"><span class="b-prio b-prio-2" title="중요">🟡 P2</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">시스템아키텍처 유형</div><div class="card-preview">옛날에는 컴퓨터 한 대가 모든 걸 다 처리해야 해서 그 컴퓨터가 고장나면 모든 게 멈춰버리…</div><div class="card-cta">레슨 시작 →</div></div><div class="card" data-prio="2" onclick="startLesson(3)"><div class="card-badges"><span class="b-prio b-prio-2" title="중요">🟡 P2</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">시스템 배치 방식에 따른 시스템아키텍처 분류</div><div class="card-preview">옛날에는 컴퓨터가 엄청 비싸서 한 곳에만 몰아두고 여러 사람이 같이 썼어. 그런데 기술이 …</div><div class="card-cta">레슨 시작 →</div></div><div class="card" data-prio="3" onclick="startLesson(4)"><div class="card-badges"><span class="b-prio b-prio-3" title="보통">🟢 P3</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">응용 프로그램 제공 방식에 따른 분류</div><div class="card-preview">옛날에는 모든 프로그램이 한 컴퓨터 안에서만 돌아갔는데, 사람이 많아지고 업무가 복잡해지니…</div><div class="card-cta">레슨 시작 →</div></div></div></div><div class="section-group" data-chapter="2"><div class="section-label">정보시스템의 구조</div><div class="card-grid"><div class="card" data-prio="3" onclick="startLesson(5)"><div class="card-badges"><span class="b-prio b-prio-3" title="보통">🟢 P3</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">정보시스템의 개념</div><div class="card-preview">옛날에 회사에서 중요한 정보들을 종이 서류로 관리하다 보니 찾기도 힘들고 실수도 많이 생겼…</div><div class="card-cta">레슨 시작 →</div></div><div class="card" data-prio="4" onclick="startLesson(6)"><div class="card-badges"><span class="b-prio b-prio-4" title="보조">⚪ P4</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">임베디드 운영체제의 종류와 동향</div><div class="card-preview">옛날에 미사일이나 인공위성 같은 장치들은 0.001초라도 늦으면 큰 사고가 나는 상황이었어…</div><div class="card-cta">레슨 시작 →</div></div></div></div><div class="section-group" data-chapter="3"><div class="section-label">정보시스템 용량 산정</div><div class="card-grid"><div class="card" data-prio="3" onclick="startLesson(7)"><div class="card-badges"><span class="b-prio b-prio-3" title="보통">🟢 P3</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">정보시스템 구조</div><div class="card-preview">옛날에는 컴퓨터 한 대가 모든 걸 혼자 처리하다 보니 사람이 몰리면 버벅거리고 망가지기 일…</div><div class="card-cta">레슨 시작 →</div></div><div class="card" data-prio="4" onclick="startLesson(8)"><div class="card-badges"><span class="b-prio b-prio-4" title="보조">⚪ P4</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">규모 산정 참조 아키텍처</div><div class="card-preview">옛날에 서버를 몇 대 살지 결정할 때 기준이 없어서 너무 많이 사거나 너무 적게 사는 문제…</div><div class="card-cta">레슨 시작 →</div></div><div class="card" data-prio="3" onclick="startLesson(9)"><div class="card-badges"><span class="b-prio b-prio-3" title="보통">🟢 P3</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">규모 산정 절차</div><div class="card-preview">옛날에 서버를 구축할 때 &#x27;그냥 대충 큰 거 사면 되겠지~&#x27; 했다가 돈은 돈대로 쓰고 성능…</div><div class="card-cta">레슨 시작 →</div></div><div class="card" data-prio="4" onclick="startLesson(10)"><div class="card-badges"><span class="b-prio b-prio-4" title="보조">⚪ P4</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">하드웨어 요소별 규모 산정 방식</div><div class="card-preview">컴퓨터 시스템을 새로 구축할 때 &#x27;서버를 얼마나 사야 하지?&#x27;라는 문제가 항상 있었어. 너…</div><div class="card-cta">레슨 시작 →</div></div></div></div><div class="section-group" data-chapter="4"><div class="section-label">고가용성(HA, High Availability)</div><div class="card-grid"><div class="card" data-prio="2" onclick="startLesson(11)"><div class="card-badges"><span class="b-prio b-prio-2" title="중요">🟡 P2</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">고가용성(HA, High Availability) 개념</div><div class="card-preview">옛날에 중요한 서버 컴퓨터가 갑자기 고장나면 은행이나 쇼핑몰 같은 서비스가 통째로 멈춰버리…</div><div class="card-cta">레슨 시작 →</div></div><div class="card" data-prio="1" onclick="startLesson(12)"><div class="card-badges"><span class="b-prio b-prio-1" title="최우선">🔴 P1</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">HA(High Availabilty) 구성 유형</div><div class="card-preview">옛날에 중요한 서버 한 대가 고장나면 회사 전체 시스템이 멈춰버리는 대형 사고가 자주 났어…</div><div class="card-cta">레슨 시작 →</div></div></div></div><div class="section-group" data-chapter="5"><div class="section-label">결함 허용 시스템</div><div class="card-grid"><div class="card" data-prio="2" onclick="startLesson(13)"><div class="card-badges"><span class="b-prio b-prio-2" title="중요">🟡 P2</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">결함 허용 시스템(Fault tolerant system)</div><div class="card-preview">옛날에 컴퓨터 한 대가 고장나면 시스템 전체가 멈춰버리는 일이 자주 있었어. 특히 병원이나…</div><div class="card-cta">레슨 시작 →</div></div></div></div><div class="section-group" data-chapter="6"><div class="section-label">재난복구시스템</div><div class="card-grid"><div class="card" data-prio="3" onclick="startLesson(14)"><div class="card-badges"><span class="b-prio b-prio-3" title="보통">🟢 P3</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">재난복구시스템(DRS, Disaster Recovery System)의 정의</div><div class="card-preview">옛날에 회사 서버실에 불이 나거나 홍수가 나면 그동안 쌓아둔 모든 데이터가 한 번에 날아가…</div><div class="card-cta">레슨 시작 →</div></div><div class="card" data-prio="1" onclick="startLesson(15)"><div class="card-badges"><span class="b-prio b-prio-1" title="최우선">🔴 P1</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">재난 복구 목표</div><div class="card-preview">옛날에 회사 서버실에 불이 나거나 홍수가 나면 데이터가 다 날아가서 회사가 망하는 일이 생…</div><div class="card-cta">레슨 시작 →</div></div><div class="card" data-prio="3" onclick="startLesson(16)"><div class="card-badges"><span class="b-prio b-prio-3" title="보통">🟢 P3</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">클라우드 컴퓨팅과 다른 컴퓨팅과의 비교</div><div class="card-preview">옛날에는 회사마다 엄청 비싼 서버를 직접 사서 건물 안에 쌓아놔야 했는데, 그게 너무 돈도…</div><div class="card-cta">레슨 시작 →</div></div><div class="card" data-prio="3" onclick="startLesson(17)"><div class="card-badges"><span class="b-prio b-prio-3" title="보통">🟢 P3</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">Hadoop의 주요기술 요소</div><div class="card-preview">옛날에 데이터가 너무 많아지면서 컴퓨터 한 대에 다 저장할 수 없는 문제가 생겼어. 그래서…</div><div class="card-cta">레슨 시작 →</div></div><div class="card" data-prio="3" onclick="startLesson(18)"><div class="card-badges"><span class="b-prio b-prio-3" title="보통">🟢 P3</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">Hadoop 지원 프로그램</div><div class="card-preview">옛날에는 데이터가 별로 없어서 그냥 엑셀이나 간단한 DB로 다 처리할 수 있었어. 근데 인…</div><div class="card-cta">레슨 시작 →</div></div><div class="card" data-prio="4" onclick="startLesson(19)"><div class="card-badges"><span class="b-prio b-prio-4" title="보조">⚪ P4</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">기타 전문 상용 솔루션</div><div class="card-preview">옛날에는 회사마다 보안 문제가 생길 때마다 개발자들이 처음부터 직접 보안 프로그램을 만들어…</div><div class="card-cta">레슨 시작 →</div></div></div></div></div>
+
+<!-- ── 레슨 모드 ── -->
+<div class="lesson" id="lesson">
+  <div class="l-head">
+    <button class="l-back" onclick="exitLesson()">←</button>
+    <div class="l-title" id="l-title"></div>
+    <div class="l-page-ind" id="l-page-ind">1 / 1</div>
+  </div>
+  <div class="l-progress"><div class="l-progress-bar" id="l-progress-bar"></div></div>
+  <div class="l-body" id="l-body"></div>
+  <div class="l-foot">
+    <button class="l-nav-btn" id="l-prev" onclick="prevPage()">← 이전</button>
+    <button class="l-nav-btn primary" id="l-next" onclick="nextPage()">다음 →</button>
+  </div>
+</div>
+
+<script>
+const LESSONS = [{"title": "시스템아키텍처의 이해", "keywords": ["텍처", "국제", "정보시스템", "관계", "구조", "네트워크", "문서", "광의의", "연결방식"], "summary": "", "background": "옛날에는 컴퓨터 시스템을 만들 때 설계도 없이 막 조립하다 보니 나중에 고치거나 확장하기가 너무 힘들었어. 그래서 '집 짓기 전에 설계도 먼저 그리자!'는 개념으로 시스템 아키텍처가 생겨났어.", "explanation": "시스템 아키텍처는 쉽게 말해 건물 설계도야. 건물을 지을 때 벽, 기둥, 배관, 전기를 어떻게 배치할지 미리 그림으로 그려두잖아? 컴퓨터 시스템도 똑같이 하드웨어(컴퓨터 본체, 서버 같은 실물 장비)와 소프트웨어(프로그램)를 어떻게 연결하고 배치할지 미리 설계하는 게 바로 시스템 아키텍처야. 이 설계도가 잘 되어 있어야 나중에 보안 문제도 찾고, 고치고, 확장하기가 훨씬 쉬워져.", "why": "", "term_focus": [], "connections": [], "types": null, "mnemonic": "🏠 '하·소 설계도' — 하드웨어 + 소프트웨어 = 설계도! '집 짓기 전에 설계도 먼저!' 떠올리면 끝!", "trap": "", "table": [], "sources": [], "priority": 3}, {"title": "정보시스템의 구성요소", "keywords": ["텍처", "국제", "정보시스템", "관계", "구조", "네트워크", "문서", "광의의", "연결방식"], "summary": "", "background": "옛날에 컴퓨터 시스템을 만들 때 뭐가 필요한지 체계 없이 막 갖다 쓰다 보니 빠진 게 생기거나 보안이 뚫리는 문제가 많았어. 그래서 '정보시스템이 돌아가려면 이런 요소들이 반드시 있어야 해!'라고 딱 정리한 거야.", "explanation": "정보시스템은 마치 음식점이랑 똑같아. 요리하는 주방(서버), 재료 보관하는 냉장고(스토리지), 홀과 주방 사이 소통하는 직원(네트워크), 그리고 손님 안전과 음식 위생을 지키는 CCTV·자물쇠(보안) — 이 네 가지가 다 있어야 음식점이 제대로 돌아가는 것처럼, 정보시스템도 이 네 요소가 함께 있어야 서비스가 가능해. 하나라도 빠지면 음식점이 망하듯이 시스템도 제대로 작동 못 해!", "why": "", "term_focus": [], "connections": [], "types": null, "mnemonic": "🍕 '서스네보' — **서**버(요리사) → **스**토리지(냉장고) → **네**트워크(배달) → **보**안(자물쇠), 피자 가게 차릴 때 '서스네보' 다 갖춰야 장사한다!", "trap": "", "table": [], "sources": [], "priority": 3}, {"title": "시스템아키텍처 유형", "keywords": ["블록스토리지", "보안", "일스토리지", "지역별", "아키텍쳐", "스토리지"], "summary": "", "background": "옛날에는 컴퓨터 한 대가 모든 걸 다 처리해야 해서 그 컴퓨터가 고장나면 모든 게 멈춰버리는 문제가 있었어. 그래서 사람들이 '어떻게 하면 더 안전하고 효율적으로 시스템을 나눠서 구성할 수 있을까?' 고민하면서 다양한 아키텍처 유형들이 생겨났어.", "explanation": "시스템 아키텍처는 쉽게 말해 '건물 설계도'랑 같아. 똑같은 건물도 1층짜리로 넓게 지을 수도 있고, 고층 빌딩으로 쌓아 올릴 수도 있고, 여러 건물로 나눠 지을 수도 있잖아. 컴퓨터 시스템도 마찬가지로 중앙에 하나로 몰아서 운영하거나(중앙집중식), 여러 곳에 나눠서 운영하거나(분산식), 아니면 요즘처럼 인터넷 클라우드에 올려서 쓰는 방식(웹/클라우드 기반)으로 구성할 수 있어. 보안 관점에서는 어떤 구조를 선택하느냐에 따라 공격받는 방식과 방어 전략이 완전히 달라지기 때문에 이걸 아는 게 중요해.", "why": "", "term_focus": [], "connections": [], "types": null, "mnemonic": "🏠→🏢→☁️ '집 한 채(중앙집중) → 아파트 단지(분산) → 하늘 위 클라우드(웹/모바일)' 순서로 시스템이 진화했다고 기억해!", "trap": "", "table": [], "sources": [], "priority": 2}, {"title": "시스템 배치 방식에 따른 시스템아키텍처 분류", "keywords": ["블록스토리지", "보안", "일스토리지", "지역별", "아키텍쳐", "스토리지"], "summary": "", "background": "옛날에는 컴퓨터가 엄청 비싸서 한 곳에만 몰아두고 여러 사람이 같이 썼어. 그런데 기술이 발전하고 사람들이 쓰는 기기가 많아지면서 '어디에, 어떻게 시스템을 배치할까?'라는 고민이 생겼어.", "explanation": "중앙 집중형은 학교 급식실처럼 한 곳(통합센터)에서 모든 걸 만들고 관리하는 방식이야. 반대로 지역별 분산형은 편의점 체인처럼 여러 지역에 나눠서 운영하는 방식이고. 중앙 집중형은 관리가 쉽고 데이터 모으기가 편하지만, 중앙이 고장나면 전체가 멈추는 위험이 있어.", "why": "", "term_focus": [], "connections": [], "types": {"caption": "정보시스템을 어떻게 배치하는지에 따른 아키텍처 분류. 집중과 분산의 2가지 축.", "items": [{"name": "중앙 집중형 아키텍처", "note": "통합센터에서 시스템과 데이터를 저장·운영하는 방식. 대용량 서버에 통합 DB를 구성. 시스템 구성이 비교적 간단하며 데이터 무결성 제어가 용이하고 단일 구조라 관리·운영이 편리. 장애 발생 시 신속한 복구 가능. 단, 통합센터 장애 시 전 업무가 중단되고 업무 집중 시간에 부하가 집중된다."}, {"name": "지역별 분산형 시스템 아키텍처", "note": "지역별로 시스템과 데이터베이스를 분산하여 운영. 각 지역의 업무 특성에 맞게 분리하여 중소형 서버를 이용해 구축. 사용자 부하 분산 효과와 지역 장애 시 해당 지역에만 영향이 제한되는 장점. 단, DB 구성 시 기준 데이터 무결성 관리가 어렵고 시스템 구성·관리가 복잡해진다."}]}, "mnemonic": "중앙 집중 = '급식실 하나' (한 곳에서 다 해결!), 분산 = '편의점 체인' (여기저기 나눠서!)  → '급식 vs 편의점'으로 기억해!", "trap": "", "table": [], "sources": [{"title": "TOPCIT ESSENCE ver.3 — 시스템 아키텍처 이해와 활용", "note": "정보통신산업진흥원(NIPA) 공식 교재"}], "priority": 2}, {"title": "응용 프로그램 제공 방식에 따른 분류", "keywords": ["블록스토리지", "보안", "일스토리지", "지역별", "아키텍쳐", "스토리지"], "summary": "", "background": "옛날에는 모든 프로그램이 한 컴퓨터 안에서만 돌아갔는데, 사람이 많아지고 업무가 복잡해지니까 한 대로는 감당이 안 됐어. 그래서 '일하는 컴퓨터(서버)'랑 '보여주는 컴퓨터(클라이언트)'를 나눠서 역할을 분담하는 방식이 생긴 거야.", "explanation": "식당으로 비유하면, 손님(클라이언트)은 메뉴판 보고 주문만 하고, 주방(서버)은 음식 만들고 데이터 관리하는 거야. 손님 쪽 화면은 예쁘고 편하게 만들 수 있지만, 식당(시스템) 전체를 관리하는 건 복잡하지. 게임, 카카오톡, FTP 같은 게 다 이 방식으로 만들어진 거야.", "why": "", "term_focus": [], "connections": [], "types": {"caption": "시스템 기능(데이터관리·비즈니스 프로세스·프레젠테이션)을 어떻게 분리해 배치하는지에 따른 분류. 티어(Tier) 구조.", "items": [{"name": "클라이언트-서버 아키텍처 (2-Tier)", "note": "업무 규모·환경에 따라 시스템 기능을 서버와 클라이언트에 분리 배치. 클라이언트에서 응용프로그램을 구동시켜 GUI의 편의성을 높일 수 있으나, 구성이 복잡하고 분리되어 개발·관리가 어렵다. 서비스 유형: 게임, 채팅, 메신저, FTP, 터미널 서버."}, {"name": "3-티어 아키텍처 (Multi-Tier)", "note": "프레젠테이션 티어와 데이터 티어 사이에 비즈니스 로직을 처리하는 티어를 따로 둠. 2티어의 문제점(클라이언트 DB 직접 접속 보안 이슈, 권한 관리 어려움, 프로그램 변경 어려움)을 해결. 클라이언트에 DB 접속 정보가 없고, 응용서버를 통해 DB 객체 참조 권한 관리가 용이, 프레젠테이션 티어 배포가 유연. 단, 개발 환경 복잡, 미들웨어·하드웨어 추가로 비용 증가."}]}, "mnemonic": "클서 = '클'라이언트는 '화면', '서'버는 '데이터' → 클화 서데! (클라이언트=화면담당, 서버=데이터담당)", "trap": "", "table": [], "sources": [{"title": "TOPCIT ESSENCE ver.3 — 시스템 아키텍처 이해와 활용", "note": "정보통신산업진흥원(NIPA) 공식 교재"}], "priority": 3}, {"title": "정보시스템의 개념", "keywords": ["운영체제(26)", "응용서버", "1-모니터(113788예07", "실시간", "운영체제", "서버"], "summary": "", "background": "옛날에 회사에서 중요한 정보들을 종이 서류로 관리하다 보니 찾기도 힘들고 실수도 많이 생겼어. 그래서 컴퓨터와 네트워크 같은 기술을 활용해서 정보를 더 빠르고 정확하게 처리할 수 있는 체계적인 시스템이 필요해졌지.", "explanation": "정보시스템은 회사가 일을 잘 할 수 있도록 도와주는 '디지털 일꾼 세트'야. 예를 들어 편의점에서 물건을 계산할 때 바코드 찍으면 재고가 자동으로 줄고 본사에 보고되는 것처럼, 컴퓨터(하드웨어), 프로그램(소프트웨어), 인터넷(네트워크), 그리고 그걸 관리하는 사람이 모두 합쳐져서 조직의 업무를 척척 처리해주는 시스템이야.", "why": "", "term_focus": [], "connections": [], "types": null, "mnemonic": "정보시스템 = '하·소·네·사람' (하드웨어 + 소프트웨어 + 네트워크 + 사람) → '하소연하는 사람'으로 외워! 하소연하는 사람처럼 4가지가 모여서 회사 일을 처리해준다고 기억해~", "trap": "", "table": [], "sources": [], "priority": 3}, {"title": "임베디드 운영체제의 종류와 동향", "keywords": ["운영체제(26)", "응용서버", "1-모니터(113788예07", "실시간", "운영체제", "서버"], "summary": "", "background": "옛날에 미사일이나 인공위성 같은 장치들은 0.001초라도 늦으면 큰 사고가 나는 상황이었어. 그래서 '무조건 제때 동작해야 하는 기계'와 '조금 늦어도 괜찮은 기계'를 구분해서 각각에 맞는 운영체제를 따로 만들게 됐어.", "explanation": "임베디드 OS는 세탁기, 냉장고, 자동차 같은 특정 기계 안에 딱 맞게 들어가는 작은 운영체제야. 여기서 핵심은 '실시간(RTOS)'이냐 아니냐인데, 에어백처럼 충돌 순간 반드시 즉시 터져야 하는 건 RTOS를 쓰고, 전자레인지 디스플레이처럼 1초쯤 늦어도 괜찮은 건 일반 임베디드 OS(윈도우 CE, 리눅스 계열 등)를 써. 쉽게 말해 RTOS는 '무조건 제시간에 배달해야 하는 퀵배송', 일반 임베디드 OS는 '좀 늦어도 되는 일반택배'라고 생각하면 돼.", "why": "", "term_focus": [], "connections": [], "types": null, "mnemonic": "RTOS = '리얼타임? 오차 없어, 싫으면 폭발!' → 미사일·에어백처럼 늦으면 터지는 것들은 RTOS!", "trap": "", "table": [], "sources": [], "priority": 4}, {"title": "정보시스템 구조", "keywords": ["디스크:", "사용자", "비즈니스", "기초자료", "필요시", "참조모델을", "스토리자:", "성능에", "단계2에서"], "summary": "", "background": "옛날에는 컴퓨터 한 대가 모든 걸 혼자 처리하다 보니 사람이 몰리면 버벅거리고 망가지기 일쑤였어. 그래서 역할을 나눠서 각자 잘하는 일만 맡기는 구조가 필요해졌지.", "explanation": "맥도날드를 떠올려봐. 손님이 주문하는 카운터(클라이언트/브라우저), 주문을 받아서 주방에 전달하는 매니저(웹서버/앱서버), 실제 재료를 보관하는 창고(데이터베이스), 이렇게 3단계로 나뉘어 있잖아. 정보시스템도 똑같이 '화면 보여주는 곳 → 처리하는 곳 → 저장하는 곳' 이렇게 3층 구조로 나눠서 각자 역할을 맡아 효율적으로 돌아가는 거야. 이렇게 나누면 창고(DB)가 바뀌어도 카운터(화면)는 그대로 쓸 수 있어서 유지보수도 훨씬 쉬워져.", "why": "", "term_focus": [], "connections": [], "types": null, "mnemonic": "3계층 = '보(보여주기, 클라이언트) → 처(처리하기, 앱서버) → 저(저장하기, DB)' — 보처저! 맥도날드에서 보고, 주문 처리하고, 창고에 저장!", "trap": "", "table": [], "sources": [], "priority": 3}, {"title": "규모 산정 참조 아키텍처", "keywords": ["디스크:", "사용자", "비즈니스", "기초자료", "필요시", "참조모델을", "스토리자:", "성능에", "단계2에서"], "summary": "", "background": "옛날에 서버를 몇 대 살지 결정할 때 기준이 없어서 너무 많이 사거나 너무 적게 사는 문제가 생겼어. 그래서 정부에서 '이렇게 생긴 시스템은 이렇게 서버를 나눠서 계산해!'라는 표준 기준을 만든 거야.", "explanation": "식당을 예로 들면, 손님 응대(프리젠테이션), 요리(비즈니스 로직), 식재료 창고(데이터 서비스) 이렇게 3개 구역으로 나뉘는 것처럼 정보시스템도 3개 층으로 나뉘어. 규모 산정 참조 아키텍처는 이 3개 층을 어떻게 합치거나 나눌지에 따라 서버를 몇 대 살지 계산하는 기준 틀이야. 정부가 1계층, 2계층, 3계층 이렇게 3가지 형태를 미리 정해놓고 '네 시스템은 어떤 형태야?'라고 물어보는 거지.", "why": "", "term_focus": [], "connections": [], "types": null, "mnemonic": "식당 3구역 → '응대-요리-창고' = 프리젠테이션-비즈니스-데이터! 층수(1~3)에 따라 서버 대수가 달라진다고 기억해!", "trap": "", "table": [], "sources": [], "priority": 4}, {"title": "규모 산정 절차", "keywords": ["디스크:", "사용자", "비즈니스", "기초자료", "필요시", "참조모델을", "스토리자:", "성능에", "단계2에서"], "summary": "", "background": "옛날에 서버를 구축할 때 '그냥 대충 큰 거 사면 되겠지~' 했다가 돈은 돈대로 쓰고 성능은 엉망인 경우가 많았어. 그래서 '얼마나 큰 서버가 필요한지 순서대로 따져보자!'는 체계적인 절차가 생긴 거야.", "explanation": "예를 들어 학교 급식실을 새로 만든다고 생각해봐. 먼저 '학생이 몇 명인지, 메뉴는 뭔지' 기초 자료를 모으고(기초자료 조사), '밥 먹는 시간대가 언제 몰리나' 분석하고(업무분석), '그럼 솥이 몇 개 필요하겠다' 크기를 정하는 거야(서버 규모산정). 마지막으로 '혹시 급식 인원이 갑자기 늘 수도 있으니 여유분 추가!'처럼 가중치를 적용해서 최종 결정하는 순서야.", "why": "", "term_focus": [], "connections": [], "types": null, "mnemonic": "🔑 '기업서가' - **기**초자료 조사 → **업**무분석 → **서**버 규모산정 → **가**중치 적용! '기업에서 가중치!' 로 외워봐!", "trap": "", "table": [], "sources": [], "priority": 3}, {"title": "하드웨어 요소별 규모 산정 방식", "keywords": ["디스크:", "사용자", "비즈니스", "기초자료", "필요시", "참조모델을", "스토리자:", "성능에", "단계2에서"], "summary": "", "background": "컴퓨터 시스템을 새로 구축할 때 '서버를 얼마나 사야 하지?'라는 문제가 항상 있었어. 너무 적게 사면 시스템이 터지고, 너무 많이 사면 돈 낭비라서 딱 맞게 계산하는 기준이 필요했어.", "explanation": "식당을 차린다고 생각해봐. 요리사(CPU)는 몇 명 필요한지, 주방 작업대(메모리)는 얼마나 넓어야 하는지, 냉장고(디스크)랑 창고(스토리지)는 얼마나 큰 걸 써야 하는지 각각 따로 계산하는 거야. FASS는 이 4가지 항목(CPU, 메모리, 디스크, 스토리지)을 하나씩 체계적으로 계산하는 방법이야.", "why": "", "term_focus": [], "connections": [], "types": {"caption": "서버를 구성하는 4가지 요소별 규모 산정. 아키텍처 형태에 따라 서버를 결정한 뒤 각 서버에 대해 산정한다.", "items": [{"name": "CPU", "note": "해당 업무를 처리하기 위한 CPU 규모를 계산한 후, 적정한 성능을 지닌 서버 기종을 선정."}, {"name": "메모리", "note": "CPU 규모산정에 따른 서버 구성방안에 의거하여, 서버별 시스템 SW, 응용 프로그램 등의 메모리 사용량을 산정."}, {"name": "디스크", "note": "OS, 애플리케이션, 데이터 저장에 필요한 디스크 용량을 산정. 업무 특성과 데이터 증가 추세를 고려."}, {"name": "스토리지", "note": "대용량 저장이 필요한 데이터를 위한 별도 스토리지 용량 산정. SAN/NAS/DAS 등 연결 방식도 함께 결정."}]}, "mnemonic": "🍔 패스트푸드(FASS)는 재료 4개! - F: 프로세서(CPU) / A: 앱 메모리 / S: 스토리지 / S: 세컨드 디스크 → 'FASS = CPU·메모리·디스크·스토리지 4형제'", "trap": "", "table": [], "sources": [{"title": "TOPCIT ESSENCE ver.3 — 시스템 아키텍처 이해와 활용", "note": "정보통신산업진흥원(NIPA) 공식 교재"}], "priority": 4}, {"title": "고가용성(HA, High Availability) 개념", "keywords": [], "summary": "", "background": "옛날에 중요한 서버 컴퓨터가 갑자기 고장나면 은행이나 쇼핑몰 같은 서비스가 통째로 멈춰버리는 큰 사고가 자주 일어났어. 그래서 '어떻게 하면 절대 안 꺼지는 시스템을 만들까?' 고민하다가 생긴 개념이야.", "explanation": "고가용성은 쉽게 말해 '절대 안 멈추는 시스템'을 만드는 방법이야. 예를 들어 롤러코스터 안전벨트가 하나 끊겨도 보조 벨트가 있어서 안전한 것처럼, 서버도 하나가 고장나면 바로 다른 서버가 대신 켜져서 사용자는 아무것도 못 느끼게 해줘. 목표는 1년 365일 중 99.999%(다섯 개의 9)만큼, 즉 거의 5분도 안 멈추게 유지하는 거야.", "why": "", "term_focus": [], "connections": [], "types": null, "mnemonic": "HA = '항상 살아있어!' — H(항상) A(alive)! 고장나도 바로 다른 애가 튀어나와서 항상 살아있는 시스템!", "trap": "", "table": [], "sources": [], "priority": 2}, {"title": "HA(High Availabilty) 구성 유형", "keywords": [], "summary": "", "background": "옛날에 중요한 서버 한 대가 고장나면 회사 전체 시스템이 멈춰버리는 대형 사고가 자주 났어. 그래서 '절대 멈추면 안 되는 시스템'을 만들기 위해 여러 대를 묶어서 운영하는 방법을 연구하게 됐어.", "explanation": "HA는 '절대 꺼지지 않는 시스템'을 만드는 방법인데, 크게 세 가지 방식이 있어. 첫째 'Active-Active'는 두 선수가 동시에 뛰는 것처럼 서버 여러 대가 함께 일하다가 한 대가 죽어도 나머지가 계속 버텨주는 방식이고, 둘째 'Active-Standby'는 주전 선수 한 명이 뛰고 교체 선수가 벤치에서 대기하다가 주전이 다치면 바로 투입되는 방식이야. 셋째 'N+1'은 여러 명의 선수가 뛰는데 예비 선수 딱 한 명만 벤치에 두는 효율적인 방식이야.", "why": "", "term_focus": [], "connections": [], "types": {"caption": "고가용성(High Availability) 클러스터링 구축 방법. 서버를 어떻게 이중화/다중화해 장애에 대비하는가.", "items": [{"name": "Hot Standby (Active-Standby)", "en": "핫 스탠바이", "note": "HA 클러스터링 구축 방법 중 가장 단순한 구조. 가동되는 활성 서버 1개와 평상시 대기 상태인 대기 서버로 구성. 대기 서버는 전원이 켜져 있고 OS까지 동작. 활성 서버 장애 시 Heartbeat Network로 장애를 감지하고 HA 서비스가 자동으로 대기 서버의 모든 서비스를 기동시키는 Fail-over를 수행."}, {"name": "Mutual Takeover (Active-Active)", "en": "상호 인수", "note": "각 서버가 별개의 2개 이상의 시스템이 동작 중인 상태에서 한 곳에 장애가 생기면 해당 서비스를 지정된 다른 서버로 전환(takeover)받아 서비스하는 구조. 장애 발생 시 Fail-over를 대비해 각 서버는 2개의 업무를 동시에 서비스할 수 있는 시스템 용량을 갖추어야 한다."}]}, "mnemonic": "🏃 'A-A, A-S, N+1' → '둘다뛰어(Active-Active), 한명대기(Active-Standby), 하나만예비(N+1)' — 축구팀으로 기억해: 둘다뛰어 / 한명대기 / 하나만예비!", "trap": "", "table": [], "sources": [{"title": "TOPCIT ESSENCE ver.3 — 시스템 아키텍처 이해와 활용", "note": "정보통신산업진흥원(NIPA) 공식 교재"}], "priority": 1}, {"title": "결함 허용 시스템(Fault tolerant system)", "keywords": [], "summary": "", "background": "옛날에 컴퓨터 한 대가 고장나면 시스템 전체가 멈춰버리는 일이 자주 있었어. 특히 병원이나 비행기처럼 절대 멈추면 안 되는 곳에서 이게 큰 문제가 됐지.", "explanation": "결함 허용 시스템은 자동차 타이어가 한 개 펑크나도 나머지 세 개로 계속 달릴 수 있는 것처럼, 부품 하나가 고장나도 전체 시스템이 멈추지 않고 계속 작동하는 구조야. 중요한 부품을 여러 개 겹쳐 놓아서 하나가 망가지면 다른 게 바로 대신하는 거지. 쉽게 말해 '백업이 항상 대기 중인 시스템'이라고 생각하면 돼.", "why": "", "term_focus": [], "connections": [], "types": null, "mnemonic": "🚨 '고장나도 고고!' — 결함(고장)이 생겨도 허용(고고)해서 계속 간다! '고장 → 고고' 두 글자로 기억해!", "trap": "", "table": [], "sources": [], "priority": 2}, {"title": "재난복구시스템(DRS, Disaster Recovery System)의 정의", "keywords": [], "summary": "", "background": "옛날에 회사 서버실에 불이 나거나 홍수가 나면 그동안 쌓아둔 모든 데이터가 한 번에 날아가버리는 끔찍한 일이 생겼어. 이런 대형 사고가 터졌을 때 회사가 완전히 멈춰버리지 않도록 미리 대비하는 방법이 필요해졌지.", "explanation": "재난복구시스템은 쉽게 말해 '데이터 보험'이야. 마치 집에 불이 났을 때를 대비해서 중요한 서류 사본을 다른 곳에 보관해두는 것처럼, 회사의 중요한 데이터와 시스템을 멀리 떨어진 다른 장소에 똑같이 복사해두는 거야. 그래서 본래 서버가 지진, 화재, 정전 같은 재난으로 망가져도 그 백업 장소에서 빠르게 다시 시작할 수 있어.", "why": "", "term_focus": [], "connections": [], "types": null, "mnemonic": "DRS = '데이터 살리는 소방서' 🚒 — 불나도(재난) 데이터는 살아있다!", "trap": "", "table": [], "sources": [], "priority": 3}, {"title": "재난 복구 목표", "keywords": [], "summary": "", "background": "옛날에 회사 서버실에 불이 나거나 홍수가 나면 데이터가 다 날아가서 회사가 망하는 일이 생겼어. 그래서 '재난이 터졌을 때 얼마나 빨리, 얼마나 많이 복구할 수 있을까?'를 미리 정해두는 기준이 필요해졌지.", "explanation": "재난 복구 목표에는 두 가지가 있어. 첫째, RPO(복구 목표 시점)는 '데이터를 얼마 전 시점까지 되돌릴 수 있냐'야 — 예를 들어 RPO가 1시간이면 최대 1시간 전 데이터까지만 살릴 수 있다는 뜻이야. 둘째, RTO(복구 목표 시간)는 '시스템이 완전히 다시 켜지는 데 얼마나 걸리냐'야 — RTO가 4시간이면 재난 후 4시간 안에 서비스가 다시 돌아와야 한다는 거지.", "why": "", "term_focus": [], "connections": [], "types": null, "mnemonic": "RPO = '얼마나 과거로 돌아가냐(Point)', RTO = '얼마나 빨리 돌아오냐(Time)' → 📼RPO는 '되감기', ⏱️RTO는 '재시작' — 되감기(RPO) 먼저, 재시작(RTO) 나중!", "trap": "", "table": [], "sources": [], "priority": 1}, {"title": "클라우드 컴퓨팅과 다른 컴퓨팅과의 비교", "keywords": [], "summary": "", "background": "옛날에는 회사마다 엄청 비싼 서버를 직접 사서 건물 안에 쌓아놔야 했는데, 그게 너무 돈도 많이 들고 관리도 힘들었어. 그래서 '그냥 인터넷으로 필요할 때만 빌려 쓰면 안 되나?' 하는 생각에서 클라우드가 탄생했지.", "explanation": "컴퓨팅 방식을 집에 비유하면 이래: 그리드 컴퓨팅은 동네 사람들이 각자 집 전기를 합쳐서 같이 쓰는 것, 유틸리티 컴퓨팅은 전기회사처럼 쓴 만큼만 돈 내는 것, 온프레미스는 내 집에 발전기를 직접 사서 설치하는 것, 그리고 클라우드는 전기회사가 발전기 관리까지 다 해주고 나는 콘센트만 꽂으면 되는 것이야. 클라우드가 제일 편하고 유연하지만, 내 데이터가 남의 서버에 있으니까 보안을 특히 신경 써야 해.", "why": "", "term_focus": [], "connections": [], "types": null, "mnemonic": "온그유클 → '온(온프레미스)전히 내 것, 그(그리드)냥 합치기, 유(유틸리티)료만큼, 클(클라우드)릭 한 번에 OK!' 순서로 자립도가 점점 낮아진다고 기억해!", "trap": "", "table": [], "sources": [], "priority": 3}, {"title": "Hadoop의 주요기술 요소", "keywords": [], "summary": "", "background": "옛날에 데이터가 너무 많아지면서 컴퓨터 한 대에 다 저장할 수 없는 문제가 생겼어. 그래서 여러 컴퓨터에 데이터를 나눠서 저장하고, 혹시 한 컴퓨터가 고장나도 데이터가 안 날아가도록 복사본도 같이 보관하는 시스템이 필요해진 거야.", "explanation": "HDFS는 엄청 큰 파일을 여러 USB에 나눠서 저장하는 것과 같아. 그런데 똑똑한 점은 혹시 USB 하나가 망가져도 괜찮게 같은 내용을 다른 USB에도 복사해 둔다는 거야. 그리고 반장(네임노드) 한 명이 '3번 USB에 뭐가 있고, 5번 USB에 뭐가 있다'는 목록을 관리하고, 나머지 반원들(데이터노드)이 실제로 데이터를 들고 있는 구조야.", "why": "", "term_focus": [], "connections": [], "types": {"caption": "Hadoop은 대용량 데이터 분산 처리 플랫폼. 핵심 2요소와 주변 생태계 도구로 구성된다.", "items": [{"name": "HDFS", "en": "Hadoop Distributed File System", "note": "Hadoop의 분산형 파일시스템. 네트워크에 연결된 기기에 데이터를 저장하며, 다수 노드에 복제 데이터를 함께 저장해 유실 방지. 스트리밍 방식으로 접근. 한 번 저장된 데이터는 수정 불가(append는 2.0부터 가능). 마스터 역할의 네임노드 서버 1대 + 슬레이브 역할의 데이터노드 서버 여러 대로 구성."}, {"name": "MapReduce", "en": "맵리듀스", "note": "대용량 데이터 처리를 위한 분산 프로그래밍 모델·프레임워크. 대규모 분산 컴퓨팅 환경에서 대량 데이터를 병렬 분석. Map(흩어진 데이터를 연관성 있게 분류, <key, value>) + Reduce(Map 출력을 중복 제거하고 원하는 데이터 추출) 두 메소드로 구성."}, {"name": "Hive", "note": "데이터 웨어하우스 인프라로, Hadoop 위에서 HiveQL(SQL 유사)을 사용해 데이터 조회·분석."}, {"name": "HBase", "note": "HDFS 기반 컬럼 지향 NoSQL 데이터베이스. 구글의 BigTable 논문을 기반으로 개발. 야후·트위터·NHN 라인 등이 사용."}, {"name": "Sqoop", "note": "관계형 DBMS와 HDFS/HBase 간 대용량 정형 데이터 수집·전송."}, {"name": "Flume", "note": "비정형 데이터 수집. 중앙 집중 서버로 전송하는 방식(페이스북 개발)."}, {"name": "YARN", "note": "Hadoop 2.0부터의 리소스 관리·작업 스케줄링 프레임워크. MapReduce 외의 다양한 분산 처리 엔진을 함께 실행 가능하게 한다."}]}, "mnemonic": "HDFS = '혹시 데이터 날아가? 복사 세 개!' — 데이터를 저장하면 자동으로 복제본 3개를 여러 곳에 나눠 보관한다고 기억해!", "trap": "", "table": [], "sources": [{"title": "TOPCIT ESSENCE ver.3 — 시스템 아키텍처 이해와 활용", "note": "정보통신산업진흥원(NIPA) 공식 교재"}], "priority": 3}, {"title": "Hadoop 지원 프로그램", "keywords": [], "summary": "", "background": "옛날에는 데이터가 별로 없어서 그냥 엑셀이나 간단한 DB로 다 처리할 수 있었어. 근데 인터넷이 발달하면서 SNS, 영상, 로그 같은 엄청난 양의 데이터가 쏟아지자 이걸 모으고, 저장하고, 분석하는 전문 도구들이 필요해졌어.", "explanation": "하둡(Hadoop)은 엄청 큰 창고라고 생각해봐. 이 창고에 물건을 가져오는 택배 기사가 Flume(비정형 데이터 수집), Chukwa 같은 수집 도구들이야. 가져온 물건을 창고 안에 정리해서 쌓아두는 역할은 HDFS가 하고, Sqoop이나 Hiho는 정형화된 박스(관계형 DB)에서 물건을 꺼내오는 특수 택배 기사야. HBase는 창고 안에 있는 특별한 서랍장으로, 구글이 설계한 방식을 따라 만든 NoSQL 데이터베이스야.", "why": "", "term_focus": [], "connections": [], "types": null, "mnemonic": "수집-저장-처리-관리 → '수저처관' / 도구 외울 땐 'F-C-S-H' → **F**lume(수집), **C**hukwa(수집), **S**qoop(정형 수집), **H**Base(저장) = **친구 섭외해** 순서로 기억해!", "trap": "", "table": [], "sources": [], "priority": 3}, {"title": "기타 전문 상용 솔루션", "keywords": [], "summary": "", "background": "옛날에는 회사마다 보안 문제가 생길 때마다 개발자들이 처음부터 직접 보안 프로그램을 만들어야 했는데, 이게 너무 시간도 오래 걸리고 비용도 엄청났어. 그래서 '보안 전문 회사들'이 이미 잘 만들어진 보안 프로그램을 패키지로 팔기 시작한 거야.", "explanation": "마치 집을 지킬 때 직접 경보기를 만드는 대신 '에스원' 같은 전문 보안 회사에 맡기는 것처럼, 기업들도 해킹·바이러스·정보유출 같은 위협을 막기 위해 보안 전문 회사가 만든 완성된 보안 프로그램을 구매해서 쓰는 거야. 예를 들면 백신 프로그램(V3, 알약), 방화벽, 침입탐지시스템 같은 것들이 다 여기에 해당해.", "why": "", "term_focus": [], "connections": [], "types": null, "mnemonic": "🛒 '보안도 장보기!' - 직접 만들지 말고 전문 보안마트에서 '완제품'을 사서 쓴다!", "trap": "", "table": [], "sources": [], "priority": 4}];
+const PRIO_LABEL = {1:'최우선', 2:'중요', 3:'보통', 4:'보조'};
+let curTab = 'all';
+let curPrio = 'all';
+let curLessonIdx = -1;
+let curPage = 0;
+let pages = [];
+
+function filterTab(btn, ch) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  curTab = ch;
+  applyFilters();
+}
+
+function filterPrio(btn) {
+  document.querySelectorAll('.pchip').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  curPrio = btn.dataset.prio;
+  applyFilters();
+}
+
+function applyFilters() {
+  const q = document.querySelector('.search').value.toLowerCase();
+  document.querySelectorAll('.section-group').forEach(grp => {
+    const chOk = curTab === 'all' || grp.dataset.chapter === curTab;
+    grp.classList.toggle('hidden', !chOk);
+    if (chOk) {
+      let any = false;
+      grp.querySelectorAll('.card').forEach(c => {
+        const qOk = !q || c.textContent.toLowerCase().includes(q);
+        const pOk = curPrio === 'all' || c.dataset.prio === curPrio;
+        const show = qOk && pOk;
+        c.classList.toggle('hidden-card', !show);
+        if (show) any = true;
+      });
+      if (q || curPrio !== 'all') grp.classList.toggle('hidden', !any);
+    }
+  });
+}
+
+function escHtml(str) {
+  return (str || '').replace(/[&<>"]/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[ch]);
+}
+
+function splitMnemonic(text) {
+  return (text || '')
+    .replace(/\r\n/g, '\n')
+    .replace(/\s+\/\s+/g, '\n')
+    .replace(/\s+vs\.\s+/gi, '\n')
+    .replace(/\s+→\s+/g, ' → ')
+    .replace(/\s+↔\s+/g, ' ↔ ')
+    .replace(/\.\s+/g, '.\n')
+    .replace(/다\.\s+/g, '다.\n')
+    .replace(/됨\.\s+/g, '됨.\n')
+    .split(/\n+/)
+    .map(line => line.trim())
+    .filter(Boolean);
+}
+
+function mnemonicIcon(tag, text) {
+  if (tag) return '◈';
+  if (text.includes('↔') || text.includes('=')) return '⇄';
+  if (text.includes('→')) return '→';
+  return '•';
+}
+
+function renderParagraph(text) {
+  return escHtml(text || '').replace(/\n/g, '<br>');
+}
+
+function renderFactSection(label, secClass, items) {
+  if (!items || !items.length) return '';
+  const html = items.map(item => `
+    <div class="fact-item">
+      ${item.label ? `<div class="fact-link-label">${escHtml(item.label)}</div>` : ''}
+      <div class="fact-term">${escHtml(item.term || '')}</div>
+      <div class="fact-note">${renderParagraph(item.note || '')}</div>
+    </div>`).join('');
+  return `<div class="sec ${secClass}"><div class="sec-label">${label}</div><div class="fact-list">${html}</div></div>`;
+}
+
+function renderTypesSection(types) {
+  if (!types) return '';
+  const items = Array.isArray(types) ? types : (types.items || []);
+  if (!items.length) return '';
+  const caption = !Array.isArray(types) && types.caption ? types.caption : '';
+  const scale = !Array.isArray(types) ? (types.scale || '') : '';
+  const scaleLabels = {
+    'strong-to-weak': ['강함','약함','reverse'],
+    'weak-to-strong': ['약함','강함',''],
+  };
+  const tierClass = {
+    'strong': 'tier-strong',
+    'mid': 'tier-mid',
+    'weak': 'tier-weak',
+  };
+  const tierLabel = {
+    'strong': '강함',
+    'mid': '중간',
+    'weak': '약함',
+  };
+  const rows = items.map(it => {
+    const tierCls = it.tier && tierClass[it.tier] ? tierClass[it.tier] : '';
+    const tierLbl = it.tier && tierLabel[it.tier] ? tierLabel[it.tier] : (it.tier || '');
+    return `
+      <div class="type-item">
+        <div class="type-body">
+          <div class="type-head">
+            <span class="type-name">${escHtml(it.name || '')}</span>
+            ${it.en ? `<span class="type-en">${escHtml(it.en)}</span>` : ''}
+            ${tierCls ? `<span class="type-tier ${tierCls}">${escHtml(tierLbl)}</span>` : ''}
+          </div>
+          <div class="type-note">${renderParagraph(it.note || '')}</div>
+        </div>
+      </div>`;
+  }).join('');
+  let scaleHtml = '';
+  if (scale && scaleLabels[scale]) {
+    const [L, R, rev] = scaleLabels[scale];
+    scaleHtml = `<div class="types-scale ${rev}"><span>${L}</span><span class="scale-arrow"></span><span>${R}</span></div>`;
+  }
+  return `<div class="sec sec-types">
+    <div class="sec-label">🗂️ 유형</div>
+    ${caption ? `<div class="types-caption">${renderParagraph(caption)}</div>` : ''}
+    <div class="types-list">${rows}</div>
+    ${scaleHtml}
+  </div>`;
+}
+
+function renderSourceSection(sources) {
+  if (!sources || !sources.length) return '';
+  const html = sources.map(src => {
+    const hasUrl = !!src.url;
+    let host = '';
+    if (hasUrl) {
+      try { host = new URL(src.url).hostname.replace(/^www\./, ''); } catch (_err) { host = ''; }
+    }
+    const inner = `
+        <span class="src-bullet">↗</span>
+        <span class="src-text">
+          ${escHtml(src.title || src.url || '')}
+          ${src.note ? `<span class="src-host">${escHtml(src.note)}</span>` : ''}
+          ${!src.note && host ? `<span class="src-host">${escHtml(host)}</span>` : ''}
+        </span>`;
+    if (hasUrl) {
+      return `<a class="src-link" href="${escHtml(src.url)}" target="_blank" rel="noreferrer">${inner}</a>`;
+    }
+    return `<div class="src-link">${inner}</div>`;
+  }).join('');
+  return `<div class="sec sec-src"><div class="sec-label">🔗 출처</div><div class="src-list">${html}</div></div>`;
+}
+
+function renderMnemonic(text) {
+  const lines = splitMnemonic(text);
+  if (!lines.length) return '';
+  const html = lines.map(line => {
+    const m = line.match(/^【([^】]+)】\s*(.*)$/);
+    const tag = m ? m[1].trim() : '';
+    const body = (m ? m[2] : line).trim();
+    const safeBody = escHtml(body).replace(/'([^']+)'/g, '<strong>$1</strong>');
+    return `
+      <div class="mn-line">
+        <span class="mn-picto">${mnemonicIcon(tag, body)}</span>
+        <div class="mn-main">
+          ${tag ? `<span class="mn-tag">${escHtml(tag)}</span>` : ''}
+          <div class="mn-text">${safeBody}</div>
+        </div>
+      </div>`;
+  }).join('');
+  return `<div class="sec sec-mn"><div class="sec-label">🧠 5초 암기</div><div class="mn-list">${html}</div></div>`;
+}
+
+function buildPages(lesson) {
+  return [
+    { type: 'learn', data: lesson },
+    { type: 'done',  data: lesson },
+  ];
+}
+
+function renderPage() {
+  const body = document.getElementById('l-body');
+  const page = pages[curPage];
+  body.innerHTML = '';
+  body.scrollTop = 0;
+
+  const wrap = document.createElement('div');
+  wrap.className = 'l-page';
+
+  if (page.type === 'learn') {
+    const d = page.data;
+    let h = '';
+    h += `<h1 class="l-page-title">${escHtml(d.title)}</h1>`;
+    const metaBits = [];
+    if (d.priority && PRIO_LABEL[d.priority]) {
+      metaBits.push(`<span class="chip chip-prio-${d.priority}">P${d.priority} · ${PRIO_LABEL[d.priority]}</span>`);
+    }
+    if (metaBits.length) h += `<div class="l-page-meta">${metaBits.join('')}</div>`;
+    if (d.keywords && d.keywords.length) {
+      h += `<div class="l-page-kw">${d.keywords.map(k => `<span>★ ${escHtml(k)}</span>`).join('')}</div>`;
+    }
+    if (d.summary)     h += `<div class="sec sec-summary"><div class="sec-label">📌 한 줄 요약</div><p>${renderParagraph(d.summary)}</p></div>`;
+    if (d.background)  h += `<div class="sec sec-bg"><div class="sec-label">📜 배경·맥락</div><p>${renderParagraph(d.background)}</p></div>`;
+    if (d.explanation) h += `<div class="sec sec-expl"><div class="sec-label">📖 핵심 설명</div><p>${renderParagraph(d.explanation)}</p></div>`;
+    if (d.types)       h += renderTypesSection(d.types);
+    if (d.why)         h += `<div class="sec sec-why"><div class="sec-label">🔍 왜 이렇게 됐나</div><p>${renderParagraph(d.why)}</p></div>`;
+    if (d.term_focus && d.term_focus.length)   h += renderFactSection('🈶 용어·한자 풀이', 'sec-term', d.term_focus);
+    if (d.connections && d.connections.length) h += renderFactSection('🧭 앞뒤 흐름 연결', 'sec-link', d.connections);
+    if (d.mnemonic)    h += renderMnemonic(d.mnemonic);
+    if (d.trap)        h += `<div class="sec sec-trap"><div class="sec-label">⚠️ 시험 함정</div><p>${renderParagraph(d.trap)}</p></div>`;
+    if (d.table && d.table.length) {
+      const cols = Object.keys(d.table[0]);
+      const head = cols.map(c => `<th>${escHtml(c)}</th>`).join('');
+      const rows = d.table.map(r => '<tr>' + cols.map(c => `<td>${escHtml(r[c] || '')}</td>`).join('') + '</tr>').join('');
+      h += `<div class="sec sec-summary" style="padding:0;background:transparent;border:none">
+        <div class="sec-label" style="padding-left:.3rem;color:#6b7280;margin-bottom:.5rem">📊 정리표</div>
+        <table class="ctable"><thead><tr>${head}</tr></thead><tbody>${rows}</tbody></table>
+      </div>`;
+    }
+    if (d.sources && d.sources.length) h += renderSourceSection(d.sources);
+    wrap.innerHTML = h;
+  }
+  else if (page.type === 'done') {
+    const d = page.data;
+    const hasNext = curLessonIdx + 1 < LESSONS.length;
+    wrap.innerHTML = `
+      <div class="done-page">
+        <div class="done-emoji">🎉</div>
+        <div class="done-title">레슨 완료!</div>
+        <div class="done-sub">${escHtml(d.title)}</div>
+        <div class="done-actions">
+          ${hasNext ? '<button class="done-btn done-btn-primary" onclick="startLesson(' + (curLessonIdx + 1) + ')">다음 개념 →</button>' : ''}
+          <button class="done-btn done-btn-sub" onclick="exitLesson()">목록으로 돌아가기</button>
+        </div>
+      </div>`;
+  }
+
+  body.appendChild(wrap);
+
+  document.getElementById('l-page-ind').textContent = `${curPage + 1} / ${pages.length}`;
+  document.getElementById('l-progress-bar').style.width = `${((curPage + 1) / pages.length) * 100}%`;
+  document.getElementById('l-prev').disabled = curPage === 0;
+  document.getElementById('l-next').disabled = curPage === pages.length - 1;
+  document.getElementById('l-next').textContent = curPage === pages.length - 2 ? '완료 🎉' : '다음 →';
+}
+
+function startLesson(idx) {
+  if (idx < 0 || idx >= LESSONS.length) return;
+  curLessonIdx = idx;
+  curPage = 0;
+  pages = buildPages(LESSONS[idx]);
+  document.getElementById('l-title').textContent = LESSONS[idx].title;
+  document.getElementById('lesson').classList.add('show');
+  document.body.style.overflow = 'hidden';
+  renderPage();
+}
+
+function exitLesson() {
+  document.getElementById('lesson').classList.remove('show');
+  document.body.style.overflow = '';
+  curLessonIdx = -1;
+}
+
+function nextPage() { if (curPage < pages.length - 1) { curPage++; renderPage(); } }
+function prevPage() { if (curPage > 0) { curPage--; renderPage(); } }
+
+document.addEventListener('keydown', e => {
+  if (curLessonIdx < 0) return;
+  if (e.key === 'ArrowLeft')  prevPage();
+  if (e.key === 'ArrowRight') nextPage();
+  if (e.key === 'Escape')     exitLesson();
+});
+</script>
+</body>
+</html>

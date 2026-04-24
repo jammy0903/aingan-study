@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>TOPCIT 01-05 형상관리 & 오픈소스</title>
+<style>
+:root{--font-sans:"Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",system-ui,sans-serif;--font-serif:"NanumMyeongjo","Nanum Myeongjo","Batang","Apple SD Gothic Neo",serif}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{overflow-x:hidden}
+body{font-family:var(--font-sans);background:#f7f8fb;color:#1f2937;min-height:100vh}
+
+.header{background:#2563eb;color:#fff;padding:.85rem 1.25rem;display:flex;align-items:center;gap:.75rem;position:sticky;top:0;z-index:20;box-shadow:0 2px 10px rgba(0,0,0,.15)}
+.header-back{color:#fff;text-decoration:none;font-size:1.2rem;opacity:.85}
+.header h1{font-size:1rem;font-weight:800;flex:1;font-family:var(--font-serif)}
+.header-cnt{font-size:.75rem;opacity:.8;white-space:nowrap}
+
+.search-wrap{padding:.7rem 1.25rem .3rem}
+.search{width:100%;padding:.6rem 1rem;border:2px solid #e2e8f0;border-radius:2rem;font-size:.88rem;outline:none;background:#fff;transition:border .2s}
+.search:focus{border-color:#2563eb}
+
+.tabs{display:flex;gap:.35rem;padding:.4rem 1.25rem .3rem;overflow-x:auto;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tab{flex-shrink:0;padding:.32rem .8rem;border-radius:2rem;border:1.5px solid #2563eb;background:#fff;color:#2563eb;font-size:.74rem;font-weight:700;cursor:pointer;white-space:nowrap;transition:all .15s;font-family:inherit}
+.tab.active,.tab:hover{background:#2563eb;color:#fff}
+
+.prio-bar{display:flex;gap:.3rem;padding:.2rem 1.25rem .6rem;overflow-x:auto;scrollbar-width:none}
+.prio-bar::-webkit-scrollbar{display:none}
+.pchip{flex-shrink:0;padding:.28rem .7rem;border-radius:2rem;border:1.5px solid #e5e7eb;background:#fff;color:#475569;font-size:.72rem;font-weight:700;cursor:pointer;white-space:nowrap;transition:all .15s;font-family:inherit}
+.pchip:hover{border-color:var(--pc,#9ca3af);color:#111827}
+.pchip.active{background:var(--pc,#2563eb);border-color:var(--pc,#2563eb);color:#fff}
+.pchip[data-prio="all"].active{background:#2563eb;border-color:#2563eb;color:#fff}
+
+.section-group{padding:.3rem 1.25rem .8rem}
+.section-group.hidden{display:none}
+.section-label{font-size:.72rem;font-weight:800;color:#1d4ed8;letter-spacing:.04em;padding:.4rem 0 .35rem;border-bottom:2px solid #2563eb33;margin-bottom:.55rem;font-family:var(--font-serif)}
+.card-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:.55rem}
+@media(min-width:540px){.card-grid{grid-template-columns:repeat(3,1fr)}}
+@media(min-width:900px){.card-grid{grid-template-columns:repeat(4,1fr)}}
+@media(min-width:1200px){.card-grid{grid-template-columns:repeat(5,1fr)}}
+.card{background:#fff;border-radius:.7rem;padding:.85rem .8rem .65rem;cursor:pointer;border:1.5px solid #e5e7eb;transition:all .18s;box-shadow:0 1px 3px rgba(0,0,0,.04);position:relative;display:flex;flex-direction:column;gap:.35rem;min-height:9rem}
+.card:hover{border-color:#2563eb;box-shadow:0 4px 14px #2563eb33;transform:translateY(-2px)}
+.card-badges{position:absolute;top:.45rem;right:.5rem;display:flex;gap:.2rem;font-size:.64rem}
+.card-badges span{padding:.1rem .42rem;border-radius:.4rem;font-weight:700;line-height:1.4;white-space:nowrap}
+.b-prio-1{background:#fee2e2;color:#991b1b}
+.b-prio-2{background:#fef3c7;color:#92400e}
+.b-prio-3{background:#dcfce7;color:#166534}
+.b-prio-4{background:#f1f5f9;color:#475569}
+.b-mn{background:#ede9fe;color:#5b21b6}
+.card-title{font-size:.86rem;font-weight:700;color:#111827;line-height:1.35;padding-right:4.5rem;font-family:var(--font-serif)}
+.card-preview{font-size:.7rem;color:#6b7280;line-height:1.5;flex:1}
+.card-cta{font-size:.68rem;color:#2563eb;font-weight:700;text-align:right;margin-top:.25rem}
+.card.hidden-card{display:none!important}
+
+/* ───────── 레슨 모드 (풀스크린) ───────── */
+.lesson{display:none;position:fixed;inset:0;background:#f7f8fb;z-index:1000;flex-direction:column}
+.lesson.show{display:flex}
+.l-head{background:#2563eb;color:#fff;padding:.7rem 1rem;display:flex;align-items:center;gap:.7rem;flex-shrink:0}
+.l-back{background:none;border:none;color:#fff;font-size:1.3rem;cursor:pointer;padding:0;line-height:1;opacity:.9}
+.l-title{flex:1;font-size:.92rem;font-weight:800;font-family:var(--font-serif);line-height:1.3;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.l-page-ind{font-size:.78rem;font-weight:700;background:rgba(0,0,0,.18);padding:.18rem .55rem;border-radius:1rem;flex-shrink:0}
+.l-progress{height:4px;background:rgba(0,0,0,.15);flex-shrink:0}
+.l-progress-bar{height:100%;background:#fff;width:0%;transition:width .3s ease}
+.l-body{flex:1;overflow-y:auto;padding:1.2rem 1.25rem 5rem;display:flex;flex-direction:column;gap:1rem;align-items:center}
+.l-page{width:100%;max-width:680px;animation:slideIn .25s ease}
+@keyframes slideIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+.l-page-title{font-size:1.5rem;font-weight:800;color:#1d4ed8;margin-bottom:.5rem;font-family:var(--font-serif);line-height:1.3}
+.l-page-meta{display:flex;flex-wrap:wrap;gap:.35rem;margin-bottom:.85rem}
+.l-page-meta .chip{padding:.18rem .55rem;border-radius:1rem;font-size:.7rem;font-weight:700}
+.chip-prio-1{background:#fee2e2;color:#991b1b}
+.chip-prio-2{background:#fef3c7;color:#92400e}
+.chip-prio-3{background:#dcfce7;color:#166534}
+.chip-prio-4{background:#f1f5f9;color:#475569}
+.l-page-kw{display:flex;flex-wrap:wrap;gap:.3rem;margin-bottom:1.2rem}
+.l-page-kw span{background:#2563eb22;color:#1d4ed8;border:1px solid #2563eb55;border-radius:1rem;padding:.18rem .65rem;font-size:.72rem;font-weight:700}
+
+.sec{border-radius:.7rem;padding:1rem 1.1rem;line-height:1.65;margin-bottom:.85rem}
+.sec-summary{background:#2563eb11;border-left:5px solid #2563eb;font-size:.95rem;color:#111827;font-weight:600}
+.sec-bg{background:#fef7ec;border-left:5px solid #d97706}
+.sec-expl{background:#eef2ff;border-left:5px solid #4f46e5}
+.sec-why{background:#ecfdf5;border-left:5px solid #059669}
+.sec-term{background:#faf5ff;border-left:5px solid #7c3aed}
+.sec-link{background:#fff7ed;border-left:5px solid #c2410c}
+.sec-mn{background:linear-gradient(145deg,#fffef5 0%,#fff7d6 56%,#2563eb20 100%);color:#1f2937;font-weight:600;border:1.5px solid #2563eb33;border-left:5px solid #2563eb;box-shadow:0 10px 26px #2563eb14}
+.sec-trap{background:#fff1f2;border:1.5px solid #fda4af;border-left:5px solid #e11d48;color:#881337}
+.sec-src{background:#fff;border:1.5px solid #e5e7eb;border-left:5px solid #475569}
+.sec-types{background:#f0f9ff;border:1.5px solid #bae6fd;border-left:5px solid #0284c7}
+.sec-types .sec-label{color:#075985}
+.types-caption{font-size:.8rem;color:#334155;margin-bottom:.6rem;line-height:1.55}
+.types-list{display:flex;flex-direction:column;gap:.55rem;counter-reset:tc}
+.type-item{display:grid;grid-template-columns:2rem 1fr;gap:.55rem;align-items:start;background:#fff;border:1px solid #e0f2fe;border-radius:.7rem;padding:.7rem .78rem;counter-increment:tc;position:relative}
+.type-item::before{content:counter(tc);display:inline-flex;align-items:center;justify-content:center;width:1.7rem;height:1.7rem;border-radius:.5rem;background:#2563eb16;color:#1d4ed8;font-size:.8rem;font-weight:800;line-height:1}
+.type-body{min-width:0}
+.type-head{display:flex;flex-wrap:wrap;gap:.35rem;align-items:center;margin-bottom:.2rem}
+.type-name{font-size:.92rem;font-weight:800;color:#0f172a;font-family:var(--font-serif)}
+.type-en{font-size:.72rem;color:#64748b;font-weight:700}
+.type-tier{display:inline-flex;align-items:center;padding:.08rem .42rem;border-radius:999px;font-size:.62rem;font-weight:800;letter-spacing:.04em}
+.tier-strong{background:#fee2e2;color:#991b1b}
+.tier-mid{background:#fef3c7;color:#92400e}
+.tier-weak{background:#dcfce7;color:#166534}
+.type-note{font-size:.86rem;line-height:1.68;color:#334155;word-break:keep-all}
+.types-scale{display:flex;align-items:center;gap:.45rem;margin-top:.65rem;padding:.5rem .7rem;background:rgba(255,255,255,.7);border:1px dashed #bae6fd;border-radius:.6rem;font-size:.72rem;color:#475569;font-weight:700}
+.types-scale .scale-arrow{flex:1;height:6px;border-radius:999px;background:linear-gradient(90deg,#16a34a,#d97706,#dc2626)}
+.types-scale.reverse .scale-arrow{background:linear-gradient(90deg,#dc2626,#d97706,#16a34a)}
+.sec-label{font-size:.7rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;margin-bottom:.5rem}
+.sec-bg .sec-label{color:#92400e}
+.sec-expl .sec-label{color:#3730a3}
+.sec-why .sec-label{color:#065f46}
+.sec-term .sec-label{color:#5b21b6}
+.sec-link .sec-label{color:#9a3412}
+.sec-mn .sec-label{color:#1d4ed8}
+.sec-trap .sec-label{color:#9f1239}
+.sec-summary .sec-label{color:#2563eb}
+.sec-src .sec-label{color:#334155}
+.sec p{font-size:.92rem;line-height:1.7}
+.sec-mn p{font-size:.98rem}
+.fact-list{display:flex;flex-direction:column;gap:.65rem}
+.fact-item{background:rgba(255,255,255,.85);border:1px solid rgba(0,0,0,.06);border-radius:.85rem;padding:.78rem .85rem}
+.fact-term{font-size:.86rem;font-weight:800;color:#111827;margin-bottom:.22rem}
+.fact-note{font-size:.9rem;line-height:1.72;color:#374151;word-break:keep-all}
+.fact-link-label{display:inline-flex;align-items:center;padding:.12rem .45rem;border-radius:999px;background:#2563eb14;color:#1d4ed8;font-size:.64rem;font-weight:800;letter-spacing:.04em;margin-bottom:.38rem}
+.src-list{display:flex;flex-direction:column;gap:.5rem}
+.src-link{display:flex;align-items:flex-start;gap:.45rem;text-decoration:none;color:#111827;background:#f9fafb;border:1px solid #e5e7eb;border-radius:.8rem;padding:.72rem .82rem;transition:border-color .15s,transform .15s}
+.src-link:hover{border-color:#2563eb;transform:translateY(-1px)}
+.src-bullet{flex-shrink:0;color:#2563eb;font-weight:800}
+.src-text{font-size:.85rem;line-height:1.55}
+.src-host{display:block;font-size:.72rem;color:#6b7280;margin-top:.1rem}
+.mn-list{display:flex;flex-direction:column;gap:.55rem}
+.mn-line{display:flex;align-items:flex-start;gap:.72rem;background:rgba(255,255,255,.82);border:1px solid #2563eb22;border-radius:.9rem;padding:.72rem .8rem .68rem;box-shadow:0 4px 12px rgba(0,0,0,.04)}
+.mn-picto{flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;width:1.6rem;height:1.6rem;border-radius:.45rem;background:#2563eb16;border:1px solid #2563eb26;font-size:.76rem;font-weight:800;line-height:1;color:#1d4ed8}
+.mn-main{display:flex;flex-direction:column;gap:.28rem;min-width:0}
+.mn-tag{display:inline-flex;align-items:center;width:fit-content;padding:.12rem .45rem;border-radius:999px;background:#2563eb18;color:#1d4ed8;font-size:.64rem;font-weight:800;letter-spacing:.05em}
+.mn-text{font-size:.95rem;line-height:1.76;color:#1f2937;word-break:keep-all}
+.mn-text strong{color:#2563eb;font-weight:800}
+
+.ctable{width:100%;border-collapse:collapse;font-size:.82rem;background:#fff;border-radius:.5rem;overflow:hidden;margin-top:.4rem}
+.ctable th{background:#2563eb;color:#fff;padding:.55rem .65rem;text-align:left;font-weight:700;font-size:.78rem}
+.ctable td{padding:.55rem .65rem;border-top:1px solid #e5e7eb;vertical-align:top;line-height:1.55}
+.ctable tr:nth-child(even) td{background:#f9fafb}
+
+.done-page{text-align:center;padding:2.5rem 1rem}
+.done-emoji{font-size:4.5rem;margin-bottom:1rem;animation:pop .4s ease}
+@keyframes pop{from{transform:scale(0)}80%{transform:scale(1.2)}to{transform:scale(1)}}
+.done-title{font-size:1.5rem;font-weight:800;color:#1d4ed8;margin-bottom:.5rem;font-family:var(--font-serif)}
+.done-sub{font-size:.95rem;color:#6b7280;margin-bottom:2rem}
+.done-actions{display:flex;flex-direction:column;gap:.6rem;max-width:300px;margin:0 auto}
+.done-btn{padding:.85rem 1.4rem;border-radius:.7rem;font-size:.95rem;font-weight:700;cursor:pointer;border:none;font-family:inherit;transition:all .15s}
+.done-btn-primary{background:#2563eb;color:#fff}
+.done-btn-primary:hover{transform:translateY(-2px);box-shadow:0 4px 14px #2563eb55}
+.done-btn-sub{background:#fff;color:#2563eb;border:1.5px solid #2563eb}
+.done-btn-sub:hover{background:#2563eb11}
+
+.l-foot{position:fixed;bottom:0;left:0;right:0;background:#fff;padding:.7rem 1rem;display:flex;gap:.5rem;border-top:1px solid #e5e7eb;z-index:1010}
+.l-nav-btn{flex:1;padding:.7rem;border-radius:.55rem;border:1.5px solid #2563eb;background:#fff;color:#2563eb;font-size:.88rem;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s}
+.l-nav-btn:hover:not(:disabled){background:#2563eb11}
+.l-nav-btn:disabled{opacity:.35;cursor:not-allowed}
+.l-nav-btn.primary{background:#2563eb;color:#fff;border-color:#2563eb}
+.l-nav-btn.primary:hover:not(:disabled){background:#1d4ed8;border-color:#1d4ed8}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <a href="../" class="header-back">←</a>
+  <span style="font-size:1.2rem">💻</span>
+  <h1><span style="opacity:.7;font-size:.85em">01</span> &nbsp;형상관리 &amp; 오픈소스</h1>
+  <span class="header-cnt">10개</span>
+</div>
+
+<div class="search-wrap">
+  <input class="search" type="text" placeholder="🔍  개념 검색..." oninput="applyFilters()">
+</div>
+
+<div class="tabs" id="tab-bar"><button class="tab active" onclick="filterTab(this,'all')">전체</button><button class="tab" onclick="filterTab(this,'0')">형상관리 도구</button><button class="tab" onclick="filterTab(this,'1')">소프트웨어 형상관리의 개요</button><button class="tab" onclick="filterTab(this,'2')">형상관리 개념도 및 구성 요소</button><button class="tab" onclick="filterTab(this,'3')">오픈소스 소프트웨어 라이선스</button><button class="tab" onclick="filterTab(this,'4')">오픈소스 소프트웨어 개념</button></div>
+<div class="prio-bar"><button class="pchip active" data-prio="all" onclick="filterPrio(this)">전체</button><button class="pchip" data-prio="1" onclick="filterPrio(this)" style="--pc:#dc2626">🔴 P1 최우선</button><button class="pchip" data-prio="2" onclick="filterPrio(this)" style="--pc:#d97706">🟡 P2 중요</button><button class="pchip" data-prio="3" onclick="filterPrio(this)" style="--pc:#16a34a">🟢 P3 보통</button><button class="pchip" data-prio="4" onclick="filterPrio(this)" style="--pc:#9ca3af">⚪ P4 보조</button></div>
+
+<div id="card-content"><div class="section-group" data-chapter="0"><div class="section-label">형상관리 도구</div><div class="card-grid"><div class="card" data-prio="3" onclick="startLesson(0)"><div class="card-badges"><span class="b-prio b-prio-3" title="보통">🟢 P3</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">형상관리 도구</div><div class="card-preview">옛날에 여러 명이 같은 코드 파일을 수정하다가 서로 덮어써서 작업이 날아가는 사고가 자주 …</div><div class="card-cta">레슨 시작 →</div></div><div class="card" data-prio="3" onclick="startLesson(1)"><div class="card-badges"><span class="b-prio b-prio-3" title="보통">🟢 P3</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">분산형 저장소(Git)</div><div class="card-preview">옛날에는 코드를 딱 한 곳(중앙 서버)에만 저장했는데, 그 서버가 고장나면 모든 코드가 날…</div><div class="card-cta">레슨 시작 →</div></div></div></div><div class="section-group" data-chapter="1"><div class="section-label">소프트웨어 형상관리의 개요</div><div class="card-grid"><div class="card" data-prio="3" onclick="startLesson(2)"><div class="card-badges"><span class="b-prio b-prio-3" title="보통">🟢 P3</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">형상관리의 정의</div><div class="card-preview">옛날에 여러 명이 함께 소프트웨어를 만들다 보니 누가 어떤 부분을 바꿨는지 몰라서 파일이 …</div><div class="card-cta">레슨 시작 →</div></div></div></div><div class="section-group" data-chapter="2"><div class="section-label">형상관리 개념도 및 구성 요소</div><div class="card-grid"><div class="card" data-prio="3" onclick="startLesson(3)"><div class="card-badges"><span class="b-prio b-prio-3" title="보통">🟢 P3</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">형상관리의 개념도</div><div class="card-preview">옛날에 여러 명이 같은 코드를 동시에 수정하다가 서로의 작업이 뒤섞여서 누가 뭘 바꿨는지 …</div><div class="card-cta">레슨 시작 →</div></div><div class="card" data-prio="2" onclick="startLesson(4)"><div class="card-badges"><span class="b-prio b-prio-2" title="중요">🟡 P2</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">형상관리의 구성요소</div><div class="card-preview">옛날에 여러 개발자가 같은 프로그램을 동시에 수정하다가 &#x27;누가 언제 뭘 바꿨는지&#x27; 몰라서 …</div><div class="card-cta">레슨 시작 →</div></div><div class="card" data-prio="4" onclick="startLesson(5)"><div class="card-badges"><span class="b-prio b-prio-4" title="보조">⚪ P4</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">형상관리 고려사항</div><div class="card-preview">옛날에 여러 개발자가 같은 코드를 동시에 수정하다가 서로의 작업이 뒤섞여서 프로그램이 망가…</div><div class="card-cta">레슨 시작 →</div></div></div></div><div class="section-group" data-chapter="3"><div class="section-label">오픈소스 소프트웨어 라이선스</div><div class="card-grid"><div class="card" data-prio="2" onclick="startLesson(6)"><div class="card-badges"><span class="b-prio b-prio-2" title="중요">🟡 P2</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">오픈소스 소프트웨어 라이선스 비교</div><div class="card-preview">옛날에 프로그래머들이 자기가 만든 코드를 공유하고 싶었는데, 아무런 규칙 없이 공유하다 보…</div><div class="card-cta">레슨 시작 →</div></div><div class="card" data-prio="3" onclick="startLesson(7)"><div class="card-badges"><span class="b-prio b-prio-3" title="보통">🟢 P3</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">오픈소스 소프트웨어 라이선스 활용을 위한 고려사항</div><div class="card-preview">옛날에는 소프트웨어를 공짜로 가져다 썼다가 나중에 &#x27;이거 우리 규칙 어겼으니 소송이야!&#x27;라…</div><div class="card-cta">레슨 시작 →</div></div></div></div><div class="section-group" data-chapter="4"><div class="section-label">오픈소스 소프트웨어 개념</div><div class="card-grid"><div class="card" data-prio="3" onclick="startLesson(8)"><div class="card-badges"><span class="b-prio b-prio-3" title="보통">🟢 P3</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">오픈소스 소프트웨어 정의</div><div class="card-preview">옛날에는 프로그래머들이 서로 코드를 자유롭게 나눠 쓰며 발전시켰는데, 1980년대부터 회사…</div><div class="card-cta">레슨 시작 →</div></div><div class="card" data-prio="3" onclick="startLesson(9)"><div class="card-badges"><span class="b-prio b-prio-3" title="보통">🟢 P3</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">오픈소스 소프트웨어 라이선스 정의</div><div class="card-preview">옛날에 개발자들이 코드를 무료로 공개했더니, 어떤 사람들이 그걸 몰래 가져다가 자기 돈벌이…</div><div class="card-cta">레슨 시작 →</div></div></div></div></div>
+
+<!-- ── 레슨 모드 ── -->
+<div class="lesson" id="lesson">
+  <div class="l-head">
+    <button class="l-back" onclick="exitLesson()">←</button>
+    <div class="l-title" id="l-title"></div>
+    <div class="l-page-ind" id="l-page-ind">1 / 1</div>
+  </div>
+  <div class="l-progress"><div class="l-progress-bar" id="l-progress-bar"></div></div>
+  <div class="l-body" id="l-body"></div>
+  <div class="l-foot">
+    <button class="l-nav-btn" id="l-prev" onclick="prevPage()">← 이전</button>
+    <button class="l-nav-btn primary" id="l-next" onclick="nextPage()">다음 →</button>
+  </div>
+</div>
+
+<script>
+const LESSONS = [{"title": "형상관리 도구", "keywords": [], "summary": "", "background": "옛날에 여러 명이 같은 코드 파일을 수정하다가 서로 덮어써서 작업이 날아가는 사고가 자주 일어났어. 그래서 '누가 언제 뭘 바꿨는지' 기록하고 충돌을 막아주는 도구가 필요해졌지.", "explanation": "형상관리 도구는 구글 드라이브랑 비슷한데, 코드 전용 타임머신이라고 생각하면 돼. 파일을 저장할 때마다 변경 내역을 전부 기록해두니까 '3일 전 버전으로 되돌려줘!' 하면 바로 가능하고, 여러 명이 동시에 작업해도 서로 충돌 없이 합칠 수 있어. 크게 '중앙 서버 한 곳에 저장하는 방식(SVN)'이랑 '각자 컴퓨터에도 전체 기록을 갖고 있는 방식(Git)'으로 나뉘어.", "why": "", "term_focus": [], "connections": [], "types": null, "mnemonic": "형상관리 도구 = '중Git분' → 중앙저장소(SVN), Git(분산저장소) — '중간은 SVN, 깃(Git)은 분산!' 이렇게 외워봐!", "trap": "", "table": [], "sources": [], "priority": 3}, {"title": "분산형 저장소(Git)", "keywords": [], "summary": "", "background": "옛날에는 코드를 딱 한 곳(중앙 서버)에만 저장했는데, 그 서버가 고장나면 모든 코드가 날아가는 대참사가 벌어졌어. 그래서 '한 곳에만 맡기지 말고, 모두가 전체 코드를 각자 갖고 있자!'는 아이디어로 분산형 저장소가 탄생했지.", "explanation": "마치 학교 모둠 과제할 때, 조장 한 명만 파일 갖고 있으면 조장 컴퓨터 고장나면 끝장이잖아. 그래서 모둠원 전원이 파일 전체를 자기 컴퓨터에 저장해두는 거야. Git은 바로 이런 방식으로, 개발자 각자의 컴퓨터에 코드 전체가 저장되고, 각자 다른 버전(Branch)으로 작업하다가 나중에 합칠 수 있어.", "why": "", "term_focus": [], "connections": [], "types": null, "mnemonic": "🌳 '모두가 통째로 복사' → Git = 각자 PC가 곧 서버! / '서버 터져도? 내 컴퓨터에 다 있어~' 로 기억해!", "trap": "", "table": [], "sources": [], "priority": 3}, {"title": "형상관리의 정의", "keywords": ["리팩토링을", "오류발견과", "프로그램", "복잡한", "일반적으로", "리팩토링은", "소프트워어", "리팩토링", "비용이"], "summary": "", "background": "옛날에 여러 명이 함께 소프트웨어를 만들다 보니 누가 어떤 부분을 바꿨는지 몰라서 파일이 뒤죽박죽 엉망이 되는 일이 많았어. 그래서 '변경 내용을 체계적으로 추적하고 관리하자!'는 필요성에서 형상관리가 생겨났어.", "explanation": "형상관리는 소프트웨어를 만들면서 생기는 모든 파일(코드, 문서, 데이터)을 '누가, 언제, 뭘, 왜 바꿨는지' 기록하고 관리하는 활동이야. 마치 구글 문서에서 '수정 기록 보기'로 누가 언제 어떤 내용을 고쳤는지 다 볼 수 있는 것과 똑같아. 덕분에 문제가 생겼을 때 원인을 찾기 쉽고, 잘못되면 이전 버전으로 되돌릴 수도 있어.", "why": "", "term_focus": [], "connections": [], "types": null, "mnemonic": "형상관리 = '형사가 변경 현장을 관리한다' → 형사처럼 변경 원인 추적, 증거(파일) 보관, 관련자(담당자)에게 통보!", "trap": "", "table": [], "sources": [], "priority": 3}, {"title": "형상관리의 개념도", "keywords": ["요구사항", "비즈니스", "후보", "초기"], "summary": "", "background": "옛날에 여러 명이 같은 코드를 동시에 수정하다가 서로의 작업이 뒤섞여서 누가 뭘 바꿨는지 아무도 몰라 프로젝트가 엉망이 된 적이 많았어. 그래서 '누가, 언제, 무엇을, 왜 바꿨는지'를 체계적으로 기록하고 관리하는 방법이 필요해졌지.", "explanation": "형상관리는 마치 구글 드라이브에서 문서 수정 기록을 남기는 것과 같아. 팀원 여러 명이 하나의 문서를 고칠 때, 누가 언제 어느 부분을 바꿨는지 기록이 남고, 문제가 생기면 이전 버전으로 되돌릴 수 있잖아. 형상관리도 똑같이 소프트웨어의 모든 변경 내용을 기록하고, 버전을 관리하고, 문제가 생기면 이전 상태로 복구할 수 있게 해주는 전체 활동이야.", "why": "", "term_focus": [], "connections": [], "types": null, "mnemonic": "형상관리 = '형사가 증거 관리'! 형사가 사건 증거를 '언제·누가·왜' 바꿨는지 철저히 기록하듯이, 형상관리도 코드 변경을 빠짐없이 기록하고 추적한다고 기억해!", "trap": "", "table": [], "sources": [], "priority": 3}, {"title": "형상관리의 구성요소", "keywords": ["요구사항", "비즈니스", "후보", "초기"], "summary": "", "background": "옛날에 여러 개발자가 같은 프로그램을 동시에 수정하다가 '누가 언제 뭘 바꿨는지' 몰라서 엉망이 된 적이 많았어. 그래서 소프트웨어의 변경 내역을 체계적으로 관리하는 방법이 필요해졌어.", "explanation": "형상관리는 마치 학교 공용 구글 문서를 여럿이 쓸 때 '버전 기록'으로 누가 언제 뭘 고쳤는지 추적하는 것과 같아. 구성요소는 크게 4가지야: 변경 기준점인 '기준선', 관리할 대상인 '형상항목', 실제로 만들어진 결과물인 '형상제품', 그리고 이 모든 정보를 모은 '형상정보'야. 형상정보는 식별 → 통제 → 감사 → 기록 순서로 활동이 이루어져.", "why": "", "term_focus": [], "connections": [], "types": {"caption": "형상관리를 구성하는 주요 항목들. 별도로 형상관리 '활동'은 식별·통제·감사·기록 4가지.", "items": [{"name": "기준선", "en": "Baseline", "note": "각 형상 항목들의 기술적 상태와 변화를 통제하는 시점의 기준."}, {"name": "형상항목", "en": "Configuration Item", "note": "소프트웨어 생명주기 중 공식적으로 정의되어 기술되는 기본 대상."}, {"name": "형상제품", "en": "Configuration Product", "note": "소프트웨어 개발 생명주기 중 공식적으로 구현되는 형체가 있는, 실현된 형상관리의 대상. 기술문서·하드웨어 제품·소프트웨어 제품 등."}, {"name": "형상정보", "en": "Configuration Information", "note": "형상항목 + 그 외 관련 정보로 구성된 전체 형상 데이터."}]}, "mnemonic": "기항제정 → '기'준선, '항'목, '제'품, '정'보 — '기항제정, 출발 준비 완료!' 라고 외워봐 (비행기 기항지 느낌으로!)", "trap": "", "table": [], "sources": [{"title": "TOPCIT ESSENCE ver.3 — 소프트웨어 개발", "note": "정보통신산업진흥원(NIPA) 공식 교재"}], "priority": 2}, {"title": "형상관리 고려사항", "keywords": ["요구사항", "비즈니스", "후보", "초기"], "summary": "", "background": "옛날에 여러 개발자가 같은 코드를 동시에 수정하다가 서로의 작업이 뒤섞여서 프로그램이 망가지는 일이 자주 있었어. 특히 이미 실제로 사용 중인 소프트웨어를 건드릴 땐 더 조심해야 했기 때문에, 변경을 체계적으로 관리하는 규칙이 필요해졌어.", "explanation": "형상관리는 마치 병원에서 환자 수술 기록을 꼼꼼히 관리하는 것과 같아. 이미 운영 중인 소프트웨어는 실제로 사람들이 쓰고 있는 '살아있는 환자'니까, 함부로 건드리면 큰일 나잖아. 그래서 H(Hardware, 하드웨어 환경), S(Software, 소프트웨어 구성), E(Environment, 운영 환경) 세 가지를 신중하게 따져보고, 절대 Con(Conflict, 충돌)이 나지 않도록 조심해야 해.", "why": "", "term_focus": [], "connections": [], "types": null, "mnemonic": "운영 중인 소프트웨어는 '병원 중환자실' — HSE(하·소·환) 건드릴 땐 Con(충돌) 조심! → 'H·S·E, Con 조심해!' 세 글자 외우고 'Con(충돌) 나면 큰일 난다'고 기억해!", "trap": "", "table": [], "sources": [], "priority": 4}, {"title": "오픈소스 소프트웨어 라이선스 비교", "keywords": [], "summary": "", "background": "옛날에 프로그래머들이 자기가 만든 코드를 공유하고 싶었는데, 아무런 규칙 없이 공유하다 보니 누군가 그걸 몰래 가져다 돈 버는 데만 쓰는 문제가 생겼어. 그래서 '공유는 하되, 이런 조건은 지켜야 해!'라는 약속 문서들이 생기기 시작했고, 그게 바로 오픈소스 라이선스야.", "explanation": "오픈소스 라이선스는 '내 레시피 공개할게, 대신 네가 개량하면 너도 공개해야 해!'처럼 코드를 공유할 때 붙이는 조건표야. 모든 오픈소스는 공통적으로 무료 사용, 코드 보기, 수정, 배포가 다 되는데, 차이점은 '네가 이걸 써서 만든 것도 공개해야 하냐'와 '돈 받는 프로그램이랑 합칠 수 있냐'야. GPL은 가장 엄격해서 GPL 코드를 쓰면 네 코드까지 전부 공개해야 하고, 돈 받는 독점 소프트웨어랑 합치는 것도 안 돼.", "why": "", "term_focus": [], "connections": [], "types": {"caption": "오픈소스 라이선스는 무료 이용·배포·소스코드 취득·수정의 공통 특징이 있으나, 2차 저작물 재공개 의무와 독점 소프트웨어와의 결합 가능 여부에서 차이가 있다. 가장 엄격한 것은 GPL.", "scale": "strong-to-weak", "items": [{"name": "GPL 2.0", "en": "GNU General Public License 2.0", "tier": "strong", "note": "현재 가장 많은 오픈소스가 채택. 자유소프트웨어재단(FSF)에서 배포. 소프트웨어 수정·링크(Static/Dynamic 모두) 시 전체 소스코드 공개 의무. 독점 소프트웨어 코드와 결합 불가."}, {"name": "GPL 3.0", "en": "GNU General Public License 3.0", "tier": "strong", "note": "GPL 2.0과 기본은 같으나 DRM 관련, 소프트웨어 특허 문제, 양립성 문제가 추가됨. 사용자 제품에 포함·배포 시 설치정보도 함께 제공해야 한다."}, {"name": "LGPL", "en": "Lesser General Public License", "tier": "mid", "note": "일부 라이브러리에 대해 GPL보다 공개 정도를 다소 완화. 라이브러리에 응용 프로그램을 링크(Static/Dynamic 모두)할 경우 응용 프로그램의 소스코드는 공개하지 않아도 된다. 상용 소프트웨어 개발자가 오픈소스 라이브러리를 쓰도록 전략적으로 만든 라이선스."}, {"name": "MPL", "en": "Mozilla Public License", "tier": "mid", "note": "Netscape 브라우저 소스코드 공개를 위해 개발. 공개해야 할 소스코드 범위를 더 명확히 정의. MPL 코드 자체의 수정부는 다시 MPL로 배포해야 하나, 다른 코드와 결합되거나 새 코드가 작성된 경우에는 공개 의무가 발생하지 않는다."}, {"name": "Apache", "en": "Apache License", "tier": "weak", "note": "아파치 소프트웨어 재단(ASF)의 모든 소프트웨어에 적용. BSD와 비슷하여 소스코드 공개 의무가 없다. 'Apache' 상표권을 침해하지 않아야 하며, 배포 시 저작권·무보증 표시 필요. Apache 코드는 GPL 3.0 코드와 결합 가능."}, {"name": "BSD", "en": "Berkeley Software Distribution License", "tier": "weak", "note": "수정한 소스코드를 공개하지 않아도 되는 대표적인 공개 소프트웨어 라이선스. 미국 정부의 자금으로 운영된 프로젝트였기에 허용 범위가 넓다. 배포 시 저작권·무보증 표시만 필요. 상용 소프트웨어에 무제한 사용 가능."}]}, "mnemonic": "GPL = '공개 Pull 강제!' → GPL 쓰면 네 코드까지 전부 끌려나와서(Pull) 공개 강제! 가장 엄격한 라이선스!", "trap": "", "table": [], "sources": [{"title": "TOPCIT ESSENCE ver.3 — 소프트웨어 개발", "note": "정보통신산업진흥원(NIPA) 공식 교재"}], "priority": 2}, {"title": "오픈소스 소프트웨어 라이선스 활용을 위한 고려사항", "keywords": [], "summary": "", "background": "옛날에는 소프트웨어를 공짜로 가져다 썼다가 나중에 '이거 우리 규칙 어겼으니 소송이야!'라는 황당한 상황이 종종 생겼어. 그래서 오픈소스를 안전하게 쓰려면 미리 규칙을 꼼꼼히 확인해야 한다는 인식이 생겼지.", "explanation": "오픈소스는 '무료로 쓸 수 있는 레시피'라고 생각해봐. 근데 어떤 레시피는 '네가 이걸로 음식 팔면, 레시피도 공개해야 해'라는 조건이 붙어 있거든. 그러니까 회사에서 오픈소스를 쓸 때는 '이 레시피 조건이 우리 사업에 괜찮은지', '앞으로도 계속 관리될 레시피인지'를 먼저 확인하고 쓰기로 결정해야 해.", "why": "", "term_focus": [], "connections": [], "types": null, "mnemonic": "오픈소스 쓰기 전에 '조건 확인 → 사업 영향 → 미래 계획' = '조사미' 세 글자만 기억해! 조건 보고, 사업에 맞는지 보고, 미래에도 쓸 수 있는지 봐!", "trap": "", "table": [], "sources": [], "priority": 3}, {"title": "오픈소스 소프트웨어 정의", "keywords": ["각종", "변경에", "추적성", "다양한", "기술적,", "시스템", "요구사항의", "참여자의"], "summary": "", "background": "옛날에는 프로그래머들이 서로 코드를 자유롭게 나눠 쓰며 발전시켰는데, 1980년대부터 회사들이 '우리 프로그램 함부로 보거나 고치면 안 돼!'라며 돈을 받고 잠가버리기 시작했어. 이에 화가 난 리처드 스톨만이 '소프트웨어는 모두가 자유롭게 써야 해!'라며 반기를 들고 자유소프트웨어재단(FSF)을 만든 게 오픈소스의 시작이야.", "explanation": "오픈소스 소프트웨어는 마치 레시피가 공개된 음식점 같아. 요리법(소스코드)을 누구나 볼 수 있고, 그걸 가져다가 내 입맛대로 바꿔서 써도 되는 거지. 단, '원래 만든 사람 이름은 지우면 안 돼' 같은 기본 예의(라이선스 규칙)는 지켜야 해.", "why": "", "term_focus": [], "connections": [], "types": null, "mnemonic": "오픈소스 = '열려있어, 공짜야, 고쳐써!' → **열공고** 3글자만 기억해!", "trap": "", "table": [], "sources": [], "priority": 3}, {"title": "오픈소스 소프트웨어 라이선스 정의", "keywords": ["각종", "변경에", "추적성", "다양한", "기술적,", "시스템", "요구사항의", "참여자의"], "summary": "", "background": "옛날에 개발자들이 코드를 무료로 공개했더니, 어떤 사람들이 그걸 몰래 가져다가 자기 돈벌이에 쓰면서 원작자한테는 아무 공도 안 돌리는 문제가 생겼어. 그래서 '공짜로 써도 되는데, 대신 이 규칙은 꼭 지켜라!'는 약속서가 필요해진 거야.", "explanation": "오픈소스 라이선스는 쉽게 말해 '공짜 레시피 공유 규칙'이야. 예를 들어 누군가 케이크 레시피를 공개하면서 '써도 되는데, 네가 이 레시피로 새 레시피 만들면 그것도 공개해야 해!'라고 조건을 단 것처럼, 코드를 공개할 때 지켜야 할 규칙을 정해둔 거야. 이 규칙을 어기면 저작권법 위반으로 법적 책임을 질 수 있어.", "why": "", "term_focus": [], "connections": [], "types": null, "mnemonic": "GPL, LGPL, BSD, MPL → '공(GPL)짜지만 Lesser(LGPL)해도 BSD(배포)하면 Mozilla(MPL)도 따라온다' — 앞글자만 따서 **'공짜 레시피는 버섯 피자'** (GPL-LGPL-BSD-MPL = ㄱ-ㄹ-ㅂ-ㅍ)", "trap": "", "table": [], "sources": [], "priority": 3}];
+const PRIO_LABEL = {1:'최우선', 2:'중요', 3:'보통', 4:'보조'};
+let curTab = 'all';
+let curPrio = 'all';
+let curLessonIdx = -1;
+let curPage = 0;
+let pages = [];
+
+function filterTab(btn, ch) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  curTab = ch;
+  applyFilters();
+}
+
+function filterPrio(btn) {
+  document.querySelectorAll('.pchip').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  curPrio = btn.dataset.prio;
+  applyFilters();
+}
+
+function applyFilters() {
+  const q = document.querySelector('.search').value.toLowerCase();
+  document.querySelectorAll('.section-group').forEach(grp => {
+    const chOk = curTab === 'all' || grp.dataset.chapter === curTab;
+    grp.classList.toggle('hidden', !chOk);
+    if (chOk) {
+      let any = false;
+      grp.querySelectorAll('.card').forEach(c => {
+        const qOk = !q || c.textContent.toLowerCase().includes(q);
+        const pOk = curPrio === 'all' || c.dataset.prio === curPrio;
+        const show = qOk && pOk;
+        c.classList.toggle('hidden-card', !show);
+        if (show) any = true;
+      });
+      if (q || curPrio !== 'all') grp.classList.toggle('hidden', !any);
+    }
+  });
+}
+
+function escHtml(str) {
+  return (str || '').replace(/[&<>"]/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[ch]);
+}
+
+function splitMnemonic(text) {
+  return (text || '')
+    .replace(/\r\n/g, '\n')
+    .replace(/\s+\/\s+/g, '\n')
+    .replace(/\s+vs\.\s+/gi, '\n')
+    .replace(/\s+→\s+/g, ' → ')
+    .replace(/\s+↔\s+/g, ' ↔ ')
+    .replace(/\.\s+/g, '.\n')
+    .replace(/다\.\s+/g, '다.\n')
+    .replace(/됨\.\s+/g, '됨.\n')
+    .split(/\n+/)
+    .map(line => line.trim())
+    .filter(Boolean);
+}
+
+function mnemonicIcon(tag, text) {
+  if (tag) return '◈';
+  if (text.includes('↔') || text.includes('=')) return '⇄';
+  if (text.includes('→')) return '→';
+  return '•';
+}
+
+function renderParagraph(text) {
+  return escHtml(text || '').replace(/\n/g, '<br>');
+}
+
+function renderFactSection(label, secClass, items) {
+  if (!items || !items.length) return '';
+  const html = items.map(item => `
+    <div class="fact-item">
+      ${item.label ? `<div class="fact-link-label">${escHtml(item.label)}</div>` : ''}
+      <div class="fact-term">${escHtml(item.term || '')}</div>
+      <div class="fact-note">${renderParagraph(item.note || '')}</div>
+    </div>`).join('');
+  return `<div class="sec ${secClass}"><div class="sec-label">${label}</div><div class="fact-list">${html}</div></div>`;
+}
+
+function renderTypesSection(types) {
+  if (!types) return '';
+  const items = Array.isArray(types) ? types : (types.items || []);
+  if (!items.length) return '';
+  const caption = !Array.isArray(types) && types.caption ? types.caption : '';
+  const scale = !Array.isArray(types) ? (types.scale || '') : '';
+  const scaleLabels = {
+    'strong-to-weak': ['강함','약함','reverse'],
+    'weak-to-strong': ['약함','강함',''],
+  };
+  const tierClass = {
+    'strong': 'tier-strong',
+    'mid': 'tier-mid',
+    'weak': 'tier-weak',
+  };
+  const tierLabel = {
+    'strong': '강함',
+    'mid': '중간',
+    'weak': '약함',
+  };
+  const rows = items.map(it => {
+    const tierCls = it.tier && tierClass[it.tier] ? tierClass[it.tier] : '';
+    const tierLbl = it.tier && tierLabel[it.tier] ? tierLabel[it.tier] : (it.tier || '');
+    return `
+      <div class="type-item">
+        <div class="type-body">
+          <div class="type-head">
+            <span class="type-name">${escHtml(it.name || '')}</span>
+            ${it.en ? `<span class="type-en">${escHtml(it.en)}</span>` : ''}
+            ${tierCls ? `<span class="type-tier ${tierCls}">${escHtml(tierLbl)}</span>` : ''}
+          </div>
+          <div class="type-note">${renderParagraph(it.note || '')}</div>
+        </div>
+      </div>`;
+  }).join('');
+  let scaleHtml = '';
+  if (scale && scaleLabels[scale]) {
+    const [L, R, rev] = scaleLabels[scale];
+    scaleHtml = `<div class="types-scale ${rev}"><span>${L}</span><span class="scale-arrow"></span><span>${R}</span></div>`;
+  }
+  return `<div class="sec sec-types">
+    <div class="sec-label">🗂️ 유형</div>
+    ${caption ? `<div class="types-caption">${renderParagraph(caption)}</div>` : ''}
+    <div class="types-list">${rows}</div>
+    ${scaleHtml}
+  </div>`;
+}
+
+function renderSourceSection(sources) {
+  if (!sources || !sources.length) return '';
+  const html = sources.map(src => {
+    const hasUrl = !!src.url;
+    let host = '';
+    if (hasUrl) {
+      try { host = new URL(src.url).hostname.replace(/^www\./, ''); } catch (_err) { host = ''; }
+    }
+    const inner = `
+        <span class="src-bullet">↗</span>
+        <span class="src-text">
+          ${escHtml(src.title || src.url || '')}
+          ${src.note ? `<span class="src-host">${escHtml(src.note)}</span>` : ''}
+          ${!src.note && host ? `<span class="src-host">${escHtml(host)}</span>` : ''}
+        </span>`;
+    if (hasUrl) {
+      return `<a class="src-link" href="${escHtml(src.url)}" target="_blank" rel="noreferrer">${inner}</a>`;
+    }
+    return `<div class="src-link">${inner}</div>`;
+  }).join('');
+  return `<div class="sec sec-src"><div class="sec-label">🔗 출처</div><div class="src-list">${html}</div></div>`;
+}
+
+function renderMnemonic(text) {
+  const lines = splitMnemonic(text);
+  if (!lines.length) return '';
+  const html = lines.map(line => {
+    const m = line.match(/^【([^】]+)】\s*(.*)$/);
+    const tag = m ? m[1].trim() : '';
+    const body = (m ? m[2] : line).trim();
+    const safeBody = escHtml(body).replace(/'([^']+)'/g, '<strong>$1</strong>');
+    return `
+      <div class="mn-line">
+        <span class="mn-picto">${mnemonicIcon(tag, body)}</span>
+        <div class="mn-main">
+          ${tag ? `<span class="mn-tag">${escHtml(tag)}</span>` : ''}
+          <div class="mn-text">${safeBody}</div>
+        </div>
+      </div>`;
+  }).join('');
+  return `<div class="sec sec-mn"><div class="sec-label">🧠 5초 암기</div><div class="mn-list">${html}</div></div>`;
+}
+
+function buildPages(lesson) {
+  return [
+    { type: 'learn', data: lesson },
+    { type: 'done',  data: lesson },
+  ];
+}
+
+function renderPage() {
+  const body = document.getElementById('l-body');
+  const page = pages[curPage];
+  body.innerHTML = '';
+  body.scrollTop = 0;
+
+  const wrap = document.createElement('div');
+  wrap.className = 'l-page';
+
+  if (page.type === 'learn') {
+    const d = page.data;
+    let h = '';
+    h += `<h1 class="l-page-title">${escHtml(d.title)}</h1>`;
+    const metaBits = [];
+    if (d.priority && PRIO_LABEL[d.priority]) {
+      metaBits.push(`<span class="chip chip-prio-${d.priority}">P${d.priority} · ${PRIO_LABEL[d.priority]}</span>`);
+    }
+    if (metaBits.length) h += `<div class="l-page-meta">${metaBits.join('')}</div>`;
+    if (d.keywords && d.keywords.length) {
+      h += `<div class="l-page-kw">${d.keywords.map(k => `<span>★ ${escHtml(k)}</span>`).join('')}</div>`;
+    }
+    if (d.summary)     h += `<div class="sec sec-summary"><div class="sec-label">📌 한 줄 요약</div><p>${renderParagraph(d.summary)}</p></div>`;
+    if (d.background)  h += `<div class="sec sec-bg"><div class="sec-label">📜 배경·맥락</div><p>${renderParagraph(d.background)}</p></div>`;
+    if (d.explanation) h += `<div class="sec sec-expl"><div class="sec-label">📖 핵심 설명</div><p>${renderParagraph(d.explanation)}</p></div>`;
+    if (d.types)       h += renderTypesSection(d.types);
+    if (d.why)         h += `<div class="sec sec-why"><div class="sec-label">🔍 왜 이렇게 됐나</div><p>${renderParagraph(d.why)}</p></div>`;
+    if (d.term_focus && d.term_focus.length)   h += renderFactSection('🈶 용어·한자 풀이', 'sec-term', d.term_focus);
+    if (d.connections && d.connections.length) h += renderFactSection('🧭 앞뒤 흐름 연결', 'sec-link', d.connections);
+    if (d.mnemonic)    h += renderMnemonic(d.mnemonic);
+    if (d.trap)        h += `<div class="sec sec-trap"><div class="sec-label">⚠️ 시험 함정</div><p>${renderParagraph(d.trap)}</p></div>`;
+    if (d.table && d.table.length) {
+      const cols = Object.keys(d.table[0]);
+      const head = cols.map(c => `<th>${escHtml(c)}</th>`).join('');
+      const rows = d.table.map(r => '<tr>' + cols.map(c => `<td>${escHtml(r[c] || '')}</td>`).join('') + '</tr>').join('');
+      h += `<div class="sec sec-summary" style="padding:0;background:transparent;border:none">
+        <div class="sec-label" style="padding-left:.3rem;color:#6b7280;margin-bottom:.5rem">📊 정리표</div>
+        <table class="ctable"><thead><tr>${head}</tr></thead><tbody>${rows}</tbody></table>
+      </div>`;
+    }
+    if (d.sources && d.sources.length) h += renderSourceSection(d.sources);
+    wrap.innerHTML = h;
+  }
+  else if (page.type === 'done') {
+    const d = page.data;
+    const hasNext = curLessonIdx + 1 < LESSONS.length;
+    wrap.innerHTML = `
+      <div class="done-page">
+        <div class="done-emoji">🎉</div>
+        <div class="done-title">레슨 완료!</div>
+        <div class="done-sub">${escHtml(d.title)}</div>
+        <div class="done-actions">
+          ${hasNext ? '<button class="done-btn done-btn-primary" onclick="startLesson(' + (curLessonIdx + 1) + ')">다음 개념 →</button>' : ''}
+          <button class="done-btn done-btn-sub" onclick="exitLesson()">목록으로 돌아가기</button>
+        </div>
+      </div>`;
+  }
+
+  body.appendChild(wrap);
+
+  document.getElementById('l-page-ind').textContent = `${curPage + 1} / ${pages.length}`;
+  document.getElementById('l-progress-bar').style.width = `${((curPage + 1) / pages.length) * 100}%`;
+  document.getElementById('l-prev').disabled = curPage === 0;
+  document.getElementById('l-next').disabled = curPage === pages.length - 1;
+  document.getElementById('l-next').textContent = curPage === pages.length - 2 ? '완료 🎉' : '다음 →';
+}
+
+function startLesson(idx) {
+  if (idx < 0 || idx >= LESSONS.length) return;
+  curLessonIdx = idx;
+  curPage = 0;
+  pages = buildPages(LESSONS[idx]);
+  document.getElementById('l-title').textContent = LESSONS[idx].title;
+  document.getElementById('lesson').classList.add('show');
+  document.body.style.overflow = 'hidden';
+  renderPage();
+}
+
+function exitLesson() {
+  document.getElementById('lesson').classList.remove('show');
+  document.body.style.overflow = '';
+  curLessonIdx = -1;
+}
+
+function nextPage() { if (curPage < pages.length - 1) { curPage++; renderPage(); } }
+function prevPage() { if (curPage > 0) { curPage--; renderPage(); } }
+
+document.addEventListener('keydown', e => {
+  if (curLessonIdx < 0) return;
+  if (e.key === 'ArrowLeft')  prevPage();
+  if (e.key === 'ArrowRight') nextPage();
+  if (e.key === 'Escape')     exitLesson();
+});
+</script>
+</body>
+</html>

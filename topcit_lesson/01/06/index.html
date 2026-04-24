@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>TOPCIT 01-06 소프트웨어 유지보수</title>
+<style>
+:root{--font-sans:"Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",system-ui,sans-serif;--font-serif:"NanumMyeongjo","Nanum Myeongjo","Batang","Apple SD Gothic Neo",serif}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{overflow-x:hidden}
+body{font-family:var(--font-sans);background:#f7f8fb;color:#1f2937;min-height:100vh}
+
+.header{background:#2563eb;color:#fff;padding:.85rem 1.25rem;display:flex;align-items:center;gap:.75rem;position:sticky;top:0;z-index:20;box-shadow:0 2px 10px rgba(0,0,0,.15)}
+.header-back{color:#fff;text-decoration:none;font-size:1.2rem;opacity:.85}
+.header h1{font-size:1rem;font-weight:800;flex:1;font-family:var(--font-serif)}
+.header-cnt{font-size:.75rem;opacity:.8;white-space:nowrap}
+
+.search-wrap{padding:.7rem 1.25rem .3rem}
+.search{width:100%;padding:.6rem 1rem;border:2px solid #e2e8f0;border-radius:2rem;font-size:.88rem;outline:none;background:#fff;transition:border .2s}
+.search:focus{border-color:#2563eb}
+
+.tabs{display:flex;gap:.35rem;padding:.4rem 1.25rem .3rem;overflow-x:auto;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tab{flex-shrink:0;padding:.32rem .8rem;border-radius:2rem;border:1.5px solid #2563eb;background:#fff;color:#2563eb;font-size:.74rem;font-weight:700;cursor:pointer;white-space:nowrap;transition:all .15s;font-family:inherit}
+.tab.active,.tab:hover{background:#2563eb;color:#fff}
+
+.prio-bar{display:flex;gap:.3rem;padding:.2rem 1.25rem .6rem;overflow-x:auto;scrollbar-width:none}
+.prio-bar::-webkit-scrollbar{display:none}
+.pchip{flex-shrink:0;padding:.28rem .7rem;border-radius:2rem;border:1.5px solid #e5e7eb;background:#fff;color:#475569;font-size:.72rem;font-weight:700;cursor:pointer;white-space:nowrap;transition:all .15s;font-family:inherit}
+.pchip:hover{border-color:var(--pc,#9ca3af);color:#111827}
+.pchip.active{background:var(--pc,#2563eb);border-color:var(--pc,#2563eb);color:#fff}
+.pchip[data-prio="all"].active{background:#2563eb;border-color:#2563eb;color:#fff}
+
+.section-group{padding:.3rem 1.25rem .8rem}
+.section-group.hidden{display:none}
+.section-label{font-size:.72rem;font-weight:800;color:#1d4ed8;letter-spacing:.04em;padding:.4rem 0 .35rem;border-bottom:2px solid #2563eb33;margin-bottom:.55rem;font-family:var(--font-serif)}
+.card-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:.55rem}
+@media(min-width:540px){.card-grid{grid-template-columns:repeat(3,1fr)}}
+@media(min-width:900px){.card-grid{grid-template-columns:repeat(4,1fr)}}
+@media(min-width:1200px){.card-grid{grid-template-columns:repeat(5,1fr)}}
+.card{background:#fff;border-radius:.7rem;padding:.85rem .8rem .65rem;cursor:pointer;border:1.5px solid #e5e7eb;transition:all .18s;box-shadow:0 1px 3px rgba(0,0,0,.04);position:relative;display:flex;flex-direction:column;gap:.35rem;min-height:9rem}
+.card:hover{border-color:#2563eb;box-shadow:0 4px 14px #2563eb33;transform:translateY(-2px)}
+.card-badges{position:absolute;top:.45rem;right:.5rem;display:flex;gap:.2rem;font-size:.64rem}
+.card-badges span{padding:.1rem .42rem;border-radius:.4rem;font-weight:700;line-height:1.4;white-space:nowrap}
+.b-prio-1{background:#fee2e2;color:#991b1b}
+.b-prio-2{background:#fef3c7;color:#92400e}
+.b-prio-3{background:#dcfce7;color:#166534}
+.b-prio-4{background:#f1f5f9;color:#475569}
+.b-mn{background:#ede9fe;color:#5b21b6}
+.card-title{font-size:.86rem;font-weight:700;color:#111827;line-height:1.35;padding-right:4.5rem;font-family:var(--font-serif)}
+.card-preview{font-size:.7rem;color:#6b7280;line-height:1.5;flex:1}
+.card-cta{font-size:.68rem;color:#2563eb;font-weight:700;text-align:right;margin-top:.25rem}
+.card.hidden-card{display:none!important}
+
+/* ───────── 레슨 모드 (풀스크린) ───────── */
+.lesson{display:none;position:fixed;inset:0;background:#f7f8fb;z-index:1000;flex-direction:column}
+.lesson.show{display:flex}
+.l-head{background:#2563eb;color:#fff;padding:.7rem 1rem;display:flex;align-items:center;gap:.7rem;flex-shrink:0}
+.l-back{background:none;border:none;color:#fff;font-size:1.3rem;cursor:pointer;padding:0;line-height:1;opacity:.9}
+.l-title{flex:1;font-size:.92rem;font-weight:800;font-family:var(--font-serif);line-height:1.3;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.l-page-ind{font-size:.78rem;font-weight:700;background:rgba(0,0,0,.18);padding:.18rem .55rem;border-radius:1rem;flex-shrink:0}
+.l-progress{height:4px;background:rgba(0,0,0,.15);flex-shrink:0}
+.l-progress-bar{height:100%;background:#fff;width:0%;transition:width .3s ease}
+.l-body{flex:1;overflow-y:auto;padding:1.2rem 1.25rem 5rem;display:flex;flex-direction:column;gap:1rem;align-items:center}
+.l-page{width:100%;max-width:680px;animation:slideIn .25s ease}
+@keyframes slideIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+.l-page-title{font-size:1.5rem;font-weight:800;color:#1d4ed8;margin-bottom:.5rem;font-family:var(--font-serif);line-height:1.3}
+.l-page-meta{display:flex;flex-wrap:wrap;gap:.35rem;margin-bottom:.85rem}
+.l-page-meta .chip{padding:.18rem .55rem;border-radius:1rem;font-size:.7rem;font-weight:700}
+.chip-prio-1{background:#fee2e2;color:#991b1b}
+.chip-prio-2{background:#fef3c7;color:#92400e}
+.chip-prio-3{background:#dcfce7;color:#166534}
+.chip-prio-4{background:#f1f5f9;color:#475569}
+.l-page-kw{display:flex;flex-wrap:wrap;gap:.3rem;margin-bottom:1.2rem}
+.l-page-kw span{background:#2563eb22;color:#1d4ed8;border:1px solid #2563eb55;border-radius:1rem;padding:.18rem .65rem;font-size:.72rem;font-weight:700}
+
+.sec{border-radius:.7rem;padding:1rem 1.1rem;line-height:1.65;margin-bottom:.85rem}
+.sec-summary{background:#2563eb11;border-left:5px solid #2563eb;font-size:.95rem;color:#111827;font-weight:600}
+.sec-bg{background:#fef7ec;border-left:5px solid #d97706}
+.sec-expl{background:#eef2ff;border-left:5px solid #4f46e5}
+.sec-why{background:#ecfdf5;border-left:5px solid #059669}
+.sec-term{background:#faf5ff;border-left:5px solid #7c3aed}
+.sec-link{background:#fff7ed;border-left:5px solid #c2410c}
+.sec-mn{background:linear-gradient(145deg,#fffef5 0%,#fff7d6 56%,#2563eb20 100%);color:#1f2937;font-weight:600;border:1.5px solid #2563eb33;border-left:5px solid #2563eb;box-shadow:0 10px 26px #2563eb14}
+.sec-trap{background:#fff1f2;border:1.5px solid #fda4af;border-left:5px solid #e11d48;color:#881337}
+.sec-src{background:#fff;border:1.5px solid #e5e7eb;border-left:5px solid #475569}
+.sec-types{background:#f0f9ff;border:1.5px solid #bae6fd;border-left:5px solid #0284c7}
+.sec-types .sec-label{color:#075985}
+.types-caption{font-size:.8rem;color:#334155;margin-bottom:.6rem;line-height:1.55}
+.types-list{display:flex;flex-direction:column;gap:.55rem;counter-reset:tc}
+.type-item{display:grid;grid-template-columns:2rem 1fr;gap:.55rem;align-items:start;background:#fff;border:1px solid #e0f2fe;border-radius:.7rem;padding:.7rem .78rem;counter-increment:tc;position:relative}
+.type-item::before{content:counter(tc);display:inline-flex;align-items:center;justify-content:center;width:1.7rem;height:1.7rem;border-radius:.5rem;background:#2563eb16;color:#1d4ed8;font-size:.8rem;font-weight:800;line-height:1}
+.type-body{min-width:0}
+.type-head{display:flex;flex-wrap:wrap;gap:.35rem;align-items:center;margin-bottom:.2rem}
+.type-name{font-size:.92rem;font-weight:800;color:#0f172a;font-family:var(--font-serif)}
+.type-en{font-size:.72rem;color:#64748b;font-weight:700}
+.type-tier{display:inline-flex;align-items:center;padding:.08rem .42rem;border-radius:999px;font-size:.62rem;font-weight:800;letter-spacing:.04em}
+.tier-strong{background:#fee2e2;color:#991b1b}
+.tier-mid{background:#fef3c7;color:#92400e}
+.tier-weak{background:#dcfce7;color:#166534}
+.type-note{font-size:.86rem;line-height:1.68;color:#334155;word-break:keep-all}
+.types-scale{display:flex;align-items:center;gap:.45rem;margin-top:.65rem;padding:.5rem .7rem;background:rgba(255,255,255,.7);border:1px dashed #bae6fd;border-radius:.6rem;font-size:.72rem;color:#475569;font-weight:700}
+.types-scale .scale-arrow{flex:1;height:6px;border-radius:999px;background:linear-gradient(90deg,#16a34a,#d97706,#dc2626)}
+.types-scale.reverse .scale-arrow{background:linear-gradient(90deg,#dc2626,#d97706,#16a34a)}
+.sec-label{font-size:.7rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;margin-bottom:.5rem}
+.sec-bg .sec-label{color:#92400e}
+.sec-expl .sec-label{color:#3730a3}
+.sec-why .sec-label{color:#065f46}
+.sec-term .sec-label{color:#5b21b6}
+.sec-link .sec-label{color:#9a3412}
+.sec-mn .sec-label{color:#1d4ed8}
+.sec-trap .sec-label{color:#9f1239}
+.sec-summary .sec-label{color:#2563eb}
+.sec-src .sec-label{color:#334155}
+.sec p{font-size:.92rem;line-height:1.7}
+.sec-mn p{font-size:.98rem}
+.fact-list{display:flex;flex-direction:column;gap:.65rem}
+.fact-item{background:rgba(255,255,255,.85);border:1px solid rgba(0,0,0,.06);border-radius:.85rem;padding:.78rem .85rem}
+.fact-term{font-size:.86rem;font-weight:800;color:#111827;margin-bottom:.22rem}
+.fact-note{font-size:.9rem;line-height:1.72;color:#374151;word-break:keep-all}
+.fact-link-label{display:inline-flex;align-items:center;padding:.12rem .45rem;border-radius:999px;background:#2563eb14;color:#1d4ed8;font-size:.64rem;font-weight:800;letter-spacing:.04em;margin-bottom:.38rem}
+.src-list{display:flex;flex-direction:column;gap:.5rem}
+.src-link{display:flex;align-items:flex-start;gap:.45rem;text-decoration:none;color:#111827;background:#f9fafb;border:1px solid #e5e7eb;border-radius:.8rem;padding:.72rem .82rem;transition:border-color .15s,transform .15s}
+.src-link:hover{border-color:#2563eb;transform:translateY(-1px)}
+.src-bullet{flex-shrink:0;color:#2563eb;font-weight:800}
+.src-text{font-size:.85rem;line-height:1.55}
+.src-host{display:block;font-size:.72rem;color:#6b7280;margin-top:.1rem}
+.mn-list{display:flex;flex-direction:column;gap:.55rem}
+.mn-line{display:flex;align-items:flex-start;gap:.72rem;background:rgba(255,255,255,.82);border:1px solid #2563eb22;border-radius:.9rem;padding:.72rem .8rem .68rem;box-shadow:0 4px 12px rgba(0,0,0,.04)}
+.mn-picto{flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;width:1.6rem;height:1.6rem;border-radius:.45rem;background:#2563eb16;border:1px solid #2563eb26;font-size:.76rem;font-weight:800;line-height:1;color:#1d4ed8}
+.mn-main{display:flex;flex-direction:column;gap:.28rem;min-width:0}
+.mn-tag{display:inline-flex;align-items:center;width:fit-content;padding:.12rem .45rem;border-radius:999px;background:#2563eb18;color:#1d4ed8;font-size:.64rem;font-weight:800;letter-spacing:.05em}
+.mn-text{font-size:.95rem;line-height:1.76;color:#1f2937;word-break:keep-all}
+.mn-text strong{color:#2563eb;font-weight:800}
+
+.ctable{width:100%;border-collapse:collapse;font-size:.82rem;background:#fff;border-radius:.5rem;overflow:hidden;margin-top:.4rem}
+.ctable th{background:#2563eb;color:#fff;padding:.55rem .65rem;text-align:left;font-weight:700;font-size:.78rem}
+.ctable td{padding:.55rem .65rem;border-top:1px solid #e5e7eb;vertical-align:top;line-height:1.55}
+.ctable tr:nth-child(even) td{background:#f9fafb}
+
+.done-page{text-align:center;padding:2.5rem 1rem}
+.done-emoji{font-size:4.5rem;margin-bottom:1rem;animation:pop .4s ease}
+@keyframes pop{from{transform:scale(0)}80%{transform:scale(1.2)}to{transform:scale(1)}}
+.done-title{font-size:1.5rem;font-weight:800;color:#1d4ed8;margin-bottom:.5rem;font-family:var(--font-serif)}
+.done-sub{font-size:.95rem;color:#6b7280;margin-bottom:2rem}
+.done-actions{display:flex;flex-direction:column;gap:.6rem;max-width:300px;margin:0 auto}
+.done-btn{padding:.85rem 1.4rem;border-radius:.7rem;font-size:.95rem;font-weight:700;cursor:pointer;border:none;font-family:inherit;transition:all .15s}
+.done-btn-primary{background:#2563eb;color:#fff}
+.done-btn-primary:hover{transform:translateY(-2px);box-shadow:0 4px 14px #2563eb55}
+.done-btn-sub{background:#fff;color:#2563eb;border:1.5px solid #2563eb}
+.done-btn-sub:hover{background:#2563eb11}
+
+.l-foot{position:fixed;bottom:0;left:0;right:0;background:#fff;padding:.7rem 1rem;display:flex;gap:.5rem;border-top:1px solid #e5e7eb;z-index:1010}
+.l-nav-btn{flex:1;padding:.7rem;border-radius:.55rem;border:1.5px solid #2563eb;background:#fff;color:#2563eb;font-size:.88rem;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s}
+.l-nav-btn:hover:not(:disabled){background:#2563eb11}
+.l-nav-btn:disabled{opacity:.35;cursor:not-allowed}
+.l-nav-btn.primary{background:#2563eb;color:#fff;border-color:#2563eb}
+.l-nav-btn.primary:hover:not(:disabled){background:#1d4ed8;border-color:#1d4ed8}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <a href="../" class="header-back">←</a>
+  <span style="font-size:1.2rem">💻</span>
+  <h1><span style="opacity:.7;font-size:.85em">01</span> &nbsp;소프트웨어 유지보수</h1>
+  <span class="header-cnt">7개</span>
+</div>
+
+<div class="search-wrap">
+  <input class="search" type="text" placeholder="🔍  개념 검색..." oninput="applyFilters()">
+</div>
+
+<div class="tabs" id="tab-bar"><button class="tab active" onclick="filterTab(this,'all')">전체</button><button class="tab" onclick="filterTab(this,'0')">소프트웨어 유지보수의 개념과 유형</button><button class="tab" onclick="filterTab(this,'1')">소프트웨어 유지보수 활동</button></div>
+<div class="prio-bar"><button class="pchip active" data-prio="all" onclick="filterPrio(this)">전체</button><button class="pchip" data-prio="1" onclick="filterPrio(this)" style="--pc:#dc2626">🔴 P1 최우선</button><button class="pchip" data-prio="2" onclick="filterPrio(this)" style="--pc:#d97706">🟡 P2 중요</button><button class="pchip" data-prio="3" onclick="filterPrio(this)" style="--pc:#16a34a">🟢 P3 보통</button><button class="pchip" data-prio="4" onclick="filterPrio(this)" style="--pc:#9ca3af">⚪ P4 보조</button></div>
+
+<div id="card-content"><div class="section-group" data-chapter="0"><div class="section-label">소프트웨어 유지보수의 개념과 유형</div><div class="card-grid"><div class="card" data-prio="3" onclick="startLesson(0)"><div class="card-badges"><span class="b-prio b-prio-3" title="보통">🟢 P3</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">소프트웨어 유지보수의 정의</div><div class="card-preview">옛날에 프로그램을 한 번 만들면 끝인 줄 알았는데, 막상 사람들이 쓰다 보니 버그도 생기고…</div><div class="card-cta">레슨 시작 →</div></div><div class="card" data-prio="4" onclick="startLesson(1)"><div class="card-badges"><span class="b-prio b-prio-4" title="보조">⚪ P4</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">소프트웨어 유지보수의 목적</div><div class="card-preview">옛날에 프로그램을 한 번 만들면 끝인 줄 알았는데, 시간이 지나면서 버그도 생기고 윈도우 …</div><div class="card-cta">레슨 시작 →</div></div><div class="card" data-prio="2" onclick="startLesson(2)"><div class="card-badges"><span class="b-prio b-prio-2" title="중요">🟡 P2</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">소프트웨어 유지보수의 종류</div><div class="card-preview">소프트웨어를 만들고 나서 그냥 내버려두면 버그도 생기고, 세상이 바뀌면 맞지 않는 부분도 …</div><div class="card-cta">레슨 시작 →</div></div></div></div><div class="section-group" data-chapter="1"><div class="section-label">소프트웨어 유지보수 활동</div><div class="card-grid"><div class="card" data-prio="3" onclick="startLesson(3)"><div class="card-badges"><span class="b-prio b-prio-3" title="보통">🟢 P3</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">SW 유지보수 절차</div><div class="card-preview">옛날에 프로그램을 만들고 나서 버그가 생기거나 기능을 바꿔야 할 때, 아무 규칙 없이 막 …</div><div class="card-cta">레슨 시작 →</div></div><div class="card" data-prio="4" onclick="startLesson(4)"><div class="card-badges"><span class="b-prio b-prio-4" title="보조">⚪ P4</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">소프트웨어 조직 유형</div><div class="card-preview">옛날에는 소프트웨어를 만들면 회사가 코드를 꽁꽁 숨기고 돈 받고 팔았는데, &#x27;왜 우리끼리 …</div><div class="card-cta">레슨 시작 →</div></div><div class="card" data-prio="4" onclick="startLesson(5)"><div class="card-badges"><span class="b-prio b-prio-4" title="보조">⚪ P4</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">오픈소스 소프트웨어</div><div class="card-preview">옛날에는 프로그램을 만들면 코드를 꽁꽁 숨겨서 돈 내고 사야만 쓸 수 있었어. 근데 &#x27;왜 …</div><div class="card-cta">레슨 시작 →</div></div><div class="card" data-prio="4" onclick="startLesson(6)"><div class="card-badges"><span class="b-prio b-prio-4" title="보조">⚪ P4</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">오픈소스 소프트웨어 라이선스 정의</div><div class="card-preview">옛날에 개발자들이 코드를 무료로 공개했더니, 어떤 사람들이 그걸 몰래 가져다가 자기 돈벌이…</div><div class="card-cta">레슨 시작 →</div></div></div></div></div>
+
+<!-- ── 레슨 모드 ── -->
+<div class="lesson" id="lesson">
+  <div class="l-head">
+    <button class="l-back" onclick="exitLesson()">←</button>
+    <div class="l-title" id="l-title"></div>
+    <div class="l-page-ind" id="l-page-ind">1 / 1</div>
+  </div>
+  <div class="l-progress"><div class="l-progress-bar" id="l-progress-bar"></div></div>
+  <div class="l-body" id="l-body"></div>
+  <div class="l-foot">
+    <button class="l-nav-btn" id="l-prev" onclick="prevPage()">← 이전</button>
+    <button class="l-nav-btn primary" id="l-next" onclick="nextPage()">다음 →</button>
+  </div>
+</div>
+
+<script>
+const LESSONS = [{"title": "소프트웨어 유지보수의 정의", "keywords": [], "summary": "", "background": "옛날에 프로그램을 한 번 만들면 끝인 줄 알았는데, 막상 사람들이 쓰다 보니 버그도 생기고 환경도 바뀌고 새로운 기능도 필요해졌어. 그래서 '만들고 나서도 계속 관리해야 한다'는 개념이 필요하게 된 거야.", "explanation": "소프트웨어 유지보수는 자동차를 산 다음에 하는 '차 관리'랑 똑같아. 차를 샀다고 끝이 아니라 기름도 넣고, 고장 나면 수리하고, 새 기능(블랙박스 등)도 추가하잖아. 소프트웨어도 고객한테 넘긴 후에 오류를 고치고, 성능을 높이고, 달라진 환경에 맞게 계속 손봐주는 작업이야. 쉽게 말해 '프로그램의 사후관리'라고 생각하면 돼!", "why": "", "term_focus": [], "connections": [], "types": null, "mnemonic": "유지보수 = '납품 후 오·성·환' → 오류 수정, 성능 향상, 환경 적응! '오성환 선수처럼 납품 후에도 계속 뛴다!' 🏃", "trap": "", "table": [], "sources": [], "priority": 3}, {"title": "소프트웨어 유지보수의 목적", "keywords": [], "summary": "", "background": "옛날에 프로그램을 한 번 만들면 끝인 줄 알았는데, 시간이 지나면서 버그도 생기고 윈도우 버전도 바뀌고 사용자 요구도 달라지면서 '만든 후 관리'가 필수라는 걸 깨달았어. 그래서 소프트웨어를 오래, 잘 쓰려면 꾸준히 손봐줘야 한다는 개념이 생긴 거야.", "explanation": "소프트웨어 유지보수는 자동차 정기점검이랑 똑같아. 차 샀다고 끝이 아니라 엔진오일도 갈고(성능 개선), 고장난 부분 고치고(하자보수), 새 도로 규정에 맞게 업그레이드(새 환경 적응)하잖아. 프로그램도 마찬가지로 출시 후에 계속 고치고 발전시켜야 오래 쓸 수 있어.", "why": "", "term_focus": [], "connections": [], "types": null, "mnemonic": "유지보수 목적 = '성하새예' → 🔧성능 개선, 🐛하자보수, 🌍새 환경 적응, 🛡️예방! '성하새예' 네 글자만 기억해!", "trap": "", "table": [], "sources": [], "priority": 4}, {"title": "소프트웨어 유지보수의 종류", "keywords": [], "summary": "", "background": "소프트웨어를 만들고 나서 그냥 내버려두면 버그도 생기고, 세상이 바뀌면 맞지 않는 부분도 생기고, 새로운 기능이 필요해지기도 했어. 그래서 '어떤 이유로, 언제, 무엇을 고칠지' 체계적으로 나눠서 관리하는 방법이 필요해졌지.", "explanation": "소프트웨어 유지보수는 크게 '왜 고치냐(사유)', '언제 고치냐(시간)', '뭘 고치냐(대상)' 이 세 가지 기준으로 나눌 수 있어. 예를 들어 앱에서 오류가 터지면 '수정', 스마트폰 OS가 바뀌면 '적응', 새 기능을 추가하면 '완전화' 유지보수인 거야. 시간 기준으로는 정기적으로 점검하는 '계획', 미리 막는 '예방', 급하게 고치는 '응급'으로 나뉘어.", "why": "", "term_focus": [], "connections": [], "types": {"caption": "소프트웨어 유지보수는 사유·시간·대상 3가지 기준으로 분류된다. 사유 기준은 아래와 같고, 시간 기준은 계획·예방·응급, 대상 기준은 데이터/프로그램·문서화·시스템 유지보수가 있다.", "items": [{"name": "수정 유지보수", "en": "Corrective", "note": "오류로 인한 유지보수. 처리·수행·구현 오류를 식별하여 바로잡는 활동."}, {"name": "적응 유지보수", "en": "Adaptive", "note": "데이터 환경과 인프라 환경 변화에 적응하기 위한 처리."}, {"name": "완전화 유지보수", "en": "Perfective", "note": "새로운 기능 추가·변경·개선을 위한 유지보수."}]}, "mnemonic": "사유는 '수적완(수정·적응·완전화)' → '수적완!' 하고 외쳐! 시간은 '계예응(계획·예방·응급)' → '계획 없이 예방도 없고 응급만 남는다!' 로 기억해봐!", "trap": "", "table": [], "sources": [{"title": "TOPCIT ESSENCE ver.3 — 소프트웨어 개발", "note": "정보통신산업진흥원(NIPA) 공식 교재"}], "priority": 2}, {"title": "SW 유지보수 절차", "keywords": [], "summary": "", "background": "옛날에 프로그램을 만들고 나서 버그가 생기거나 기능을 바꿔야 할 때, 아무 규칙 없이 막 고치다 보니 오히려 더 망가지는 일이 많았어. 그래서 '고칠 때도 순서대로 체계적으로 하자!'는 약속이 생긴 거야.", "explanation": "SW 유지보수 절차는 앱에 문제가 생겼을 때 고치는 순서야. 마치 병원 가는 것처럼 → ① 증상 접수(문제 요청 접수) → ② 진단(문제 분석) → ③ 수술(코드 수정) → ④ 퇴원 전 검사(테스트) → ⑤ 퇴원(배포 및 완료 확인) 순서로 진행돼. 이 순서를 지켜야 고치다가 다른 곳을 망가뜨리는 실수를 막을 수 있어.", "why": "", "term_focus": [], "connections": [], "types": null, "mnemonic": "병원 순서로 외워! '접분수테완' → 접수 → 분석 → 수정 → 테스트 → 완료! '아파서 접수했더니 분석하고 수술(수정)하고 테스트하고 완료!' 🏥", "trap": "", "table": [], "sources": [], "priority": 3}, {"title": "소프트웨어 조직 유형", "keywords": [], "summary": "", "background": "옛날에는 소프트웨어를 만들면 회사가 코드를 꽁꽁 숨기고 돈 받고 팔았는데, '왜 우리끼리 코드 공유하면서 같이 발전시키면 안 되지?'라는 생각을 가진 개발자들이 모이기 시작했어. 그래서 코드를 공개하는 그룹이냐, 비공개로 운영하는 그룹이냐에 따라 소프트웨어 조직 유형이 나뉘게 된 거야.", "explanation": "소프트웨어 조직 유형은 크게 '오픈소스'와 '클로즈드소스' 두 가지로 나뉘어. 오픈소스는 레시피를 공개해서 누구나 요리를 따라 만들고 개선할 수 있는 것처럼, 코드를 누구나 보고 수정하고 나눌 수 있게 공개한 거야. 반대로 클로즈드소스는 맥도날드 비밀 소스처럼 레시피를 절대 공개 안 하고 완성된 제품만 파는 방식이지.", "why": "", "term_focus": [], "connections": [], "types": {"caption": "소프트웨어 유지보수 조직의 대표 유형 3가지. 가장 많이 적용되는 것은 애플리케이션 분야에 따른 조직이며, 응용업무 지식이 필요한 분야에 주로 쓰인다.", "items": [{"name": "작업의 형태에 따른 조직", "note": "사용자 요구를 분석하고 시스템을 설계·구현·테스트. 각 팀은 서로 분리된 책임과 역할을 수행. 프로그래밍 지식과 기술에 대해 전문화되나, 분석가와 프로그래머 간 조정 비용이 필요하다."}, {"name": "애플리케이션 분야에 따른 조직", "note": "응용 애플리케이션에 따라 조직을 분류. 응용지식의 개발에 대해 전문성을 가짐. 가장 많이 적용되는 유형."}, {"name": "생명주기에 따른 조직", "note": "개발과 유지보수로 조직을 구분. 개발과 유지보수 기술의 전문성을 가짐. 개발/유지보수 조직 간 조정 비용이 필요하다."}]}, "mnemonic": "오픈소스 = '오픈(open)=열려있다' → 문이 활짝 열린 집 🏠, 클로즈드소스 = '잠긴 금고 🔒' — 열린 집 vs 잠긴 금고!", "trap": "", "table": [], "sources": [{"title": "TOPCIT ESSENCE ver.3 — 소프트웨어 개발", "note": "정보통신산업진흥원(NIPA) 공식 교재"}], "priority": 4}, {"title": "오픈소스 소프트웨어", "keywords": [], "summary": "", "background": "옛날에는 프로그램을 만들면 코드를 꽁꽁 숨겨서 돈 내고 사야만 쓸 수 있었어. 근데 '왜 우리끼리 코드 공유하면서 같이 발전시키면 안 돼?'라고 생각한 개발자들이 모여서 코드를 공개하는 문화를 만들기 시작했지.", "explanation": "오픈소스는 레시피를 공개한 요리책 같은 거야. 보통 식당은 레시피를 절대 안 알려주지만, 오픈소스는 '이 코드 마음껏 보고, 고치고, 나눠써!'라고 하는 거거든. 예를 들어 안드로이드폰의 기반이 되는 코드도 오픈소스라 전 세계 개발자들이 함께 고치고 발전시키고 있어.", "why": "", "term_focus": [], "connections": [], "types": null, "mnemonic": "오픈소스 = '오픈(열려있는) 주방(소스코드)' → 누구나 들어와서 레시피 보고 요리해도 OK!", "trap": "", "table": [], "sources": [], "priority": 4}, {"title": "오픈소스 소프트웨어 라이선스 정의", "keywords": [], "summary": "", "background": "옛날에 개발자들이 코드를 무료로 공개했더니, 어떤 사람들이 그걸 몰래 가져다가 자기 돈벌이에 쓰면서 원작자한테는 아무 공도 안 돌리는 문제가 생겼어. 그래서 '공짜로 써도 되는데, 대신 이 규칙은 꼭 지켜라!'는 약속서가 필요해진 거야.", "explanation": "오픈소스 라이선스는 쉽게 말해 '공짜 레시피 공유 규칙'이야. 예를 들어 누군가 케이크 레시피를 공개하면서 '써도 되는데, 네가 이 레시피로 새 레시피 만들면 그것도 공개해야 해!'라고 조건을 단 것처럼, 코드를 공개할 때 지켜야 할 규칙을 정해둔 거야. 이 규칙을 어기면 저작권법 위반으로 법적 책임을 질 수 있어.", "why": "", "term_focus": [], "connections": [], "types": null, "mnemonic": "GPL, LGPL, BSD, MPL → '공(GPL)짜지만 Lesser(LGPL)해도 BSD(배포)하면 Mozilla(MPL)도 따라온다' — 앞글자만 따서 **'공짜 레시피는 버섯 피자'** (GPL-LGPL-BSD-MPL = ㄱ-ㄹ-ㅂ-ㅍ)", "trap": "", "table": [], "sources": [], "priority": 4}];
+const PRIO_LABEL = {1:'최우선', 2:'중요', 3:'보통', 4:'보조'};
+let curTab = 'all';
+let curPrio = 'all';
+let curLessonIdx = -1;
+let curPage = 0;
+let pages = [];
+
+function filterTab(btn, ch) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  curTab = ch;
+  applyFilters();
+}
+
+function filterPrio(btn) {
+  document.querySelectorAll('.pchip').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  curPrio = btn.dataset.prio;
+  applyFilters();
+}
+
+function applyFilters() {
+  const q = document.querySelector('.search').value.toLowerCase();
+  document.querySelectorAll('.section-group').forEach(grp => {
+    const chOk = curTab === 'all' || grp.dataset.chapter === curTab;
+    grp.classList.toggle('hidden', !chOk);
+    if (chOk) {
+      let any = false;
+      grp.querySelectorAll('.card').forEach(c => {
+        const qOk = !q || c.textContent.toLowerCase().includes(q);
+        const pOk = curPrio === 'all' || c.dataset.prio === curPrio;
+        const show = qOk && pOk;
+        c.classList.toggle('hidden-card', !show);
+        if (show) any = true;
+      });
+      if (q || curPrio !== 'all') grp.classList.toggle('hidden', !any);
+    }
+  });
+}
+
+function escHtml(str) {
+  return (str || '').replace(/[&<>"]/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[ch]);
+}
+
+function splitMnemonic(text) {
+  return (text || '')
+    .replace(/\r\n/g, '\n')
+    .replace(/\s+\/\s+/g, '\n')
+    .replace(/\s+vs\.\s+/gi, '\n')
+    .replace(/\s+→\s+/g, ' → ')
+    .replace(/\s+↔\s+/g, ' ↔ ')
+    .replace(/\.\s+/g, '.\n')
+    .replace(/다\.\s+/g, '다.\n')
+    .replace(/됨\.\s+/g, '됨.\n')
+    .split(/\n+/)
+    .map(line => line.trim())
+    .filter(Boolean);
+}
+
+function mnemonicIcon(tag, text) {
+  if (tag) return '◈';
+  if (text.includes('↔') || text.includes('=')) return '⇄';
+  if (text.includes('→')) return '→';
+  return '•';
+}
+
+function renderParagraph(text) {
+  return escHtml(text || '').replace(/\n/g, '<br>');
+}
+
+function renderFactSection(label, secClass, items) {
+  if (!items || !items.length) return '';
+  const html = items.map(item => `
+    <div class="fact-item">
+      ${item.label ? `<div class="fact-link-label">${escHtml(item.label)}</div>` : ''}
+      <div class="fact-term">${escHtml(item.term || '')}</div>
+      <div class="fact-note">${renderParagraph(item.note || '')}</div>
+    </div>`).join('');
+  return `<div class="sec ${secClass}"><div class="sec-label">${label}</div><div class="fact-list">${html}</div></div>`;
+}
+
+function renderTypesSection(types) {
+  if (!types) return '';
+  const items = Array.isArray(types) ? types : (types.items || []);
+  if (!items.length) return '';
+  const caption = !Array.isArray(types) && types.caption ? types.caption : '';
+  const scale = !Array.isArray(types) ? (types.scale || '') : '';
+  const scaleLabels = {
+    'strong-to-weak': ['강함','약함','reverse'],
+    'weak-to-strong': ['약함','강함',''],
+  };
+  const tierClass = {
+    'strong': 'tier-strong',
+    'mid': 'tier-mid',
+    'weak': 'tier-weak',
+  };
+  const tierLabel = {
+    'strong': '강함',
+    'mid': '중간',
+    'weak': '약함',
+  };
+  const rows = items.map(it => {
+    const tierCls = it.tier && tierClass[it.tier] ? tierClass[it.tier] : '';
+    const tierLbl = it.tier && tierLabel[it.tier] ? tierLabel[it.tier] : (it.tier || '');
+    return `
+      <div class="type-item">
+        <div class="type-body">
+          <div class="type-head">
+            <span class="type-name">${escHtml(it.name || '')}</span>
+            ${it.en ? `<span class="type-en">${escHtml(it.en)}</span>` : ''}
+            ${tierCls ? `<span class="type-tier ${tierCls}">${escHtml(tierLbl)}</span>` : ''}
+          </div>
+          <div class="type-note">${renderParagraph(it.note || '')}</div>
+        </div>
+      </div>`;
+  }).join('');
+  let scaleHtml = '';
+  if (scale && scaleLabels[scale]) {
+    const [L, R, rev] = scaleLabels[scale];
+    scaleHtml = `<div class="types-scale ${rev}"><span>${L}</span><span class="scale-arrow"></span><span>${R}</span></div>`;
+  }
+  return `<div class="sec sec-types">
+    <div class="sec-label">🗂️ 유형</div>
+    ${caption ? `<div class="types-caption">${renderParagraph(caption)}</div>` : ''}
+    <div class="types-list">${rows}</div>
+    ${scaleHtml}
+  </div>`;
+}
+
+function renderSourceSection(sources) {
+  if (!sources || !sources.length) return '';
+  const html = sources.map(src => {
+    const hasUrl = !!src.url;
+    let host = '';
+    if (hasUrl) {
+      try { host = new URL(src.url).hostname.replace(/^www\./, ''); } catch (_err) { host = ''; }
+    }
+    const inner = `
+        <span class="src-bullet">↗</span>
+        <span class="src-text">
+          ${escHtml(src.title || src.url || '')}
+          ${src.note ? `<span class="src-host">${escHtml(src.note)}</span>` : ''}
+          ${!src.note && host ? `<span class="src-host">${escHtml(host)}</span>` : ''}
+        </span>`;
+    if (hasUrl) {
+      return `<a class="src-link" href="${escHtml(src.url)}" target="_blank" rel="noreferrer">${inner}</a>`;
+    }
+    return `<div class="src-link">${inner}</div>`;
+  }).join('');
+  return `<div class="sec sec-src"><div class="sec-label">🔗 출처</div><div class="src-list">${html}</div></div>`;
+}
+
+function renderMnemonic(text) {
+  const lines = splitMnemonic(text);
+  if (!lines.length) return '';
+  const html = lines.map(line => {
+    const m = line.match(/^【([^】]+)】\s*(.*)$/);
+    const tag = m ? m[1].trim() : '';
+    const body = (m ? m[2] : line).trim();
+    const safeBody = escHtml(body).replace(/'([^']+)'/g, '<strong>$1</strong>');
+    return `
+      <div class="mn-line">
+        <span class="mn-picto">${mnemonicIcon(tag, body)}</span>
+        <div class="mn-main">
+          ${tag ? `<span class="mn-tag">${escHtml(tag)}</span>` : ''}
+          <div class="mn-text">${safeBody}</div>
+        </div>
+      </div>`;
+  }).join('');
+  return `<div class="sec sec-mn"><div class="sec-label">🧠 5초 암기</div><div class="mn-list">${html}</div></div>`;
+}
+
+function buildPages(lesson) {
+  return [
+    { type: 'learn', data: lesson },
+    { type: 'done',  data: lesson },
+  ];
+}
+
+function renderPage() {
+  const body = document.getElementById('l-body');
+  const page = pages[curPage];
+  body.innerHTML = '';
+  body.scrollTop = 0;
+
+  const wrap = document.createElement('div');
+  wrap.className = 'l-page';
+
+  if (page.type === 'learn') {
+    const d = page.data;
+    let h = '';
+    h += `<h1 class="l-page-title">${escHtml(d.title)}</h1>`;
+    const metaBits = [];
+    if (d.priority && PRIO_LABEL[d.priority]) {
+      metaBits.push(`<span class="chip chip-prio-${d.priority}">P${d.priority} · ${PRIO_LABEL[d.priority]}</span>`);
+    }
+    if (metaBits.length) h += `<div class="l-page-meta">${metaBits.join('')}</div>`;
+    if (d.keywords && d.keywords.length) {
+      h += `<div class="l-page-kw">${d.keywords.map(k => `<span>★ ${escHtml(k)}</span>`).join('')}</div>`;
+    }
+    if (d.summary)     h += `<div class="sec sec-summary"><div class="sec-label">📌 한 줄 요약</div><p>${renderParagraph(d.summary)}</p></div>`;
+    if (d.background)  h += `<div class="sec sec-bg"><div class="sec-label">📜 배경·맥락</div><p>${renderParagraph(d.background)}</p></div>`;
+    if (d.explanation) h += `<div class="sec sec-expl"><div class="sec-label">📖 핵심 설명</div><p>${renderParagraph(d.explanation)}</p></div>`;
+    if (d.types)       h += renderTypesSection(d.types);
+    if (d.why)         h += `<div class="sec sec-why"><div class="sec-label">🔍 왜 이렇게 됐나</div><p>${renderParagraph(d.why)}</p></div>`;
+    if (d.term_focus && d.term_focus.length)   h += renderFactSection('🈶 용어·한자 풀이', 'sec-term', d.term_focus);
+    if (d.connections && d.connections.length) h += renderFactSection('🧭 앞뒤 흐름 연결', 'sec-link', d.connections);
+    if (d.mnemonic)    h += renderMnemonic(d.mnemonic);
+    if (d.trap)        h += `<div class="sec sec-trap"><div class="sec-label">⚠️ 시험 함정</div><p>${renderParagraph(d.trap)}</p></div>`;
+    if (d.table && d.table.length) {
+      const cols = Object.keys(d.table[0]);
+      const head = cols.map(c => `<th>${escHtml(c)}</th>`).join('');
+      const rows = d.table.map(r => '<tr>' + cols.map(c => `<td>${escHtml(r[c] || '')}</td>`).join('') + '</tr>').join('');
+      h += `<div class="sec sec-summary" style="padding:0;background:transparent;border:none">
+        <div class="sec-label" style="padding-left:.3rem;color:#6b7280;margin-bottom:.5rem">📊 정리표</div>
+        <table class="ctable"><thead><tr>${head}</tr></thead><tbody>${rows}</tbody></table>
+      </div>`;
+    }
+    if (d.sources && d.sources.length) h += renderSourceSection(d.sources);
+    wrap.innerHTML = h;
+  }
+  else if (page.type === 'done') {
+    const d = page.data;
+    const hasNext = curLessonIdx + 1 < LESSONS.length;
+    wrap.innerHTML = `
+      <div class="done-page">
+        <div class="done-emoji">🎉</div>
+        <div class="done-title">레슨 완료!</div>
+        <div class="done-sub">${escHtml(d.title)}</div>
+        <div class="done-actions">
+          ${hasNext ? '<button class="done-btn done-btn-primary" onclick="startLesson(' + (curLessonIdx + 1) + ')">다음 개념 →</button>' : ''}
+          <button class="done-btn done-btn-sub" onclick="exitLesson()">목록으로 돌아가기</button>
+        </div>
+      </div>`;
+  }
+
+  body.appendChild(wrap);
+
+  document.getElementById('l-page-ind').textContent = `${curPage + 1} / ${pages.length}`;
+  document.getElementById('l-progress-bar').style.width = `${((curPage + 1) / pages.length) * 100}%`;
+  document.getElementById('l-prev').disabled = curPage === 0;
+  document.getElementById('l-next').disabled = curPage === pages.length - 1;
+  document.getElementById('l-next').textContent = curPage === pages.length - 2 ? '완료 🎉' : '다음 →';
+}
+
+function startLesson(idx) {
+  if (idx < 0 || idx >= LESSONS.length) return;
+  curLessonIdx = idx;
+  curPage = 0;
+  pages = buildPages(LESSONS[idx]);
+  document.getElementById('l-title').textContent = LESSONS[idx].title;
+  document.getElementById('lesson').classList.add('show');
+  document.body.style.overflow = 'hidden';
+  renderPage();
+}
+
+function exitLesson() {
+  document.getElementById('lesson').classList.remove('show');
+  document.body.style.overflow = '';
+  curLessonIdx = -1;
+}
+
+function nextPage() { if (curPage < pages.length - 1) { curPage++; renderPage(); } }
+function prevPage() { if (curPage > 0) { curPage--; renderPage(); } }
+
+document.addEventListener('keydown', e => {
+  if (curLessonIdx < 0) return;
+  if (e.key === 'ArrowLeft')  prevPage();
+  if (e.key === 'ArrowRight') nextPage();
+  if (e.key === 'Escape')     exitLesson();
+});
+</script>
+</body>
+</html>

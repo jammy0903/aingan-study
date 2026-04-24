@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>TOPCIT 04-02 암호 기술</title>
+<style>
+:root{--font-sans:"Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",system-ui,sans-serif;--font-serif:"NanumMyeongjo","Nanum Myeongjo","Batang","Apple SD Gothic Neo",serif}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{overflow-x:hidden}
+body{font-family:var(--font-sans);background:#f7f8fb;color:#1f2937;min-height:100vh}
+
+.header{background:#dc2626;color:#fff;padding:.85rem 1.25rem;display:flex;align-items:center;gap:.75rem;position:sticky;top:0;z-index:20;box-shadow:0 2px 10px rgba(0,0,0,.15)}
+.header-back{color:#fff;text-decoration:none;font-size:1.2rem;opacity:.85}
+.header h1{font-size:1rem;font-weight:800;flex:1;font-family:var(--font-serif)}
+.header-cnt{font-size:.75rem;opacity:.8;white-space:nowrap}
+
+.search-wrap{padding:.7rem 1.25rem .3rem}
+.search{width:100%;padding:.6rem 1rem;border:2px solid #e2e8f0;border-radius:2rem;font-size:.88rem;outline:none;background:#fff;transition:border .2s}
+.search:focus{border-color:#dc2626}
+
+.tabs{display:flex;gap:.35rem;padding:.4rem 1.25rem .3rem;overflow-x:auto;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tab{flex-shrink:0;padding:.32rem .8rem;border-radius:2rem;border:1.5px solid #dc2626;background:#fff;color:#dc2626;font-size:.74rem;font-weight:700;cursor:pointer;white-space:nowrap;transition:all .15s;font-family:inherit}
+.tab.active,.tab:hover{background:#dc2626;color:#fff}
+
+.prio-bar{display:flex;gap:.3rem;padding:.2rem 1.25rem .6rem;overflow-x:auto;scrollbar-width:none}
+.prio-bar::-webkit-scrollbar{display:none}
+.pchip{flex-shrink:0;padding:.28rem .7rem;border-radius:2rem;border:1.5px solid #e5e7eb;background:#fff;color:#475569;font-size:.72rem;font-weight:700;cursor:pointer;white-space:nowrap;transition:all .15s;font-family:inherit}
+.pchip:hover{border-color:var(--pc,#9ca3af);color:#111827}
+.pchip.active{background:var(--pc,#dc2626);border-color:var(--pc,#dc2626);color:#fff}
+.pchip[data-prio="all"].active{background:#dc2626;border-color:#dc2626;color:#fff}
+
+.section-group{padding:.3rem 1.25rem .8rem}
+.section-group.hidden{display:none}
+.section-label{font-size:.72rem;font-weight:800;color:#991b1b;letter-spacing:.04em;padding:.4rem 0 .35rem;border-bottom:2px solid #dc262633;margin-bottom:.55rem;font-family:var(--font-serif)}
+.card-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:.55rem}
+@media(min-width:540px){.card-grid{grid-template-columns:repeat(3,1fr)}}
+@media(min-width:900px){.card-grid{grid-template-columns:repeat(4,1fr)}}
+@media(min-width:1200px){.card-grid{grid-template-columns:repeat(5,1fr)}}
+.card{background:#fff;border-radius:.7rem;padding:.85rem .8rem .65rem;cursor:pointer;border:1.5px solid #e5e7eb;transition:all .18s;box-shadow:0 1px 3px rgba(0,0,0,.04);position:relative;display:flex;flex-direction:column;gap:.35rem;min-height:9rem}
+.card:hover{border-color:#dc2626;box-shadow:0 4px 14px #dc262633;transform:translateY(-2px)}
+.card-badges{position:absolute;top:.45rem;right:.5rem;display:flex;gap:.2rem;font-size:.64rem}
+.card-badges span{padding:.1rem .42rem;border-radius:.4rem;font-weight:700;line-height:1.4;white-space:nowrap}
+.b-prio-1{background:#fee2e2;color:#991b1b}
+.b-prio-2{background:#fef3c7;color:#92400e}
+.b-prio-3{background:#dcfce7;color:#166534}
+.b-prio-4{background:#f1f5f9;color:#475569}
+.b-mn{background:#ede9fe;color:#5b21b6}
+.card-title{font-size:.86rem;font-weight:700;color:#111827;line-height:1.35;padding-right:4.5rem;font-family:var(--font-serif)}
+.card-preview{font-size:.7rem;color:#6b7280;line-height:1.5;flex:1}
+.card-cta{font-size:.68rem;color:#dc2626;font-weight:700;text-align:right;margin-top:.25rem}
+.card.hidden-card{display:none!important}
+
+/* ───────── 레슨 모드 (풀스크린) ───────── */
+.lesson{display:none;position:fixed;inset:0;background:#f7f8fb;z-index:1000;flex-direction:column}
+.lesson.show{display:flex}
+.l-head{background:#dc2626;color:#fff;padding:.7rem 1rem;display:flex;align-items:center;gap:.7rem;flex-shrink:0}
+.l-back{background:none;border:none;color:#fff;font-size:1.3rem;cursor:pointer;padding:0;line-height:1;opacity:.9}
+.l-title{flex:1;font-size:.92rem;font-weight:800;font-family:var(--font-serif);line-height:1.3;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.l-page-ind{font-size:.78rem;font-weight:700;background:rgba(0,0,0,.18);padding:.18rem .55rem;border-radius:1rem;flex-shrink:0}
+.l-progress{height:4px;background:rgba(0,0,0,.15);flex-shrink:0}
+.l-progress-bar{height:100%;background:#fff;width:0%;transition:width .3s ease}
+.l-body{flex:1;overflow-y:auto;padding:1.2rem 1.25rem 5rem;display:flex;flex-direction:column;gap:1rem;align-items:center}
+.l-page{width:100%;max-width:680px;animation:slideIn .25s ease}
+@keyframes slideIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+.l-page-title{font-size:1.5rem;font-weight:800;color:#991b1b;margin-bottom:.5rem;font-family:var(--font-serif);line-height:1.3}
+.l-page-meta{display:flex;flex-wrap:wrap;gap:.35rem;margin-bottom:.85rem}
+.l-page-meta .chip{padding:.18rem .55rem;border-radius:1rem;font-size:.7rem;font-weight:700}
+.chip-prio-1{background:#fee2e2;color:#991b1b}
+.chip-prio-2{background:#fef3c7;color:#92400e}
+.chip-prio-3{background:#dcfce7;color:#166534}
+.chip-prio-4{background:#f1f5f9;color:#475569}
+.l-page-kw{display:flex;flex-wrap:wrap;gap:.3rem;margin-bottom:1.2rem}
+.l-page-kw span{background:#dc262622;color:#991b1b;border:1px solid #dc262655;border-radius:1rem;padding:.18rem .65rem;font-size:.72rem;font-weight:700}
+
+.sec{border-radius:.7rem;padding:1rem 1.1rem;line-height:1.65;margin-bottom:.85rem}
+.sec-summary{background:#dc262611;border-left:5px solid #dc2626;font-size:.95rem;color:#111827;font-weight:600}
+.sec-bg{background:#fef7ec;border-left:5px solid #d97706}
+.sec-expl{background:#eef2ff;border-left:5px solid #4f46e5}
+.sec-why{background:#ecfdf5;border-left:5px solid #059669}
+.sec-term{background:#faf5ff;border-left:5px solid #7c3aed}
+.sec-link{background:#fff7ed;border-left:5px solid #c2410c}
+.sec-mn{background:linear-gradient(145deg,#fffef5 0%,#fff7d6 56%,#dc262620 100%);color:#1f2937;font-weight:600;border:1.5px solid #dc262633;border-left:5px solid #dc2626;box-shadow:0 10px 26px #dc262614}
+.sec-trap{background:#fff1f2;border:1.5px solid #fda4af;border-left:5px solid #e11d48;color:#881337}
+.sec-src{background:#fff;border:1.5px solid #e5e7eb;border-left:5px solid #475569}
+.sec-types{background:#f0f9ff;border:1.5px solid #bae6fd;border-left:5px solid #0284c7}
+.sec-types .sec-label{color:#075985}
+.types-caption{font-size:.8rem;color:#334155;margin-bottom:.6rem;line-height:1.55}
+.types-list{display:flex;flex-direction:column;gap:.55rem;counter-reset:tc}
+.type-item{display:grid;grid-template-columns:2rem 1fr;gap:.55rem;align-items:start;background:#fff;border:1px solid #e0f2fe;border-radius:.7rem;padding:.7rem .78rem;counter-increment:tc;position:relative}
+.type-item::before{content:counter(tc);display:inline-flex;align-items:center;justify-content:center;width:1.7rem;height:1.7rem;border-radius:.5rem;background:#dc262616;color:#991b1b;font-size:.8rem;font-weight:800;line-height:1}
+.type-body{min-width:0}
+.type-head{display:flex;flex-wrap:wrap;gap:.35rem;align-items:center;margin-bottom:.2rem}
+.type-name{font-size:.92rem;font-weight:800;color:#0f172a;font-family:var(--font-serif)}
+.type-en{font-size:.72rem;color:#64748b;font-weight:700}
+.type-tier{display:inline-flex;align-items:center;padding:.08rem .42rem;border-radius:999px;font-size:.62rem;font-weight:800;letter-spacing:.04em}
+.tier-strong{background:#fee2e2;color:#991b1b}
+.tier-mid{background:#fef3c7;color:#92400e}
+.tier-weak{background:#dcfce7;color:#166534}
+.type-note{font-size:.86rem;line-height:1.68;color:#334155;word-break:keep-all}
+.types-scale{display:flex;align-items:center;gap:.45rem;margin-top:.65rem;padding:.5rem .7rem;background:rgba(255,255,255,.7);border:1px dashed #bae6fd;border-radius:.6rem;font-size:.72rem;color:#475569;font-weight:700}
+.types-scale .scale-arrow{flex:1;height:6px;border-radius:999px;background:linear-gradient(90deg,#16a34a,#d97706,#dc2626)}
+.types-scale.reverse .scale-arrow{background:linear-gradient(90deg,#dc2626,#d97706,#16a34a)}
+.sec-label{font-size:.7rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;margin-bottom:.5rem}
+.sec-bg .sec-label{color:#92400e}
+.sec-expl .sec-label{color:#3730a3}
+.sec-why .sec-label{color:#065f46}
+.sec-term .sec-label{color:#5b21b6}
+.sec-link .sec-label{color:#9a3412}
+.sec-mn .sec-label{color:#991b1b}
+.sec-trap .sec-label{color:#9f1239}
+.sec-summary .sec-label{color:#dc2626}
+.sec-src .sec-label{color:#334155}
+.sec p{font-size:.92rem;line-height:1.7}
+.sec-mn p{font-size:.98rem}
+.fact-list{display:flex;flex-direction:column;gap:.65rem}
+.fact-item{background:rgba(255,255,255,.85);border:1px solid rgba(0,0,0,.06);border-radius:.85rem;padding:.78rem .85rem}
+.fact-term{font-size:.86rem;font-weight:800;color:#111827;margin-bottom:.22rem}
+.fact-note{font-size:.9rem;line-height:1.72;color:#374151;word-break:keep-all}
+.fact-link-label{display:inline-flex;align-items:center;padding:.12rem .45rem;border-radius:999px;background:#dc262614;color:#991b1b;font-size:.64rem;font-weight:800;letter-spacing:.04em;margin-bottom:.38rem}
+.src-list{display:flex;flex-direction:column;gap:.5rem}
+.src-link{display:flex;align-items:flex-start;gap:.45rem;text-decoration:none;color:#111827;background:#f9fafb;border:1px solid #e5e7eb;border-radius:.8rem;padding:.72rem .82rem;transition:border-color .15s,transform .15s}
+.src-link:hover{border-color:#dc2626;transform:translateY(-1px)}
+.src-bullet{flex-shrink:0;color:#dc2626;font-weight:800}
+.src-text{font-size:.85rem;line-height:1.55}
+.src-host{display:block;font-size:.72rem;color:#6b7280;margin-top:.1rem}
+.mn-list{display:flex;flex-direction:column;gap:.55rem}
+.mn-line{display:flex;align-items:flex-start;gap:.72rem;background:rgba(255,255,255,.82);border:1px solid #dc262622;border-radius:.9rem;padding:.72rem .8rem .68rem;box-shadow:0 4px 12px rgba(0,0,0,.04)}
+.mn-picto{flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;width:1.6rem;height:1.6rem;border-radius:.45rem;background:#dc262616;border:1px solid #dc262626;font-size:.76rem;font-weight:800;line-height:1;color:#991b1b}
+.mn-main{display:flex;flex-direction:column;gap:.28rem;min-width:0}
+.mn-tag{display:inline-flex;align-items:center;width:fit-content;padding:.12rem .45rem;border-radius:999px;background:#dc262618;color:#991b1b;font-size:.64rem;font-weight:800;letter-spacing:.05em}
+.mn-text{font-size:.95rem;line-height:1.76;color:#1f2937;word-break:keep-all}
+.mn-text strong{color:#dc2626;font-weight:800}
+
+.ctable{width:100%;border-collapse:collapse;font-size:.82rem;background:#fff;border-radius:.5rem;overflow:hidden;margin-top:.4rem}
+.ctable th{background:#dc2626;color:#fff;padding:.55rem .65rem;text-align:left;font-weight:700;font-size:.78rem}
+.ctable td{padding:.55rem .65rem;border-top:1px solid #e5e7eb;vertical-align:top;line-height:1.55}
+.ctable tr:nth-child(even) td{background:#f9fafb}
+
+.done-page{text-align:center;padding:2.5rem 1rem}
+.done-emoji{font-size:4.5rem;margin-bottom:1rem;animation:pop .4s ease}
+@keyframes pop{from{transform:scale(0)}80%{transform:scale(1.2)}to{transform:scale(1)}}
+.done-title{font-size:1.5rem;font-weight:800;color:#991b1b;margin-bottom:.5rem;font-family:var(--font-serif)}
+.done-sub{font-size:.95rem;color:#6b7280;margin-bottom:2rem}
+.done-actions{display:flex;flex-direction:column;gap:.6rem;max-width:300px;margin:0 auto}
+.done-btn{padding:.85rem 1.4rem;border-radius:.7rem;font-size:.95rem;font-weight:700;cursor:pointer;border:none;font-family:inherit;transition:all .15s}
+.done-btn-primary{background:#dc2626;color:#fff}
+.done-btn-primary:hover{transform:translateY(-2px);box-shadow:0 4px 14px #dc262655}
+.done-btn-sub{background:#fff;color:#dc2626;border:1.5px solid #dc2626}
+.done-btn-sub:hover{background:#dc262611}
+
+.l-foot{position:fixed;bottom:0;left:0;right:0;background:#fff;padding:.7rem 1rem;display:flex;gap:.5rem;border-top:1px solid #e5e7eb;z-index:1010}
+.l-nav-btn{flex:1;padding:.7rem;border-radius:.55rem;border:1.5px solid #dc2626;background:#fff;color:#dc2626;font-size:.88rem;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s}
+.l-nav-btn:hover:not(:disabled){background:#dc262611}
+.l-nav-btn:disabled{opacity:.35;cursor:not-allowed}
+.l-nav-btn.primary{background:#dc2626;color:#fff;border-color:#dc2626}
+.l-nav-btn.primary:hover:not(:disabled){background:#991b1b;border-color:#991b1b}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <a href="../" class="header-back">←</a>
+  <span style="font-size:1.2rem">🔒</span>
+  <h1><span style="opacity:.7;font-size:.85em">04</span> &nbsp;암호 기술</h1>
+  <span class="header-cnt">17개</span>
+</div>
+
+<div class="search-wrap">
+  <input class="search" type="text" placeholder="🔍  개념 검색..." oninput="applyFilters()">
+</div>
+
+<div class="tabs" id="tab-bar"><button class="tab active" onclick="filterTab(this,'all')">전체</button><button class="tab" onclick="filterTab(this,'0')">암호 기술</button></div>
+<div class="prio-bar"><button class="pchip active" data-prio="all" onclick="filterPrio(this)">전체</button><button class="pchip" data-prio="1" onclick="filterPrio(this)" style="--pc:#dc2626">🔴 P1 최우선</button><button class="pchip" data-prio="2" onclick="filterPrio(this)" style="--pc:#d97706">🟡 P2 중요</button><button class="pchip" data-prio="3" onclick="filterPrio(this)" style="--pc:#16a34a">🟢 P3 보통</button><button class="pchip" data-prio="4" onclick="filterPrio(this)" style="--pc:#9ca3af">⚪ P4 보조</button></div>
+
+<div id="card-content"><div class="section-group" data-chapter="0"><div class="section-label">암호 기술</div><div class="card-grid"><div class="card" data-prio="3" onclick="startLesson(0)"><div class="card-badges"><span class="b-prio b-prio-3" title="보통">🟢 P3</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">암호의 개념</div><div class="card-preview">옛날에 편지나 중요한 정보를 주고받을 때, 중간에 나쁜 사람이 가로채서 내용을 다 읽어버리…</div><div class="card-cta">레슨 시작 →</div></div><div class="card" data-prio="3" onclick="startLesson(1)"><div class="card-badges"><span class="b-prio b-prio-3" title="보통">🟢 P3</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">암호화와 복호화(Decryption)</div><div class="card-preview">옛날에 전쟁할 때 적군이 아군의 편지를 훔쳐보면 작전이 다 들통나버리는 문제가 있었어. 그…</div><div class="card-cta">레슨 시작 →</div></div><div class="card" data-prio="2" onclick="startLesson(2)"><div class="card-badges"><span class="b-prio b-prio-2" title="중요">🟡 P2</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">암호기술의 분류</div><div class="card-preview">옛날에는 메시지를 보낼 때 누군가 중간에서 훔쳐볼 수 있어서 큰 문제였어. 그래서 &#x27;어떻게…</div><div class="card-cta">레슨 시작 →</div></div><div class="card" data-prio="2" onclick="startLesson(3)"><div class="card-badges"><span class="b-prio b-prio-2" title="중요">🟡 P2</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">비밀키 암호와 공개키 암호 알고리즘</div><div class="card-preview">옛날에 인터넷으로 메시지를 주고받을 때, 내용을 암호로 잠그려면 상대방도 같은 열쇠(키)를…</div><div class="card-cta">레슨 시작 →</div></div><div class="card" data-prio="2" onclick="startLesson(4)"><div class="card-badges"><span class="b-prio b-prio-2" title="중요">🟡 P2</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">해쉬</div><div class="card-preview">옛날에 인터넷으로 파일을 받으면 &#x27;이 파일이 중간에 누가 몰래 바꾼 건 아닐까?&#x27; 하는 걱…</div><div class="card-cta">레슨 시작 →</div></div><div class="card" data-prio="2" onclick="startLesson(5)"><div class="card-badges"><span class="b-prio b-prio-2" title="중요">🟡 P2</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">인증(Authentication) 개념</div><div class="card-preview">옛날에 인터넷으로 파일이나 메시지를 주고받을 때, 중간에 나쁜 사람이 내용을 몰래 바꿔치기…</div><div class="card-cta">레슨 시작 →</div></div><div class="card" data-prio="1" onclick="startLesson(6)"><div class="card-badges"><span class="b-prio b-prio-1" title="최우선">🔴 P1</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">인증방식의 유</div><div class="card-preview">옛날에는 그냥 이름만 대면 본인 확인이 됐는데, 인터넷이 발전하면서 &#x27;진짜 너 맞아?&#x27;를 …</div><div class="card-cta">레슨 시작 →</div></div><div class="card" data-prio="2" onclick="startLesson(7)"><div class="card-badges"><span class="b-prio b-prio-2" title="중요">🟡 P2</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">인증기술의 종류</div><div class="card-preview">옛날에 컴퓨터가 여러 사람이 쓰는 공용 기계가 되면서 &#x27;이 사람이 진짜 허가된 사람인가?&#x27;…</div><div class="card-cta">레슨 시작 →</div></div><div class="card" data-prio="4" onclick="startLesson(8)"><div class="card-badges"><span class="b-prio b-prio-4" title="보조">⚪ P4</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">전자서명</div><div class="card-preview">옛날에 중요한 계약서나 문서에는 꼭 도장이나 손으로 쓴 서명이 필요했는데, 인터넷으로 문서…</div><div class="card-cta">레슨 시작 →</div></div><div class="card" data-prio="3" onclick="startLesson(9)"><div class="card-badges"><span class="b-prio b-prio-3" title="보통">🟢 P3</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">접근통제 개요</div><div class="card-preview">옛날에 컴퓨터 시스템이 생기면서 &#x27;아무나 들어와서 중요한 파일을 보거나 지우면 어떡하지?&#x27;…</div><div class="card-cta">레슨 시작 →</div></div><div class="card" data-prio="3" onclick="startLesson(10)"><div class="card-badges"><span class="b-prio b-prio-3" title="보통">🟢 P3</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">접근통제 정책</div><div class="card-preview">옛날에 컴퓨터 시스템이 생기면서 &#x27;누가 어떤 파일을 볼 수 있어야 하지?&#x27;라는 문제가 생겼…</div><div class="card-cta">레슨 시작 →</div></div><div class="card" data-prio="1" onclick="startLesson(11)"><div class="card-badges"><span class="b-prio b-prio-1" title="최우선">🔴 P1</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">접근통제 정책의 종류</div><div class="card-preview">옛날에 컴퓨터가 보급되면서 &#x27;누가 어떤 파일을 볼 수 있게 할까?&#x27;라는 문제가 생겼어. 특…</div><div class="card-cta">레슨 시작 →</div></div><div class="card" data-prio="2" onclick="startLesson(12)"><div class="card-badges"><span class="b-prio b-prio-2" title="중요">🟡 P2</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">접근통제 메커니즘</div><div class="card-preview">컴퓨터에 파일이나 자원이 많아지면서 &#x27;누가 어떤 파일을 볼 수 있는지&#x27; 일일이 기억하기가 …</div><div class="card-cta">레슨 시작 →</div></div><div class="card" data-prio="1" onclick="startLesson(13)"><div class="card-badges"><span class="b-prio b-prio-1" title="최우선">🔴 P1</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">접근통제 모델</div><div class="card-preview">옛날에 컴퓨터로 군사 기밀을 다루다 보니 &#x27;중요한 정보가 엉뚱한 사람한테 새나가면 어떡하지…</div><div class="card-cta">레슨 시작 →</div></div><div class="card" data-prio="2" onclick="startLesson(14)"><div class="card-badges"><span class="b-prio b-prio-2" title="중요">🟡 P2</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">APT(Advanced Persistent Threat) 공격</div><div class="card-preview">옛날 해커들은 한 번 공격하고 도망가는 방식을 썼는데, 더 영리한 해커들이 &#x27;차라리 몰래 …</div><div class="card-cta">레슨 시작 →</div></div><div class="card" data-prio="2" onclick="startLesson(15)"><div class="card-badges"><span class="b-prio b-prio-2" title="중요">🟡 P2</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">파밍(Pharming)</div><div class="card-preview">옛날에 해커들이 가짜 사이트 링크를 직접 보내는 피싱 수법을 썼는데, 사람들이 &#x27;이상한 링…</div><div class="card-cta">레슨 시작 →</div></div><div class="card" data-prio="2" onclick="startLesson(16)"><div class="card-badges"><span class="b-prio b-prio-2" title="중요">🟡 P2</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">큐싱</div><div class="card-preview">스마트폰이 널리 퍼지면서 해커들이 QR코드를 악용하기 시작했어. 사람들이 QR코드를 아무 …</div><div class="card-cta">레슨 시작 →</div></div></div></div></div>
+
+<!-- ── 레슨 모드 ── -->
+<div class="lesson" id="lesson">
+  <div class="l-head">
+    <button class="l-back" onclick="exitLesson()">←</button>
+    <div class="l-title" id="l-title"></div>
+    <div class="l-page-ind" id="l-page-ind">1 / 1</div>
+  </div>
+  <div class="l-progress"><div class="l-progress-bar" id="l-progress-bar"></div></div>
+  <div class="l-body" id="l-body"></div>
+  <div class="l-foot">
+    <button class="l-nav-btn" id="l-prev" onclick="prevPage()">← 이전</button>
+    <button class="l-nav-btn primary" id="l-next" onclick="nextPage()">다음 →</button>
+  </div>
+</div>
+
+<script>
+const LESSONS = [{"title": "암호의 개념", "keywords": [], "summary": "", "background": "옛날에 편지나 중요한 정보를 주고받을 때, 중간에 나쁜 사람이 가로채서 내용을 다 읽어버리는 문제가 있었어. 그래서 '나만 알아볼 수 있는 비밀 언어'로 바꿔서 보내자는 아이디어가 생긴 거야.", "explanation": "암호화는 일기장에 나만 아는 비밀 코드로 글을 쓰는 것과 같아. 예를 들어 'A=1, B=2' 같은 규칙(이게 바로 키!)으로 '사랑해'를 숫자로 바꾸면 다른 사람은 못 읽지만, 규칙을 아는 친구는 다시 원래 말로 해독할 수 있어. 즉, 원래 글(평문)을 암호문으로 잠그고, 키로 다시 열 수 있는 자물쇠 시스템이야.", "why": "", "term_focus": [], "connections": [], "types": null, "mnemonic": "평-암-키! 👉 '평'문을 '암'호문으로 바꾸려면 반드시 '키'가 필요하다! (평암키, 평암키~ 세 글자만 기억해!)", "trap": "", "table": [], "sources": [], "priority": 3}, {"title": "암호화와 복호화(Decryption)", "keywords": [], "summary": "", "background": "옛날에 전쟁할 때 적군이 아군의 편지를 훔쳐보면 작전이 다 들통나버리는 문제가 있었어. 그래서 내용을 알아볼 수 없게 바꿔서 보내고, 받은 쪽에서만 원래 내용으로 되돌릴 수 있는 방법이 필요했던 거야.", "explanation": "암호화는 일기장에 나만 아는 비밀 기호로 내용을 바꿔 쓰는 것과 같아. 남이 보면 무슨 말인지 전혀 모르지만, 나는 기호표(=키)를 갖고 있으니까 언제든 원래 내용으로 되돌릴 수 있지. 암호화는 '일기 → 비밀기호'로 바꾸는 것이고, 복호화는 '비밀기호 → 일기'로 다시 되돌리는 거야.", "why": "", "term_focus": [], "connections": [], "types": null, "mnemonic": "암호화·복호화는 '잠그고(🔒) 열고(🔓)'! — 암호화=자물쇠로 잠금, 복호화=열쇠로 열기. 잠글 때 쓰는 열쇠가 '암호화 키', 열 때 쓰는 열쇠가 '복호화 키'!", "trap": "", "table": [], "sources": [], "priority": 3}, {"title": "암호기술의 분류", "keywords": [], "summary": "", "background": "옛날에는 메시지를 보낼 때 누군가 중간에서 훔쳐볼 수 있어서 큰 문제였어. 그래서 '어떻게 하면 내 메시지를 나만 아는 방식으로 숨길 수 있을까?'를 고민하다가 암호 기술이 체계적으로 발전하게 됐어.", "explanation": "암호 기술은 크게 두 종류야. 첫째, '암호화 기술'은 자물쇠랑 열쇠로 비유할 수 있는데, 잠그는 열쇠와 여는 열쇠가 같으면 '대칭키', 다르면 '공개키 방식'이야. 둘째, '암호 프로토콜'은 두 명 이상이 서로 안전하게 대화하는 약속된 절차인데, 예를 들어 인터넷 쇼핑할 때 내 카드번호가 안전하게 전달되도록 보장해주는 규칙이야.", "why": "", "term_focus": [], "connections": [], "types": {"caption": "암호 기술은 크게 암호화 기술과 암호 프로토콜 기술로 분류된다.", "items": [{"name": "암호화 기술 — 대칭키 암호 방식", "note": "암호화 키와 복호화 키가 동일한 방식. 대표 알고리즘: DES, AES, IDEA, SEED, ARIA 등. 블록 암호 방식과 스트림 암호 방식으로 나뉜다."}, {"name": "암호화 기술 — 공개키 암호 방식", "note": "암호화 키와 복호화 키가 서로 다른 방식(비대칭). 인수분해 문제, 이산대수 문제, 타원형 곡선 문제 기반. 대표 알고리즘: RSA, ECC, DH."}, {"name": "암호 프로토콜", "note": "암호 기술을 사용하는 프로토콜. 개인 식별 및 인증, 전자서명, 전자결제(전화결제·전자화폐·전자선거) 등의 특정 목적(인증/기밀성/무결성/부인방지)을 보장하도록 설계된다."}]}, "mnemonic": "암호 기술 = '화(化) + 콜(Protocol)' → **'화장하고 콜받기'** / 화장(암호화기술) = 대칭이냐 비대칭이냐 / 콜(프로토콜) = 인증·기밀·무결·부인방지 4가지 목적 지킴", "trap": "", "table": [], "sources": [{"title": "TOPCIT ESSENCE ver.3 — 정보보안 이해와 활용", "note": "정보통신산업진흥원(NIPA) 공식 교재"}], "priority": 2}, {"title": "비밀키 암호와 공개키 암호 알고리즘", "keywords": [], "summary": "", "background": "옛날에 인터넷으로 메시지를 주고받을 때, 내용을 암호로 잠그려면 상대방도 같은 열쇠(키)를 가져야 했는데 그 열쇠를 어떻게 안전하게 전달하냐는 게 큰 골칫거리였어. 그래서 '자물쇠는 공개하고 열쇠는 나만 갖는' 방식인 공개키 암호가 나중에 등장하게 됐지.", "explanation": "비밀키 암호는 친구랑 똑같은 일기장 자물쇠 열쇠를 하나씩 나눠 갖는 거야. 빠르고 편한데, 열쇠를 직접 만나서 나눠줘야 하니까 멀리 있는 사람한테 전달하기가 어렵지. 반면 공개키 암호는 내가 열린 자물쇠(공개키)를 세상에 뿌려놓으면 누구든 편지를 잠가서 보낼 수 있고, 열쇠(비밀키)는 나만 갖고 있어서 나만 열 수 있는 방식이야.", "why": "", "term_focus": [], "connections": [], "types": {"caption": "비밀키 암호(대칭키)는 암호화/복호화 키가 동일하고 연산이 빠르며, 공개키 암호(비대칭키)는 두 키가 달라 키 분배가 쉽고 전자서명이 가능.", "items": [{"name": "비밀키 암호 — 블록 암호 방식", "en": "Block Cipher", "note": "평문을 블록이라고 부르는 고정 길이의 입력으로 나누어 블록 단위로 암호화 수행. 구현이 용이하나 오류 확산 위험이 높고 초기값 설정이 필요. 알고리즘: Feistel Network, DES, AES, IDEA, SEED, ARIA 등."}, {"name": "비밀키 암호 — 스트림 암호 방식", "en": "Stream Cipher", "note": "평문을 비트 단위로 암호화. 평문 비트열과 키 비트열의 비트 단위 XOR 연산으로 암호문 생성. 오류 확산 위험이 낮고 이동통신 환경에서 구현 용이. 수행 시간이 느리고 악의적 공격자에 의해 쉽게 변경 가능. 대표: RC4, A5/1, A5/2."}, {"name": "공개키 암호 — RSA", "note": "1978년 개발된 실용적인 공개키 암호 알고리즘. 인수분해 문제 기반. 현대 암호의 핵심 요소."}, {"name": "공개키 암호 — ECC", "en": "Elliptic Curve Cryptography", "note": "타원 곡선 문제 기반 공개키 암호. RSA보다 짧은 키로 동일한 보안 강도 제공."}, {"name": "공개키 암호 — DH", "en": "Diffie-Hellman", "note": "1976년 Diffie와 Hellman이 제안한 공개키 암호 개념의 시초. 이산대수 문제 기반 키 교환 알고리즘."}]}, "mnemonic": "비밀키 = '둘이 같은 열쇠' → 빠르지만 열쇠 나눠주기 힘들어 / 공개키 = '자물쇠는 공짜, 열쇠는 나만' → 느리지만 안전하게 전달 가능! '비같(비밀=같은열쇠) 공달(공개=달라요)'", "trap": "", "table": [], "sources": [{"title": "TOPCIT ESSENCE ver.3 — 정보보안 이해와 활용", "note": "정보통신산업진흥원(NIPA) 공식 교재"}], "priority": 2}, {"title": "해쉬", "keywords": [], "summary": "", "background": "옛날에 인터넷으로 파일을 받으면 '이 파일이 중간에 누가 몰래 바꾼 건 아닐까?' 하는 걱정이 있었어. 그래서 파일이 진짜 원본인지 빠르게 확인할 수 있는 방법이 필요했고, 그게 바로 해시야.", "explanation": "해시는 어떤 내용이든 일정한 길이의 '지문'으로 바꿔주는 기계야. 예를 들어 '안녕'이라는 말을 넣으면 'AB12'가 나오고, '안녕!'처럼 느낌표 하나만 달라져도 완전히 다른 'XZ99'가 나와. 그리고 항상 같은 내용을 넣으면 같은 지문이 나오기 때문에, 파일이 중간에 바뀌었는지 바로 확인할 수 있어.", "why": "", "term_focus": [], "connections": [], "types": null, "mnemonic": "해시 = 사람 지문! 사람마다 지문이 다르듯, 내용이 조금만 달라도 완전히 다른 값이 나온다. '해시 = 데이터 지문' 딱 이것만 기억해!", "trap": "", "table": [], "sources": [], "priority": 2}, {"title": "인증(Authentication) 개념", "keywords": [], "summary": "", "background": "옛날에 인터넷으로 파일이나 메시지를 주고받을 때, 중간에 나쁜 사람이 내용을 몰래 바꿔치기하거나 '나 철수야~' 하고 거짓말해도 전혀 알 방법이 없었어. 그래서 '이 사람이 진짜 그 사람 맞아?', '이 파일 중간에 누가 건드린 거 아니야?' 를 확인하는 방법이 필요해진 거야.", "explanation": "인증은 쉽게 말해 '신분증 검사 + 봉인 스티커 확인' 이야. 편의점에서 술 살 때 신분증으로 '이 사람이 진짜 성인인지' 확인하는 게 사용자 인증이고, 택배 박스에 봉인 스티커 붙여서 '배송 중에 아무도 안 열었다'는 걸 확인하는 게 메시지 인증이야. 해쉬 함수는 봉인 스티커 역할인데, 파일 내용이 조금이라도 바뀌면 스티커 모양(해쉬 값)이 완전히 달라져서 바로 들통나는 거지!", "why": "", "term_focus": [], "connections": [], "types": null, "mnemonic": "인증 = '신분증(사용자 인증) + 봉인스티커(메시지 인증)' → 줄여서 **신봉**! '나 신봉해~ 너 진짜야? 내용 그대로야?' 라고 외쳐봐!", "trap": "", "table": [], "sources": [], "priority": 2}, {"title": "인증방식의 유", "keywords": [], "summary": "", "background": "옛날에는 그냥 이름만 대면 본인 확인이 됐는데, 인터넷이 발전하면서 '진짜 너 맞아?'를 확인해야 할 상황이 폭발적으로 늘어났어. 그래서 '어떤 방식으로 본인임을 증명할까?'를 체계적으로 정리한 게 바로 인증 방식의 유형이야.", "explanation": "인증 방식은 크게 3가지야. 첫째, 내가 알고 있는 것(비밀번호, PIN번호) — 머릿속에 있는 정보로 증명하는 것. 둘째, 내가 가지고 있는 것(OTP 카드, 신분증) — 내 손에 들고 있는 물건으로 증명하는 것. 셋째, 내가 바로 나인 것(지문, 얼굴, 홍채) — 내 몸 자체로 증명하는 거야!", "why": "", "term_focus": [], "connections": [], "types": {"caption": "사용자 인증은 3가지 기본 축으로 분류된다. 최근에는 이들을 조합한 멀티팩터(Multi-Factor) 인증이 주로 사용된다.", "items": [{"name": "지식 기반 인증", "en": "What you know", "note": "사용자가 알고 있는 정보에 기반한 방법. PIN(Personal Identification Number), 패스워드, 계좌번호 등."}, {"name": "소유 기반 인증", "en": "What you have", "note": "사용자가 가진 물건에 기반한 방법. OTP 토큰, 스마트카드, 공인인증서 등."}, {"name": "존재(생체) 기반 인증", "en": "What you are", "note": "사용자 자신의 신체나 신체의 특징에 기반한 방법. 홍채인식, 지문인식, 음성인식, 얼굴인식 등."}, {"name": "멀티팩터 인증", "en": "Multi-Factor Authentication", "note": "단일 인증 방식의 취약점을 보완하기 위해 복수 개의 인증 기술을 조합하여 보안성을 향상시킨 방식."}]}, "mnemonic": "👉 '알-가-나' 3박자로 기억해! '알'고 있는 것(비번) → '가'지고 있는 것(카드) → '나' 자신(지문) — 알가나!", "trap": "", "table": [], "sources": [{"title": "TOPCIT ESSENCE ver.3 — 정보보안 이해와 활용", "note": "정보통신산업진흥원(NIPA) 공식 교재"}], "priority": 1}, {"title": "인증기술의 종류", "keywords": [], "summary": "", "background": "옛날에 컴퓨터가 여러 사람이 쓰는 공용 기계가 되면서 '이 사람이 진짜 허가된 사람인가?'를 확인할 방법이 필요했어. 그래서 미리 약속한 비밀번호를 맞추면 본인으로 인정해주는 가장 단순한 방법이 등장했지.", "explanation": "패스워드 인증은 마치 동네 비밀 아지트에 들어갈 때 '암호가 뭐야?'라고 물어보는 것과 똑같아. 내가 미리 정해둔 암호를 정확히 말하면 들어갈 수 있고, 모르면 못 들어가는 거지. 단, 이 암호를 남이 엿들으면 바로 뚫리기 때문에 대문자·소문자·숫자·특수문자를 섞어서 8자리 이상으로 복잡하게 만들어야 해.", "why": "", "term_focus": [], "connections": [], "types": {"caption": "대표적인 인증 기술들. 패스워드 인증은 가장 널리 쓰이나 안전하지 않고, OTP·생체 인증은 보안성이 높다.", "items": [{"name": "패스워드 인증", "note": "사용자가 미리 패스워드를 설정한 후, 인증 시 입력된 패스워드와 설정된 패스워드를 비교. 가장 널리 사용되지만 가장 안전하지 않은 기술. 공격 기법: 무차별공격(Brute Force), 사전공격(Dictionary Attack), 트로이목마, 사회공학적 기법."}, {"name": "OTP 인증", "en": "One Time Password", "note": "매 세션마다 일회용 패스워드를 생성하여 입력하는 일회용 패스워드 생성기 사용. 동기식(시도-응답, 시간 동기화, 이벤트 동기화)과 비동기식으로 나뉜다."}, {"name": "공인인증서 인증", "note": "PKI(Public Key Infrastructure) 기반. 공인인증기관이 발급한 인증서를 통한 사용자 인증."}, {"name": "생체 인증", "note": "지문·홍채·음성·얼굴 등의 생체정보를 DB에 저장한 후, 인증 시 센서로 추출된 정보와 비교하여 인증. 생체정보 등록 시스템과 생체인증 시스템으로 구성."}, {"name": "FIDO", "en": "Fast IDentity Online", "note": "생체인증을 안전하게 인터넷에서 사용하기 위한 국제 표준. 로컬 인증 + 서버 공개키 기반 표준 프레임워크."}]}, "mnemonic": "패스워드 만들 때 '대소숫특 8자 이상!' → '대'문자, '소'문자, '숫'자, '특'수문자, '8'자리 이상 — 줄여서 **대소숫특8** 이렇게 외워!", "trap": "", "table": [], "sources": [{"title": "TOPCIT ESSENCE ver.3 — 정보보안 이해와 활용", "note": "정보통신산업진흥원(NIPA) 공식 교재"}], "priority": 2}, {"title": "전자서명", "keywords": [], "summary": "", "background": "옛날에 중요한 계약서나 문서에는 꼭 도장이나 손으로 쓴 서명이 필요했는데, 인터넷으로 문서를 주고받을 때는 '이게 진짜 그 사람이 보낸 건지' 증명할 방법이 없었어. 그래서 디지털 세상에서도 '이 문서는 내가 보낸 게 맞아!'를 증명할 수 있는 전자서명 기술이 만들어졌어.", "explanation": "전자서명은 나만 가진 '비밀 도장(개인키)'으로 문서에 찍는 거야. 받는 사람은 누구나 볼 수 있는 '공개 확인 도구(공개키)'로 '아, 이 도장은 진짜 그 사람 것이 맞네!'라고 확인할 수 있어. 비밀 도장은 나만 갖고 있으니까, 그 도장이 찍혀 있으면 반드시 내가 보낸 거라는 걸 증명할 수 있는 거지!", "why": "", "term_focus": [], "connections": [], "types": null, "mnemonic": "🔑 '비공확' 3단계로 기억해! 👉 비밀키로 서명 → 공개키로 확인 → '비공확(비밀로 찍고, 공개로 확인!)'", "trap": "", "table": [], "sources": [], "priority": 4}, {"title": "접근통제 개요", "keywords": [], "summary": "", "background": "옛날에 컴퓨터 시스템이 생기면서 '아무나 들어와서 중요한 파일을 보거나 지우면 어떡하지?' 하는 문제가 생겼어. 그래서 '누가, 무엇을, 어디까지 할 수 있는지'를 딱 정해서 관리하는 방법이 필요해진 거야.", "explanation": "접근통제는 아파트 출입 시스템이랑 똑같아. 먼저 인터폰으로 '나 홍길동이에요'라고 말하는 게 **식별**, 비밀번호나 지문으로 '진짜 홍길동 맞네'를 확인하는 게 **인증**, 그리고 '넌 101호만 들어갈 수 있어'처럼 할 수 있는 범위를 정해주는 게 **인가**야. 이 세 단계가 합쳐져서 아무나 못 들어오게 막아주는 거지!", "why": "", "term_focus": [], "connections": [], "types": null, "mnemonic": "🔐 '식-인-인' → 식당 인기 인정! (식별 → 인증 → 인가 순서를 '식당 인기 인정'으로 기억해!)", "trap": "", "table": [], "sources": [], "priority": 3}, {"title": "접근통제 정책", "keywords": [], "summary": "", "background": "옛날에 컴퓨터 시스템이 생기면서 '누가 어떤 파일을 볼 수 있어야 하지?'라는 문제가 생겼어. 아무나 다 볼 수 있으면 보안이 엉망이 되니까, 누가 무엇을 할 수 있는지 규칙을 정해야 했던 거야.", "explanation": "학교 도서관을 떠올려봐. 학생은 책을 빌릴 수 있지만 반납 처리는 못 하고, 사서 선생님만 반납 처리를 할 수 있잖아. 접근통제 정책은 이처럼 '누가(who), 언제(when), 어디서(where), 무엇을(what), 어떻게(how)' 할 수 있는지 미리 규칙을 정해놓는 거야. 특히 최소권한 정책은 '네 일에 필요한 것만 딱 줄게'라는 원칙으로, 사서가 교장실 금고 열쇠까지 가질 필요는 없는 것처럼 딱 필요한 권한만 주는 거야.", "why": "", "term_focus": [], "connections": [], "types": null, "mnemonic": "5W1H로 외워! '누가(Who) 언제(When) 어디서(Where) 무엇을(What) 왜(Why) 어떻게(How)' → 접근통제는 5W1H 출입 검사관! 최소권한은 'need-to-know = 필요한 것만 알아도 돼!'", "trap": "", "table": [], "sources": [], "priority": 3}, {"title": "접근통제 정책의 종류", "keywords": [], "summary": "", "background": "옛날에 컴퓨터가 보급되면서 '누가 어떤 파일을 볼 수 있게 할까?'라는 문제가 생겼어. 특히 군대나 기업처럼 중요한 정보를 다루는 곳에서는 아무나 마음대로 접근하면 큰일 나니까, 체계적인 규칙이 필요해졌지.", "explanation": "접근통제 정책은 '누가 어떤 문을 열 수 있냐'를 정하는 규칙이야. 크게 3가지가 있는데, 첫째 강제적 접근통제(MAC)는 군대처럼 윗사람이 등급을 딱 정해놓고 그 등급에 맞는 사람만 볼 수 있게 하는 방식이고, 둘째 임의적 접근통제는 파일 주인이 직접 '너는 봐도 돼, 너는 안 돼'를 결정하는 방식, 셋째 역할기반 접근통제는 직급(역할)에 따라 접근을 허용하는 방식이야.", "why": "", "term_focus": [], "connections": [], "types": {"caption": "권한이 있는 사용자에게만 정보 자원에 접근 가능하도록 하는 보안 체계의 정책.", "items": [{"name": "MAC", "en": "Mandatory Access Control (강제적 접근통제)", "note": "주체에게 보안 등급(Security Level)을 부여하고 객체에게 보안 레이블(Security Label)을 부여한 후, 사전에 정한 규칙에 따라 주체가 객체에 접근이 가능한지 결정. 주로 군사적 목적으로 사용. 강력한 보안 정책을 유지할 수 있지만 관리 효율성이 저하된다."}, {"name": "DAC", "en": "Discretionary Access Control (임의적 접근통제)", "note": "주체나 그들이 속한 그룹의 신원에 근거하여 객체에 대한 접근을 제어하며, 객체의 소유자가 직접 접근 여부를 결정. 주로 유닉스나 리눅스의 시스템에서 사용. 관리 편의성이 있으나 보안성은 MAC보다 낮다."}, {"name": "RBAC", "en": "Role Based Access Control (역할 기반 접근통제)", "note": "관리자가 사전에 역할(Role)을 정의하고, 각 역할에 따라 접근이 가능. 사용자가 빈번한 조직이나 시스템에서 활용될 수 있으나 보안성이 저하될 수 있는 단점이 있다."}]}, "mnemonic": "접근통제 3형제 → '강임역' / 강(강제-군대등급), 임(임의-주인결정), 역(역할-직급따라) — '강한 임원이 역할을 맡는다'로 외워봐!", "trap": "", "table": [], "sources": [{"title": "TOPCIT ESSENCE ver.3 — 정보보안 이해와 활용", "note": "정보통신산업진흥원(NIPA) 공식 교재"}], "priority": 1}, {"title": "접근통제 메커니즘", "keywords": [], "summary": "", "background": "컴퓨터에 파일이나 자원이 많아지면서 '누가 어떤 파일을 볼 수 있는지' 일일이 기억하기가 너무 어려워졌어. 그래서 사람(주체)과 파일(객체)의 관계를 체계적으로 정리하는 방법이 필요해졌지.", "explanation": "학교 사물함을 생각해봐. 접근통제 행렬은 '학생 vs 사물함' 표를 만들어서 누가 어느 사물함을 열 수 있는지 한눈에 보여주는 거야. 근데 이 표가 너무 크면 찾기 불편하니까, ACL은 '이 사물함은 철수만 열 수 있음'처럼 사물함 기준으로 쪼개서 관리하는 방식이야.", "why": "", "term_focus": [], "connections": [], "types": {"caption": "접근통제 정책을 실제로 구현하기 위한 메커니즘들.", "items": [{"name": "접근통제 행렬", "en": "Access Control Matrix", "note": "주체와 객체를 행과 열로 표현하고 행렬의 각 엔트리는 접근 권한을 표시. 주체와 객체의 모든 관계를 행렬로 관리하나 자원 접근 시 전체 검색이 비효율적이어서 ACL과 Capability List로 나누어 관리한다."}, {"name": "ACL", "en": "Access Control List", "note": "객체를 기준으로 주체에 대한 접근 권한을 관리. Access Control Matrix의 열에 해당. 유닉스/리눅스 파일 권한 등에 활용."}, {"name": "CL", "en": "Capability List", "note": "주체를 기준으로 객체에 대한 접근 권한을 링크드리스트 형식으로 관리. Access Control Matrix의 행에 해당."}, {"name": "SL", "en": "Security Label", "note": "객체에 부여된 보안 속성 정보의 집합. MAC 정책 구현에 사용된다."}]}, "mnemonic": "ACL = '아, 출입 List!' → 객체(사물함/파일) 입장에서 '누가 들어올 수 있나?' 리스트!", "trap": "", "table": [], "sources": [{"title": "TOPCIT ESSENCE ver.3 — 정보보안 이해와 활용", "note": "정보통신산업진흥원(NIPA) 공식 교재"}], "priority": 2}, {"title": "접근통제 모델", "keywords": [], "summary": "", "background": "옛날에 컴퓨터로 군사 기밀을 다루다 보니 '중요한 정보가 엉뚱한 사람한테 새나가면 어떡하지?'라는 문제가 생겼어. 그래서 미국 국방부가 '누가 어떤 정보에 접근할 수 있는지' 규칙을 수학적으로 딱 정해버리는 모델을 만들게 됐어.", "explanation": "벨-라파듈라 모델은 '기밀 유출 방지'가 목표야. 높은 등급의 정보는 낮은 등급의 사람이 읽을 수 없고, 낮은 곳에 함부로 쓰지도 못해 — 마치 대통령 문서를 일반인은 볼 수도, 복사해서 낮은 곳에 흘릴 수도 없는 것처럼. 반면 비바 모델은 '정보가 오염되거나 조작되는 것'을 막는 게 목표야 — 마치 위키피디아를 아무나 수정 못 하게 막아서 내용의 신뢰성을 지키는 것과 비슷해.", "why": "", "term_focus": [], "connections": [], "types": {"caption": "접근통제 정책을 형식화한 이론적 모델들.", "items": [{"name": "Bell-LaPadula 모델 (BLP)", "note": "수학적 모델. 강제적 정책에 의한 접근통제 모델(MAC). 미 국방성의 지원에 따라 설계. 기밀 유출 방지에 초점을 두었으며, 정보가 높은 레벨에서 낮은 레벨로 흐르지 못하게 제한한다. 'No read up, no write down' 원칙."}, {"name": "Biba 모델", "note": "Bell-LaPadula 모델의 단점인 무결성을 보장하도록 만들어진 모델(기밀성은 보장하지 않음). 주체에 의한 객체 접근의 항목으로 무결성을 다룬다. 'No read down, no write up' 원칙."}, {"name": "Clark and Wilson 모델", "note": "무결성 중심의 상업용으로 설계. 애플리케이션의 보안 요구사항을 다루는데 정보의 특성에 따라 비밀 노출 방지보다 변조 방지가 더 중요할 수 있다는 것에 기초. 객체는 항상 프로그램을 통해서만 접근 가능."}, {"name": "Chinese Wall 모델 (만리장성, Brewer-Nash)", "note": "이해 충돌을 야기하는 어떠한 정보의 흐름도 차단해야 한다는 모델. 이익의 충돌을 금지하기 위한 모델로 직무 분리를 접근 통제에 반영한 개념이 적용."}]}, "mnemonic": "벨라(BL)는 '비밀 지킴이(기밀성)', 비바(Biba)는 '비바 무결성!'으로 외워봐! 벨라=비밀, 비바=변조금지 — B로 시작하는 두 모델, 앞 글자로 역할 구분!", "trap": "", "table": [], "sources": [{"title": "TOPCIT ESSENCE ver.3 — 정보보안 이해와 활용", "note": "정보통신산업진흥원(NIPA) 공식 교재"}], "priority": 1}, {"title": "APT(Advanced Persistent Threat) 공격", "keywords": [], "summary": "", "background": "옛날 해커들은 한 번 공격하고 도망가는 방식을 썼는데, 더 영리한 해커들이 '차라리 몰래 숨어서 오래오래 정보를 훔치자'는 생각을 하게 됐어. 특히 국가 기관이나 대기업처럼 중요한 곳을 노리면서 들키지 않고 수개월~수년간 잠복하는 새로운 해킹 방식이 등장한 거야.", "explanation": "APT 공격은 마치 스파이가 적국 회사에 직원으로 위장 취업해서, 들키지 않게 몇 달 동안 조용히 기밀 서류를 빼돌리는 것과 똑같아. 한 번에 '쾅!' 터뜨리는 게 아니라, 천천히 숨어서 정보를 모으고 결정적인 순간에 크게 터뜨리는 방식이야. 2011년 우리나라 금융기관이 이 방식으로 해킹당한 게 대표적인 사례야.", "why": "", "term_focus": [], "connections": [], "types": {"caption": "정치·사회·경제적, 기술적으로 중요한 공격 대상이 표적이 되는 복합적·지능적 장기 해킹 전략. 정기적인 정보 수집으로 취약점 파악 후 다양한 공격기술과 사회공학적 기법을 활용한다.", "items": [{"name": "정찰 (Reconnaissance)", "note": "정기적인 정보 수집으로 표적의 취약점을 파악하는 단계. 조직의 구성, 네트워크 구조, 보안 체계 등 정보를 수집."}, {"name": "침투 (Intrusion)", "note": "파악한 취약점을 통해 시스템에 침투. 스피어 피싱·악성 이메일·웹 공격 등 다양한 방법을 사용."}, {"name": "확산 (Lateral Movement)", "note": "침투 후 내부 네트워크에서 다른 시스템으로 확산. 권한 상승과 장기간 잠복을 통해 거점 확보."}, {"name": "유출 (Exfiltration)", "note": "취약한 시스템으로부터 중요 정보 유출, 시스템 파괴 또는 서비스 거부 공격. 최종 목적 달성 단계."}]}, "mnemonic": "APT = '아주 Persistent(끈질긴) 스파이'! → A(아주) P(포기 안 하고) T(틈새를 노린다) — 절대 안 들키고 끝까지 파고드는 스파이를 떠올려봐!", "trap": "", "table": [], "sources": [{"title": "TOPCIT ESSENCE ver.3 — 정보보안 이해와 활용", "note": "정보통신산업진흥원(NIPA) 공식 교재"}], "priority": 2}, {"title": "파밍(Pharming)", "keywords": [], "summary": "", "background": "옛날에 해커들이 가짜 사이트 링크를 직접 보내는 피싱 수법을 썼는데, 사람들이 '이상한 링크는 클릭하지 말자'고 조심하기 시작했어. 그러자 해커들은 '그럼 링크 말고 컴퓨터 자체를 감염시켜서, 정상 주소를 입력해도 가짜 사이트로 보내버리자!'는 더 교묘한 방법을 만들어낸 거야.", "explanation": "네가 평소에 즐겨 가던 은행 사이트 주소를 정확히 입력했는데, 알고 보니 컴퓨터가 이미 바이러스에 감염돼서 몰래 가짜 은행 사이트로 연결해버리는 거야. 마치 집 앞 우체통을 누군가 몰래 바꿔치기해서, 내 편지가 엉뚱한 곳으로 가는 것처럼. 그래서 아무리 조심해서 주소를 입력해도 내 통장 정보가 털릴 수 있어.", "why": "", "term_focus": [], "connections": [], "types": null, "mnemonic": "파밍 = '파'도 모르게 '밍'기적으로 가짜 사이트! → PC가 감염되면 내가 모르는 사이에 자동으로 가짜 사이트로 끌려간다!", "trap": "", "table": [], "sources": [], "priority": 2}, {"title": "큐싱", "keywords": [], "summary": "", "background": "스마트폰이 널리 퍼지면서 해커들이 QR코드를 악용하기 시작했어. 사람들이 QR코드를 아무 의심 없이 스캔하는 습관을 노려서 금융 정보를 훔치는 새로운 방법이 생겨난 거야.", "explanation": "큐싱은 QR코드 + 피싱(낚시)을 합친 말인데, 쉽게 말하면 '가짜 QR코드로 낚시하는 것'이야. 카페 메뉴판에 붙은 QR코드인 줄 알고 스캔했더니 사실 해커가 바꿔치기한 가짜 QR코드여서, 스캔하는 순간 내 폰에 악성 앱이 깔리고 은행 앱을 켜도 가짜 은행 사이트로 연결돼서 비밀번호랑 보안카드 번호를 다 털리는 거야. 결국 내가 아무것도 모르는 사이에 문자도 가로채이고 돈도 빠져나가게 되는 무서운 금융 사기야.", "why": "", "term_focus": [], "connections": [], "types": null, "mnemonic": "QR코드 = 큐(Q)싱의 무기! → 'QR 찍으면 지갑이 싹~' 으로 기억해. Q(큐)알 코드로 R(robbery, 강도질)하는 게 큐싱!", "trap": "", "table": [], "sources": [], "priority": 2}];
+const PRIO_LABEL = {1:'최우선', 2:'중요', 3:'보통', 4:'보조'};
+let curTab = 'all';
+let curPrio = 'all';
+let curLessonIdx = -1;
+let curPage = 0;
+let pages = [];
+
+function filterTab(btn, ch) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  curTab = ch;
+  applyFilters();
+}
+
+function filterPrio(btn) {
+  document.querySelectorAll('.pchip').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  curPrio = btn.dataset.prio;
+  applyFilters();
+}
+
+function applyFilters() {
+  const q = document.querySelector('.search').value.toLowerCase();
+  document.querySelectorAll('.section-group').forEach(grp => {
+    const chOk = curTab === 'all' || grp.dataset.chapter === curTab;
+    grp.classList.toggle('hidden', !chOk);
+    if (chOk) {
+      let any = false;
+      grp.querySelectorAll('.card').forEach(c => {
+        const qOk = !q || c.textContent.toLowerCase().includes(q);
+        const pOk = curPrio === 'all' || c.dataset.prio === curPrio;
+        const show = qOk && pOk;
+        c.classList.toggle('hidden-card', !show);
+        if (show) any = true;
+      });
+      if (q || curPrio !== 'all') grp.classList.toggle('hidden', !any);
+    }
+  });
+}
+
+function escHtml(str) {
+  return (str || '').replace(/[&<>"]/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[ch]);
+}
+
+function splitMnemonic(text) {
+  return (text || '')
+    .replace(/\r\n/g, '\n')
+    .replace(/\s+\/\s+/g, '\n')
+    .replace(/\s+vs\.\s+/gi, '\n')
+    .replace(/\s+→\s+/g, ' → ')
+    .replace(/\s+↔\s+/g, ' ↔ ')
+    .replace(/\.\s+/g, '.\n')
+    .replace(/다\.\s+/g, '다.\n')
+    .replace(/됨\.\s+/g, '됨.\n')
+    .split(/\n+/)
+    .map(line => line.trim())
+    .filter(Boolean);
+}
+
+function mnemonicIcon(tag, text) {
+  if (tag) return '◈';
+  if (text.includes('↔') || text.includes('=')) return '⇄';
+  if (text.includes('→')) return '→';
+  return '•';
+}
+
+function renderParagraph(text) {
+  return escHtml(text || '').replace(/\n/g, '<br>');
+}
+
+function renderFactSection(label, secClass, items) {
+  if (!items || !items.length) return '';
+  const html = items.map(item => `
+    <div class="fact-item">
+      ${item.label ? `<div class="fact-link-label">${escHtml(item.label)}</div>` : ''}
+      <div class="fact-term">${escHtml(item.term || '')}</div>
+      <div class="fact-note">${renderParagraph(item.note || '')}</div>
+    </div>`).join('');
+  return `<div class="sec ${secClass}"><div class="sec-label">${label}</div><div class="fact-list">${html}</div></div>`;
+}
+
+function renderTypesSection(types) {
+  if (!types) return '';
+  const items = Array.isArray(types) ? types : (types.items || []);
+  if (!items.length) return '';
+  const caption = !Array.isArray(types) && types.caption ? types.caption : '';
+  const scale = !Array.isArray(types) ? (types.scale || '') : '';
+  const scaleLabels = {
+    'strong-to-weak': ['강함','약함','reverse'],
+    'weak-to-strong': ['약함','강함',''],
+  };
+  const tierClass = {
+    'strong': 'tier-strong',
+    'mid': 'tier-mid',
+    'weak': 'tier-weak',
+  };
+  const tierLabel = {
+    'strong': '강함',
+    'mid': '중간',
+    'weak': '약함',
+  };
+  const rows = items.map(it => {
+    const tierCls = it.tier && tierClass[it.tier] ? tierClass[it.tier] : '';
+    const tierLbl = it.tier && tierLabel[it.tier] ? tierLabel[it.tier] : (it.tier || '');
+    return `
+      <div class="type-item">
+        <div class="type-body">
+          <div class="type-head">
+            <span class="type-name">${escHtml(it.name || '')}</span>
+            ${it.en ? `<span class="type-en">${escHtml(it.en)}</span>` : ''}
+            ${tierCls ? `<span class="type-tier ${tierCls}">${escHtml(tierLbl)}</span>` : ''}
+          </div>
+          <div class="type-note">${renderParagraph(it.note || '')}</div>
+        </div>
+      </div>`;
+  }).join('');
+  let scaleHtml = '';
+  if (scale && scaleLabels[scale]) {
+    const [L, R, rev] = scaleLabels[scale];
+    scaleHtml = `<div class="types-scale ${rev}"><span>${L}</span><span class="scale-arrow"></span><span>${R}</span></div>`;
+  }
+  return `<div class="sec sec-types">
+    <div class="sec-label">🗂️ 유형</div>
+    ${caption ? `<div class="types-caption">${renderParagraph(caption)}</div>` : ''}
+    <div class="types-list">${rows}</div>
+    ${scaleHtml}
+  </div>`;
+}
+
+function renderSourceSection(sources) {
+  if (!sources || !sources.length) return '';
+  const html = sources.map(src => {
+    const hasUrl = !!src.url;
+    let host = '';
+    if (hasUrl) {
+      try { host = new URL(src.url).hostname.replace(/^www\./, ''); } catch (_err) { host = ''; }
+    }
+    const inner = `
+        <span class="src-bullet">↗</span>
+        <span class="src-text">
+          ${escHtml(src.title || src.url || '')}
+          ${src.note ? `<span class="src-host">${escHtml(src.note)}</span>` : ''}
+          ${!src.note && host ? `<span class="src-host">${escHtml(host)}</span>` : ''}
+        </span>`;
+    if (hasUrl) {
+      return `<a class="src-link" href="${escHtml(src.url)}" target="_blank" rel="noreferrer">${inner}</a>`;
+    }
+    return `<div class="src-link">${inner}</div>`;
+  }).join('');
+  return `<div class="sec sec-src"><div class="sec-label">🔗 출처</div><div class="src-list">${html}</div></div>`;
+}
+
+function renderMnemonic(text) {
+  const lines = splitMnemonic(text);
+  if (!lines.length) return '';
+  const html = lines.map(line => {
+    const m = line.match(/^【([^】]+)】\s*(.*)$/);
+    const tag = m ? m[1].trim() : '';
+    const body = (m ? m[2] : line).trim();
+    const safeBody = escHtml(body).replace(/'([^']+)'/g, '<strong>$1</strong>');
+    return `
+      <div class="mn-line">
+        <span class="mn-picto">${mnemonicIcon(tag, body)}</span>
+        <div class="mn-main">
+          ${tag ? `<span class="mn-tag">${escHtml(tag)}</span>` : ''}
+          <div class="mn-text">${safeBody}</div>
+        </div>
+      </div>`;
+  }).join('');
+  return `<div class="sec sec-mn"><div class="sec-label">🧠 5초 암기</div><div class="mn-list">${html}</div></div>`;
+}
+
+function buildPages(lesson) {
+  return [
+    { type: 'learn', data: lesson },
+    { type: 'done',  data: lesson },
+  ];
+}
+
+function renderPage() {
+  const body = document.getElementById('l-body');
+  const page = pages[curPage];
+  body.innerHTML = '';
+  body.scrollTop = 0;
+
+  const wrap = document.createElement('div');
+  wrap.className = 'l-page';
+
+  if (page.type === 'learn') {
+    const d = page.data;
+    let h = '';
+    h += `<h1 class="l-page-title">${escHtml(d.title)}</h1>`;
+    const metaBits = [];
+    if (d.priority && PRIO_LABEL[d.priority]) {
+      metaBits.push(`<span class="chip chip-prio-${d.priority}">P${d.priority} · ${PRIO_LABEL[d.priority]}</span>`);
+    }
+    if (metaBits.length) h += `<div class="l-page-meta">${metaBits.join('')}</div>`;
+    if (d.keywords && d.keywords.length) {
+      h += `<div class="l-page-kw">${d.keywords.map(k => `<span>★ ${escHtml(k)}</span>`).join('')}</div>`;
+    }
+    if (d.summary)     h += `<div class="sec sec-summary"><div class="sec-label">📌 한 줄 요약</div><p>${renderParagraph(d.summary)}</p></div>`;
+    if (d.background)  h += `<div class="sec sec-bg"><div class="sec-label">📜 배경·맥락</div><p>${renderParagraph(d.background)}</p></div>`;
+    if (d.explanation) h += `<div class="sec sec-expl"><div class="sec-label">📖 핵심 설명</div><p>${renderParagraph(d.explanation)}</p></div>`;
+    if (d.types)       h += renderTypesSection(d.types);
+    if (d.why)         h += `<div class="sec sec-why"><div class="sec-label">🔍 왜 이렇게 됐나</div><p>${renderParagraph(d.why)}</p></div>`;
+    if (d.term_focus && d.term_focus.length)   h += renderFactSection('🈶 용어·한자 풀이', 'sec-term', d.term_focus);
+    if (d.connections && d.connections.length) h += renderFactSection('🧭 앞뒤 흐름 연결', 'sec-link', d.connections);
+    if (d.mnemonic)    h += renderMnemonic(d.mnemonic);
+    if (d.trap)        h += `<div class="sec sec-trap"><div class="sec-label">⚠️ 시험 함정</div><p>${renderParagraph(d.trap)}</p></div>`;
+    if (d.table && d.table.length) {
+      const cols = Object.keys(d.table[0]);
+      const head = cols.map(c => `<th>${escHtml(c)}</th>`).join('');
+      const rows = d.table.map(r => '<tr>' + cols.map(c => `<td>${escHtml(r[c] || '')}</td>`).join('') + '</tr>').join('');
+      h += `<div class="sec sec-summary" style="padding:0;background:transparent;border:none">
+        <div class="sec-label" style="padding-left:.3rem;color:#6b7280;margin-bottom:.5rem">📊 정리표</div>
+        <table class="ctable"><thead><tr>${head}</tr></thead><tbody>${rows}</tbody></table>
+      </div>`;
+    }
+    if (d.sources && d.sources.length) h += renderSourceSection(d.sources);
+    wrap.innerHTML = h;
+  }
+  else if (page.type === 'done') {
+    const d = page.data;
+    const hasNext = curLessonIdx + 1 < LESSONS.length;
+    wrap.innerHTML = `
+      <div class="done-page">
+        <div class="done-emoji">🎉</div>
+        <div class="done-title">레슨 완료!</div>
+        <div class="done-sub">${escHtml(d.title)}</div>
+        <div class="done-actions">
+          ${hasNext ? '<button class="done-btn done-btn-primary" onclick="startLesson(' + (curLessonIdx + 1) + ')">다음 개념 →</button>' : ''}
+          <button class="done-btn done-btn-sub" onclick="exitLesson()">목록으로 돌아가기</button>
+        </div>
+      </div>`;
+  }
+
+  body.appendChild(wrap);
+
+  document.getElementById('l-page-ind').textContent = `${curPage + 1} / ${pages.length}`;
+  document.getElementById('l-progress-bar').style.width = `${((curPage + 1) / pages.length) * 100}%`;
+  document.getElementById('l-prev').disabled = curPage === 0;
+  document.getElementById('l-next').disabled = curPage === pages.length - 1;
+  document.getElementById('l-next').textContent = curPage === pages.length - 2 ? '완료 🎉' : '다음 →';
+}
+
+function startLesson(idx) {
+  if (idx < 0 || idx >= LESSONS.length) return;
+  curLessonIdx = idx;
+  curPage = 0;
+  pages = buildPages(LESSONS[idx]);
+  document.getElementById('l-title').textContent = LESSONS[idx].title;
+  document.getElementById('lesson').classList.add('show');
+  document.body.style.overflow = 'hidden';
+  renderPage();
+}
+
+function exitLesson() {
+  document.getElementById('lesson').classList.remove('show');
+  document.body.style.overflow = '';
+  curLessonIdx = -1;
+}
+
+function nextPage() { if (curPage < pages.length - 1) { curPage++; renderPage(); } }
+function prevPage() { if (curPage > 0) { curPage--; renderPage(); } }
+
+document.addEventListener('keydown', e => {
+  if (curLessonIdx < 0) return;
+  if (e.key === 'ArrowLeft')  prevPage();
+  if (e.key === 'ArrowRight') nextPage();
+  if (e.key === 'Escape')     exitLesson();
+});
+</script>
+</body>
+</html>

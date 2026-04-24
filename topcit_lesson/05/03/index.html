@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>TOPCIT 05-03 지식재산권</title>
+<style>
+:root{--font-sans:"Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",system-ui,sans-serif;--font-serif:"NanumMyeongjo","Nanum Myeongjo","Batang","Apple SD Gothic Neo",serif}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{overflow-x:hidden}
+body{font-family:var(--font-sans);background:#f7f8fb;color:#1f2937;min-height:100vh}
+
+.header{background:#b45309;color:#fff;padding:.85rem 1.25rem;display:flex;align-items:center;gap:.75rem;position:sticky;top:0;z-index:20;box-shadow:0 2px 10px rgba(0,0,0,.15)}
+.header-back{color:#fff;text-decoration:none;font-size:1.2rem;opacity:.85}
+.header h1{font-size:1rem;font-weight:800;flex:1;font-family:var(--font-serif)}
+.header-cnt{font-size:.75rem;opacity:.8;white-space:nowrap}
+
+.search-wrap{padding:.7rem 1.25rem .3rem}
+.search{width:100%;padding:.6rem 1rem;border:2px solid #e2e8f0;border-radius:2rem;font-size:.88rem;outline:none;background:#fff;transition:border .2s}
+.search:focus{border-color:#b45309}
+
+.tabs{display:flex;gap:.35rem;padding:.4rem 1.25rem .3rem;overflow-x:auto;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tab{flex-shrink:0;padding:.32rem .8rem;border-radius:2rem;border:1.5px solid #b45309;background:#fff;color:#b45309;font-size:.74rem;font-weight:700;cursor:pointer;white-space:nowrap;transition:all .15s;font-family:inherit}
+.tab.active,.tab:hover{background:#b45309;color:#fff}
+
+.prio-bar{display:flex;gap:.3rem;padding:.2rem 1.25rem .6rem;overflow-x:auto;scrollbar-width:none}
+.prio-bar::-webkit-scrollbar{display:none}
+.pchip{flex-shrink:0;padding:.28rem .7rem;border-radius:2rem;border:1.5px solid #e5e7eb;background:#fff;color:#475569;font-size:.72rem;font-weight:700;cursor:pointer;white-space:nowrap;transition:all .15s;font-family:inherit}
+.pchip:hover{border-color:var(--pc,#9ca3af);color:#111827}
+.pchip.active{background:var(--pc,#b45309);border-color:var(--pc,#b45309);color:#fff}
+.pchip[data-prio="all"].active{background:#b45309;border-color:#b45309;color:#fff}
+
+.section-group{padding:.3rem 1.25rem .8rem}
+.section-group.hidden{display:none}
+.section-label{font-size:.72rem;font-weight:800;color:#78350f;letter-spacing:.04em;padding:.4rem 0 .35rem;border-bottom:2px solid #b4530933;margin-bottom:.55rem;font-family:var(--font-serif)}
+.card-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:.55rem}
+@media(min-width:540px){.card-grid{grid-template-columns:repeat(3,1fr)}}
+@media(min-width:900px){.card-grid{grid-template-columns:repeat(4,1fr)}}
+@media(min-width:1200px){.card-grid{grid-template-columns:repeat(5,1fr)}}
+.card{background:#fff;border-radius:.7rem;padding:.85rem .8rem .65rem;cursor:pointer;border:1.5px solid #e5e7eb;transition:all .18s;box-shadow:0 1px 3px rgba(0,0,0,.04);position:relative;display:flex;flex-direction:column;gap:.35rem;min-height:9rem}
+.card:hover{border-color:#b45309;box-shadow:0 4px 14px #b4530933;transform:translateY(-2px)}
+.card-badges{position:absolute;top:.45rem;right:.5rem;display:flex;gap:.2rem;font-size:.64rem}
+.card-badges span{padding:.1rem .42rem;border-radius:.4rem;font-weight:700;line-height:1.4;white-space:nowrap}
+.b-prio-1{background:#fee2e2;color:#991b1b}
+.b-prio-2{background:#fef3c7;color:#92400e}
+.b-prio-3{background:#dcfce7;color:#166534}
+.b-prio-4{background:#f1f5f9;color:#475569}
+.b-mn{background:#ede9fe;color:#5b21b6}
+.card-title{font-size:.86rem;font-weight:700;color:#111827;line-height:1.35;padding-right:4.5rem;font-family:var(--font-serif)}
+.card-preview{font-size:.7rem;color:#6b7280;line-height:1.5;flex:1}
+.card-cta{font-size:.68rem;color:#b45309;font-weight:700;text-align:right;margin-top:.25rem}
+.card.hidden-card{display:none!important}
+
+/* ───────── 레슨 모드 (풀스크린) ───────── */
+.lesson{display:none;position:fixed;inset:0;background:#f7f8fb;z-index:1000;flex-direction:column}
+.lesson.show{display:flex}
+.l-head{background:#b45309;color:#fff;padding:.7rem 1rem;display:flex;align-items:center;gap:.7rem;flex-shrink:0}
+.l-back{background:none;border:none;color:#fff;font-size:1.3rem;cursor:pointer;padding:0;line-height:1;opacity:.9}
+.l-title{flex:1;font-size:.92rem;font-weight:800;font-family:var(--font-serif);line-height:1.3;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.l-page-ind{font-size:.78rem;font-weight:700;background:rgba(0,0,0,.18);padding:.18rem .55rem;border-radius:1rem;flex-shrink:0}
+.l-progress{height:4px;background:rgba(0,0,0,.15);flex-shrink:0}
+.l-progress-bar{height:100%;background:#fff;width:0%;transition:width .3s ease}
+.l-body{flex:1;overflow-y:auto;padding:1.2rem 1.25rem 5rem;display:flex;flex-direction:column;gap:1rem;align-items:center}
+.l-page{width:100%;max-width:680px;animation:slideIn .25s ease}
+@keyframes slideIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+.l-page-title{font-size:1.5rem;font-weight:800;color:#78350f;margin-bottom:.5rem;font-family:var(--font-serif);line-height:1.3}
+.l-page-meta{display:flex;flex-wrap:wrap;gap:.35rem;margin-bottom:.85rem}
+.l-page-meta .chip{padding:.18rem .55rem;border-radius:1rem;font-size:.7rem;font-weight:700}
+.chip-prio-1{background:#fee2e2;color:#991b1b}
+.chip-prio-2{background:#fef3c7;color:#92400e}
+.chip-prio-3{background:#dcfce7;color:#166534}
+.chip-prio-4{background:#f1f5f9;color:#475569}
+.l-page-kw{display:flex;flex-wrap:wrap;gap:.3rem;margin-bottom:1.2rem}
+.l-page-kw span{background:#b4530922;color:#78350f;border:1px solid #b4530955;border-radius:1rem;padding:.18rem .65rem;font-size:.72rem;font-weight:700}
+
+.sec{border-radius:.7rem;padding:1rem 1.1rem;line-height:1.65;margin-bottom:.85rem}
+.sec-summary{background:#b4530911;border-left:5px solid #b45309;font-size:.95rem;color:#111827;font-weight:600}
+.sec-bg{background:#fef7ec;border-left:5px solid #d97706}
+.sec-expl{background:#eef2ff;border-left:5px solid #4f46e5}
+.sec-why{background:#ecfdf5;border-left:5px solid #059669}
+.sec-term{background:#faf5ff;border-left:5px solid #7c3aed}
+.sec-link{background:#fff7ed;border-left:5px solid #c2410c}
+.sec-mn{background:linear-gradient(145deg,#fffef5 0%,#fff7d6 56%,#b4530920 100%);color:#1f2937;font-weight:600;border:1.5px solid #b4530933;border-left:5px solid #b45309;box-shadow:0 10px 26px #b4530914}
+.sec-trap{background:#fff1f2;border:1.5px solid #fda4af;border-left:5px solid #e11d48;color:#881337}
+.sec-src{background:#fff;border:1.5px solid #e5e7eb;border-left:5px solid #475569}
+.sec-types{background:#f0f9ff;border:1.5px solid #bae6fd;border-left:5px solid #0284c7}
+.sec-types .sec-label{color:#075985}
+.types-caption{font-size:.8rem;color:#334155;margin-bottom:.6rem;line-height:1.55}
+.types-list{display:flex;flex-direction:column;gap:.55rem;counter-reset:tc}
+.type-item{display:grid;grid-template-columns:2rem 1fr;gap:.55rem;align-items:start;background:#fff;border:1px solid #e0f2fe;border-radius:.7rem;padding:.7rem .78rem;counter-increment:tc;position:relative}
+.type-item::before{content:counter(tc);display:inline-flex;align-items:center;justify-content:center;width:1.7rem;height:1.7rem;border-radius:.5rem;background:#b4530916;color:#78350f;font-size:.8rem;font-weight:800;line-height:1}
+.type-body{min-width:0}
+.type-head{display:flex;flex-wrap:wrap;gap:.35rem;align-items:center;margin-bottom:.2rem}
+.type-name{font-size:.92rem;font-weight:800;color:#0f172a;font-family:var(--font-serif)}
+.type-en{font-size:.72rem;color:#64748b;font-weight:700}
+.type-tier{display:inline-flex;align-items:center;padding:.08rem .42rem;border-radius:999px;font-size:.62rem;font-weight:800;letter-spacing:.04em}
+.tier-strong{background:#fee2e2;color:#991b1b}
+.tier-mid{background:#fef3c7;color:#92400e}
+.tier-weak{background:#dcfce7;color:#166534}
+.type-note{font-size:.86rem;line-height:1.68;color:#334155;word-break:keep-all}
+.types-scale{display:flex;align-items:center;gap:.45rem;margin-top:.65rem;padding:.5rem .7rem;background:rgba(255,255,255,.7);border:1px dashed #bae6fd;border-radius:.6rem;font-size:.72rem;color:#475569;font-weight:700}
+.types-scale .scale-arrow{flex:1;height:6px;border-radius:999px;background:linear-gradient(90deg,#16a34a,#d97706,#dc2626)}
+.types-scale.reverse .scale-arrow{background:linear-gradient(90deg,#dc2626,#d97706,#16a34a)}
+.sec-label{font-size:.7rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;margin-bottom:.5rem}
+.sec-bg .sec-label{color:#92400e}
+.sec-expl .sec-label{color:#3730a3}
+.sec-why .sec-label{color:#065f46}
+.sec-term .sec-label{color:#5b21b6}
+.sec-link .sec-label{color:#9a3412}
+.sec-mn .sec-label{color:#78350f}
+.sec-trap .sec-label{color:#9f1239}
+.sec-summary .sec-label{color:#b45309}
+.sec-src .sec-label{color:#334155}
+.sec p{font-size:.92rem;line-height:1.7}
+.sec-mn p{font-size:.98rem}
+.fact-list{display:flex;flex-direction:column;gap:.65rem}
+.fact-item{background:rgba(255,255,255,.85);border:1px solid rgba(0,0,0,.06);border-radius:.85rem;padding:.78rem .85rem}
+.fact-term{font-size:.86rem;font-weight:800;color:#111827;margin-bottom:.22rem}
+.fact-note{font-size:.9rem;line-height:1.72;color:#374151;word-break:keep-all}
+.fact-link-label{display:inline-flex;align-items:center;padding:.12rem .45rem;border-radius:999px;background:#b4530914;color:#78350f;font-size:.64rem;font-weight:800;letter-spacing:.04em;margin-bottom:.38rem}
+.src-list{display:flex;flex-direction:column;gap:.5rem}
+.src-link{display:flex;align-items:flex-start;gap:.45rem;text-decoration:none;color:#111827;background:#f9fafb;border:1px solid #e5e7eb;border-radius:.8rem;padding:.72rem .82rem;transition:border-color .15s,transform .15s}
+.src-link:hover{border-color:#b45309;transform:translateY(-1px)}
+.src-bullet{flex-shrink:0;color:#b45309;font-weight:800}
+.src-text{font-size:.85rem;line-height:1.55}
+.src-host{display:block;font-size:.72rem;color:#6b7280;margin-top:.1rem}
+.mn-list{display:flex;flex-direction:column;gap:.55rem}
+.mn-line{display:flex;align-items:flex-start;gap:.72rem;background:rgba(255,255,255,.82);border:1px solid #b4530922;border-radius:.9rem;padding:.72rem .8rem .68rem;box-shadow:0 4px 12px rgba(0,0,0,.04)}
+.mn-picto{flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;width:1.6rem;height:1.6rem;border-radius:.45rem;background:#b4530916;border:1px solid #b4530926;font-size:.76rem;font-weight:800;line-height:1;color:#78350f}
+.mn-main{display:flex;flex-direction:column;gap:.28rem;min-width:0}
+.mn-tag{display:inline-flex;align-items:center;width:fit-content;padding:.12rem .45rem;border-radius:999px;background:#b4530918;color:#78350f;font-size:.64rem;font-weight:800;letter-spacing:.05em}
+.mn-text{font-size:.95rem;line-height:1.76;color:#1f2937;word-break:keep-all}
+.mn-text strong{color:#b45309;font-weight:800}
+
+.ctable{width:100%;border-collapse:collapse;font-size:.82rem;background:#fff;border-radius:.5rem;overflow:hidden;margin-top:.4rem}
+.ctable th{background:#b45309;color:#fff;padding:.55rem .65rem;text-align:left;font-weight:700;font-size:.78rem}
+.ctable td{padding:.55rem .65rem;border-top:1px solid #e5e7eb;vertical-align:top;line-height:1.55}
+.ctable tr:nth-child(even) td{background:#f9fafb}
+
+.done-page{text-align:center;padding:2.5rem 1rem}
+.done-emoji{font-size:4.5rem;margin-bottom:1rem;animation:pop .4s ease}
+@keyframes pop{from{transform:scale(0)}80%{transform:scale(1.2)}to{transform:scale(1)}}
+.done-title{font-size:1.5rem;font-weight:800;color:#78350f;margin-bottom:.5rem;font-family:var(--font-serif)}
+.done-sub{font-size:.95rem;color:#6b7280;margin-bottom:2rem}
+.done-actions{display:flex;flex-direction:column;gap:.6rem;max-width:300px;margin:0 auto}
+.done-btn{padding:.85rem 1.4rem;border-radius:.7rem;font-size:.95rem;font-weight:700;cursor:pointer;border:none;font-family:inherit;transition:all .15s}
+.done-btn-primary{background:#b45309;color:#fff}
+.done-btn-primary:hover{transform:translateY(-2px);box-shadow:0 4px 14px #b4530955}
+.done-btn-sub{background:#fff;color:#b45309;border:1.5px solid #b45309}
+.done-btn-sub:hover{background:#b4530911}
+
+.l-foot{position:fixed;bottom:0;left:0;right:0;background:#fff;padding:.7rem 1rem;display:flex;gap:.5rem;border-top:1px solid #e5e7eb;z-index:1010}
+.l-nav-btn{flex:1;padding:.7rem;border-radius:.55rem;border:1.5px solid #b45309;background:#fff;color:#b45309;font-size:.88rem;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s}
+.l-nav-btn:hover:not(:disabled){background:#b4530911}
+.l-nav-btn:disabled{opacity:.35;cursor:not-allowed}
+.l-nav-btn.primary{background:#b45309;color:#fff;border-color:#b45309}
+.l-nav-btn.primary:hover:not(:disabled){background:#78350f;border-color:#78350f}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <a href="../" class="header-back">←</a>
+  <span style="font-size:1.2rem">💼</span>
+  <h1><span style="opacity:.7;font-size:.85em">05</span> &nbsp;지식재산권</h1>
+  <span class="header-cnt">14개</span>
+</div>
+
+<div class="search-wrap">
+  <input class="search" type="text" placeholder="🔍  개념 검색..." oninput="applyFilters()">
+</div>
+
+<div class="tabs" id="tab-bar"><button class="tab active" onclick="filterTab(this,'all')">전체</button><button class="tab" onclick="filterTab(this,'0')">지식재산권의 이해</button><button class="tab" onclick="filterTab(this,'1')">산업재산권과 신지식재산권의 이해</button><button class="tab" onclick="filterTab(this,'2')">저작권의 이해</button></div>
+<div class="prio-bar"><button class="pchip active" data-prio="all" onclick="filterPrio(this)">전체</button><button class="pchip" data-prio="1" onclick="filterPrio(this)" style="--pc:#dc2626">🔴 P1 최우선</button><button class="pchip" data-prio="2" onclick="filterPrio(this)" style="--pc:#d97706">🟡 P2 중요</button><button class="pchip" data-prio="3" onclick="filterPrio(this)" style="--pc:#16a34a">🟢 P3 보통</button><button class="pchip" data-prio="4" onclick="filterPrio(this)" style="--pc:#9ca3af">⚪ P4 보조</button></div>
+
+<div id="card-content"><div class="section-group" data-chapter="0"><div class="section-label">지식재산권의 이해</div><div class="card-grid"><div class="card" data-prio="3" onclick="startLesson(0)"><div class="card-badges"><span class="b-prio b-prio-3" title="보통">🟢 P3</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">지식재산권의 정의</div><div class="card-preview">옛날엔 눈에 보이는 물건만 &#x27;내 것&#x27;으로 인정받았어. 그런데 아이디어, 발명, 창작물도 가…</div><div class="card-cta">레슨 시작 →</div></div><div class="card" data-prio="2" onclick="startLesson(1)"><div class="card-badges"><span class="b-prio b-prio-2" title="중요">🟡 P2</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">지식재산권의 유형</div><div class="card-preview">창작물의 종류가 다양해지면서 하나의 법으로 다 커버하기 어렵게 됐어. 그래서 성격에 따라 …</div><div class="card-cta">레슨 시작 →</div></div></div></div><div class="section-group" data-chapter="1"><div class="section-label">산업재산권과 신지식재산권의 이해</div><div class="card-grid"><div class="card" data-prio="1" onclick="startLesson(2)"><div class="card-badges"><span class="b-prio b-prio-1" title="최우선">🔴 P1</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">산업재산권의 개념</div><div class="card-preview">공장에서 만든 발명품이나 브랜드를 아무나 따라 만들면 기업이 투자할 이유가 없잖아. 그래서…</div><div class="card-cta">레슨 시작 →</div></div><div class="card" data-prio="2" onclick="startLesson(3)"><div class="card-badges"><span class="b-prio b-prio-2" title="중요">🟡 P2</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">신지식재산권의 개념과 유형</div><div class="card-preview">인터넷과 IT 기술이 발달하면서 기존 특허권·저작권으로는 컴퓨터 프로그램이나 반도체 설계 …</div><div class="card-cta">레슨 시작 →</div></div><div class="card" data-prio="3" onclick="startLesson(4)"><div class="card-badges"><span class="b-prio b-prio-3" title="보통">🟢 P3</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">최신 서비스 윤리 이슈</div><div class="card-preview">옛날에는 IT 기술이 그냥 &#x27;편리한 도구&#x27;였는데, 인터넷과 스마트폰이 퍼지면서 개인 정보 …</div><div class="card-cta">레슨 시작 →</div></div></div></div><div class="section-group" data-chapter="2"><div class="section-label">저작권의 이해</div><div class="card-grid"><div class="card" data-prio="2" onclick="startLesson(5)"><div class="card-badges"><span class="b-prio b-prio-2" title="중요">🟡 P2</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">저작권의 정의와 분류</div><div class="card-preview">옛날에 누군가가 열심히 책이나 음악을 만들었는데, 다른 사람이 그냥 복사해서 돈을 버는 일…</div><div class="card-cta">레슨 시작 →</div></div><div class="card" data-prio="4" onclick="startLesson(6)"><div class="card-badges"><span class="b-prio b-prio-4" title="보조">⚪ P4</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">최신 서비스 윤리 이슈</div><div class="card-preview">옛날에는 IT 기술이 그냥 &#x27;편리한 도구&#x27;였는데, 인터넷과 스마트폰이 퍼지면서 개인 정보 …</div><div class="card-cta">레슨 시작 →</div></div><div class="card" data-prio="4" onclick="startLesson(7)"><div class="card-badges"><span class="b-prio b-prio-4" title="보조">⚪ P4</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">MBO의 주요관점</div><div class="card-preview">옛날에 컴퓨터 프로그램들이 많아지면서 &#x27;이 프로그램이 제대로 잘 돌아가고 있나?&#x27;를 체계적…</div><div class="card-cta">레슨 시작 →</div></div><div class="card" data-prio="4" onclick="startLesson(8)"><div class="card-badges"><span class="b-prio b-prio-4" title="보조">⚪ P4</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">MBO를 기업에서 도입하는 이유</div><div class="card-preview">옛날에 회사에서 사장님이 &#x27;열심히 해!&#x27;라고만 하면 직원들이 뭘 어떻게 해야 할지 몰라서 …</div><div class="card-cta">레슨 시작 →</div></div><div class="card" data-prio="4" onclick="startLesson(9)"><div class="card-badges"><span class="b-prio b-prio-4" title="보조">⚪ P4</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">MBO의 구성요소</div><div class="card-preview">옛날에 회사에서 직원들한테 &#x27;그냥 열심히 해!&#x27;라고만 하니까 다들 뭘 해야 할지 몰라서 우…</div><div class="card-cta">레슨 시작 →</div></div><div class="card" data-prio="4" onclick="startLesson(10)"><div class="card-badges"><span class="b-prio b-prio-4" title="보조">⚪ P4</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">| 비즈니</div><div class="card-preview">옛날에는 회사마다 프로그램 만드는 방식이 다 달라서 서로 연결하거나 공유하기가 너무 힘들었…</div><div class="card-cta">레슨 시작 →</div></div><div class="card" data-prio="4" onclick="startLesson(11)"><div class="card-badges"><span class="b-prio b-prio-4" title="보조">⚪ P4</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">| 비즈니</div><div class="card-preview">옛날에는 회사마다 프로그램 만드는 방식이 다 달라서 서로 연결하거나 공유하기가 너무 힘들었…</div><div class="card-cta">레슨 시작 →</div></div><div class="card" data-prio="4" onclick="startLesson(12)"><div class="card-badges"><span class="b-prio b-prio-4" title="보조">⚪ P4</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">최신 웹</div><div class="card-preview">옛날 웹사이트는 버튼 하나 클릭할 때마다 페이지 전체가 새로고침되면서 흰 화면이 번쩍였어.…</div><div class="card-cta">레슨 시작 →</div></div><div class="card" data-prio="4" onclick="startLesson(13)"><div class="card-badges"><span class="b-prio b-prio-4" title="보조">⚪ P4</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">모바일</div><div class="card-preview">옛날에는 컴퓨터가 책상 위에 고정되어 있어서 이동하면서 사용하는 게 불가능했어. 그래서 사…</div><div class="card-cta">레슨 시작 →</div></div></div></div></div>
+
+<!-- ── 레슨 모드 ── -->
+<div class="lesson" id="lesson">
+  <div class="l-head">
+    <button class="l-back" onclick="exitLesson()">←</button>
+    <div class="l-title" id="l-title"></div>
+    <div class="l-page-ind" id="l-page-ind">1 / 1</div>
+  </div>
+  <div class="l-progress"><div class="l-progress-bar" id="l-progress-bar"></div></div>
+  <div class="l-body" id="l-body"></div>
+  <div class="l-foot">
+    <button class="l-nav-btn" id="l-prev" onclick="prevPage()">← 이전</button>
+    <button class="l-nav-btn primary" id="l-next" onclick="nextPage()">다음 →</button>
+  </div>
+</div>
+
+<script>
+const LESSONS = [{"title": "지식재산권의 정의", "keywords": ["비교", "활동", "조직전반"], "summary": "", "background": "옛날엔 눈에 보이는 물건만 '내 것'으로 인정받았어. 그런데 아이디어, 발명, 창작물도 가치가 있으니 법적으로 보호해야 한다는 인식이 생긴 거야.", "explanation": "네가 새로운 게임을 만들었을 때, 그 게임 코드나 캐릭터 디자인이 도둑맞지 않도록 법이 지켜주는 게 지식재산권이야. 눈에 안 보이는 창작물도 내 '재산'으로 인정해주는 거지.", "why": "", "term_focus": [], "connections": [], "types": null, "mnemonic": "지식재산권 = '창조적 활동의 무형 재산에 대한 법적 권리' → 줄이면 '창무법'", "trap": "", "table": [], "sources": [], "priority": 3}, {"title": "지식재산권의 유형", "keywords": ["비교", "활동", "조직전반"], "summary": "", "background": "창작물의 종류가 다양해지면서 하나의 법으로 다 커버하기 어렵게 됐어. 그래서 성격에 따라 저작권, 산업재산권, 신지식재산권 3가지로 나눠서 관리하게 됐어.", "explanation": "저작권은 소설·음악·영화처럼 예술 창작물, 산업재산권은 발명(특허)·로고(상표)·디자인 같은 사업용 창작물, 신지식재산권은 컴퓨터 프로그램·반도체 회로 같은 IT 신기술 관련이야. 세 바구니에 나눠 담는다고 생각해.", "why": "", "term_focus": [], "connections": [], "types": {"caption": "지식재산권은 법령 또는 조약 등에 따라 인정되거나 보호되는 지식재산에 관한 권리. 크게 3가지 유형으로 구분된다.", "items": [{"name": "저작권", "en": "Copyright", "note": "학문의 연구결과나 문예창작물에 대해 인정되는 배타적 권리. 저작인격권·저작재산권·저작인접권으로 구분."}, {"name": "산업재산권", "en": "Industrial Property", "note": "새로운 산업적 발명이나 실용적인 고안 또는 상품의 형태나 상표의 고유성에 대하여 인정되는 권리. 특허권·실용신안권·디자인권·상표권."}, {"name": "신지식재산권", "en": "New Intellectual Property", "note": "경제·사회 또는 문화의 변화나 과학기술의 발전에 따라 새로운 분야에서 출현하는 지식재산에 대한 권리."}]}, "mnemonic": "지식재산권 3유형 = '저산신' — 저작권 / 산업재산권 / 신지식재산권", "trap": "", "table": [], "sources": [{"title": "TOPCIT ESSENCE ver.3 — IT 비즈니스와 윤리", "note": "정보통신산업진흥원(NIPA) 공식 교재"}], "priority": 2}, {"title": "산업재산권의 개념", "keywords": ["변화", "개인용", "구마력", "전략", "의료비", "데이터", "관계", "안정적", "그룹정책", "체계", "인증,", "편리한"], "summary": "", "background": "공장에서 만든 발명품이나 브랜드를 아무나 따라 만들면 기업이 투자할 이유가 없잖아. 그래서 산업 활동에서 나오는 창작물을 보호하는 권리가 생긴 거야.", "explanation": "특허권(발명), 실용신안권(작은 개선 아이디어), 디자인권(외관 모양), 상표권(브랜드 로고) 이렇게 4가지야. 삼성 로고를 다른 회사가 똑같이 쓰면 안 되는 게 상표권, 새로운 배터리 기술을 독점하는 게 특허권이야.", "why": "", "term_focus": [], "connections": [], "types": null, "mnemonic": "산업재산권 4총사 = '특실디상' — 특허 / 실용신안 / 디자인 / 상표", "trap": "", "table": [], "sources": [], "priority": 1}, {"title": "신지식재산권의 개념과 유형", "keywords": ["변화", "개인용", "구마력", "전략", "의료비", "데이터", "관계", "안정적", "그룹정책", "체계", "인증,", "편리한"], "summary": "", "background": "인터넷과 IT 기술이 발달하면서 기존 특허권·저작권으로는 컴퓨터 프로그램이나 반도체 설계 같은 걸 보호하기가 애매해졌어. 그래서 새로운 유형의 지식재산권이 등장한 거야.", "explanation": "인터넷 도메인 이름, 반도체 칩 회로 설계, 유전자 조작 생물, 컴퓨터 소프트웨어처럼 기존 법이 예상 못했던 새 분야를 보호하는 게 신지식재산권이야. '옛날 법에 없던 새 기술은 새 법으로 보호'라고 보면 돼.", "why": "", "term_focus": [], "connections": [], "types": {"caption": "신지식재산권은 과학기술의 발전과 경제·사회·문화의 변화에 따라 새로운 분야에서 출현하는 지식재산에 대한 권리. 전통적인 특허권·저작권의 보호 범위를 넘어선다.", "items": [{"name": "첨단산업재산권", "note": "컴퓨터 프로그램, 유전자조작 동식물, 반도체 설계, 인터넷 등 과학기술 분야에서 발생하는 권리. 세계무역기구(WTO) 신지식재산권 보호 대상에 포함."}, {"name": "정보재산권", "note": "영업비밀, 데이터베이스, 컴퓨터 프로그램 등 정보 자산에 대한 권리. 영업비밀 보호, DB 제작자 권리 등."}, {"name": "생명공학 관련 재산권", "note": "생명공학 분야의 연구 결과물(유전자, 세포 등)에 대한 지식재산권."}, {"name": "기타 신지식재산권", "note": "상품 판매·서비스 제공방법 등의 비즈니스 모델, 부정경쟁 방지에 대한 보호 등."}]}, "mnemonic": "신지식재산권 = '컴반도유' — 컴퓨터프로그램 / 반도체설계 / 도메인 / 유전자", "trap": "", "table": [], "sources": [{"title": "TOPCIT ESSENCE ver.3 — IT 비즈니스와 윤리", "note": "정보통신산업진흥원(NIPA) 공식 교재"}], "priority": 2}, {"title": "최신 서비스 윤리 이슈", "keywords": ["변화", "개인용", "구마력", "전략", "의료비", "데이터", "관계", "안정적", "그룹정책", "체계", "인증,", "편리한"], "summary": "", "background": "옛날에는 IT 기술이 그냥 '편리한 도구'였는데, 인터넷과 스마트폰이 퍼지면서 개인 정보 유출, 가짜 뉴스, AI 차별 같은 문제들이 터지기 시작했어. 그래서 '기술을 어떻게 만들고 쓰는 게 올바른 건가?'라는 윤리 기준이 필요해진 거야.", "explanation": "예를 들어 유튜브가 내가 좋아할 것 같은 영상만 계속 추천해주면 편하긴 한데, 나도 모르는 사이에 한쪽 생각에만 갇혀버릴 수 있잖아. 또 배달 앱이 내 위치 정보를 다른 회사에 팔아버리면 내 동의 없이 개인 정보가 새나가는 거고. IT 서비스를 만드는 사람도, 쓰는 사람도 이런 문제들을 알고 책임감 있게 행동해야 한다는 게 핵심이야.", "why": "", "term_focus": [], "connections": [], "types": null, "mnemonic": "IT 윤리의 3대 키워드 → '개·공·책' / 개인정보 보호, 공정한 알고리즘, 책임감 있는 서비스 — '개공책 없으면 IT는 망해' 로 외워!", "trap": "", "table": [], "sources": [], "priority": 3}, {"title": "저작권의 정의와 분류", "keywords": [], "summary": "", "background": "옛날에 누군가가 열심히 책이나 음악을 만들었는데, 다른 사람이 그냥 복사해서 돈을 버는 일이 생겼어. 그래서 '내가 만든 건 내 것!'이라고 법으로 보호해주는 규칙이 필요해졌지.", "explanation": "저작권은 내가 직접 만든 작품(그림, 음악, 글, 코드 등)을 다른 사람이 허락 없이 못 쓰게 막아주는 '작품 주민등록증' 같은 거야. 크게 나누면 '내가 만들었다고 이름 올릴 권리(저작인격권)'랑 '내 작품으로 돈 벌 권리(저작재산권)'로 나뉘어. 예를 들어 내가 만든 노래를 유튜브에 허락 없이 올리면 저작권 침해가 되는 거야!", "why": "", "term_focus": [], "connections": [], "types": {"caption": "저작권은 저작물을 창작한 자에게 발생되는 배타적 권리. 저작물을 창작한 때부터 발생(무방식주의)하며 크게 3가지로 구분.", "items": [{"name": "저작인격권", "note": "저작자 명예와 인격을 보호하기 위한 비금전적 권리이며 양도가 불가능(일신전속성). 공표권, 성명표시권, 동일성유지권 3가지."}, {"name": "저작재산권", "note": "저작자의 재산과 관련된 금전적 권리이며 양도가 가능. 복제권, 공연권, 방송권, 전송권, 전시권, 배포권, 2차적저작물작성권."}, {"name": "저작인접권", "note": "실연자, 음반제작자 및 방송사업자 등 인접자의 권리를 통칭. 저작물을 활용하여 부가가치를 창출하는 2차적 권리이기 때문에 저작권자에게 보다 제한적인 권리가 주어진다."}]}, "mnemonic": "저작권 = '저 작품 내 꺼!' → 인격(이름)권 + 재산(돈)권, 딱 2개!", "trap": "", "table": [], "sources": [{"title": "TOPCIT ESSENCE ver.3 — IT 비즈니스와 윤리", "note": "정보통신산업진흥원(NIPA) 공식 교재"}], "priority": 2}, {"title": "최신 서비스 윤리 이슈", "keywords": [], "summary": "", "background": "옛날에는 IT 기술이 그냥 '편리한 도구'였는데, 인터넷과 스마트폰이 퍼지면서 개인 정보 유출, 가짜 뉴스, AI 차별 같은 문제들이 터지기 시작했어. 그래서 '기술을 어떻게 만들고 쓰는 게 올바른 건가?'라는 윤리 기준이 필요해진 거야.", "explanation": "예를 들어 유튜브가 내가 좋아할 것 같은 영상만 계속 추천해주면 편하긴 한데, 나도 모르는 사이에 한쪽 생각에만 갇혀버릴 수 있잖아. 또 배달 앱이 내 위치 정보를 다른 회사에 팔아버리면 내 동의 없이 개인 정보가 새나가는 거고. IT 서비스를 만드는 사람도, 쓰는 사람도 이런 문제들을 알고 책임감 있게 행동해야 한다는 게 핵심이야.", "why": "", "term_focus": [], "connections": [], "types": null, "mnemonic": "IT 윤리의 3대 키워드 → '개·공·책' / 개인정보 보호, 공정한 알고리즘, 책임감 있는 서비스 — '개공책 없으면 IT는 망해' 로 외워!", "trap": "", "table": [], "sources": [], "priority": 4}, {"title": "MBO의 주요관점", "keywords": [], "summary": "", "background": "옛날에 컴퓨터 프로그램들이 많아지면서 '이 프로그램이 제대로 잘 돌아가고 있나?'를 체계적으로 파악할 방법이 필요했어. 그래서 여러 각도에서 시스템을 바라보는 MBO(Management By Objectives, 목표 중심 관리)의 관점이 등장했지.", "explanation": "MBO의 주요 관점은 시스템을 '기능적으로 뭘 하는가', '어떻게 구조로 이루어졌는가', '실제로 어떻게 동작하는가'로 나눠서 보는 거야. 예를 들어 자동차를 볼 때 '이 차는 사람을 태운다(기능)', '엔진·바퀴·핸들로 이루어졌다(구조)', '시동 걸면 엔진이 돌고 바퀴가 구른다(동작)'로 따로따로 분석하는 것과 같아. 이렇게 나눠서 보면 어디서 문제가 생겼는지 훨씬 빨리 찾을 수 있어.", "why": "", "term_focus": [], "connections": [], "types": null, "mnemonic": "🚗 '기구동' 세 글자만 기억해! → **기**능(뭘 하나) - **구**조(어떻게 생겼나) - **동**작(어떻게 움직이나). '자동차가 기가 막히게 구동한다!'로 외워봐!", "trap": "", "table": [], "sources": [], "priority": 4}, {"title": "MBO를 기업에서 도입하는 이유", "keywords": [], "summary": "", "background": "옛날에 회사에서 사장님이 '열심히 해!'라고만 하면 직원들이 뭘 어떻게 해야 할지 몰라서 다들 그냥 바쁜 척만 했어. 그래서 '목표를 딱 정해놓고 그걸 달성했는지 보자!'는 방식이 필요해졌지.", "explanation": "MBO(목표에 의한 관리)는 학교에서 선생님이 '이번 달 수학 80점 이상 받아라'고 목표를 정해주는 것과 같아. 막연하게 '공부 열심히 해'가 아니라 구체적인 목표가 생기니까 학생도 어떻게 해야 할지 알고, 선생님도 잘했는지 못했는지 딱 판단할 수 있잖아. 회사도 이렇게 하면 직원마다 명확한 목표가 생겨서 성과를 공정하게 평가할 수 있어.", "why": "", "term_focus": [], "connections": [], "types": null, "mnemonic": "MBO = '목표 박아, 평가해!' — M(목표), B(박고), O(OK평가) 순서로 기억해!", "trap": "", "table": [], "sources": [], "priority": 4}, {"title": "MBO의 구성요소", "keywords": [], "summary": "", "background": "옛날에 회사에서 직원들한테 '그냥 열심히 해!'라고만 하니까 다들 뭘 해야 할지 몰라서 우왕좌왕했어. 그래서 '목표를 딱 정해놓고 그걸 기준으로 관리하자!'는 아이디어가 나온 거야.", "explanation": "MBO(목표에 의한 관리)는 마치 게임에서 '이번 스테이지 클리어 조건'을 미리 정해두는 것과 같아. 상사랑 직원이 함께 목표를 정하고(목표 설정), 중간중간 잘 되고 있는지 확인하고(진행 점검), 마지막에 얼마나 달성했는지 평가하는(결과 평가) 3단계로 이루어져 있어. 쉽게 말해 '목표 정하기 → 중간 체크 → 결과 확인' 이 세 가지가 핵심이야.", "why": "", "term_focus": [], "connections": [], "types": {"caption": "MBO(Management By Objective, 목표관리 체계)는 개인의 직무성과와 능력향상을 위한 경영관리 기법. Bottom-UP 방식으로 달성목표를 설정하며 상급자와 협의를 거친다. 3가지 핵심 구성요소.", "items": [{"name": "목표의 설정", "en": "Setting of Objectives", "note": "측정 가능하고 구체적이며 달성 가능해야 함. 매년 지속적으로 개선되는 방향으로 수립되어야 하며, 조직의 목표와 능력범위 내에서 설정되어야 한다."}, {"name": "참여", "en": "Participation", "note": "목표설정과 수행과정에서 구성원 간에 상호작용이 있어야 함. 상급자·관리자와 협의 과정을 거쳐야 한다."}, {"name": "피드백", "en": "Feedback", "note": "목표와 평가가 상호 연계될 수 있어야 함. 개인의 직무수행을 지속적으로 개선할 수 있도록 모니터링하는 평가기간 전 피드백을 거쳐 이루어져야 한다."}]}, "mnemonic": "✋ '목-중-결' 세 박자! 손가락 세 개 펴면서 외워봐 → 엄지(목표 설정), 검지(중간 점검), 중지(결과 평가) — '목중결, 세 박자면 MBO 완성!'", "trap": "", "table": [], "sources": [{"title": "TOPCIT ESSENCE ver.3 — IT 비즈니스와 윤리", "note": "정보통신산업진흥원(NIPA) 공식 교재"}], "priority": 4}, {"title": "| 비즈니", "keywords": [], "summary": "", "background": "옛날에는 회사마다 프로그램 만드는 방식이 다 달라서 서로 연결하거나 공유하기가 너무 힘들었어. 그래서 '우리 서로 약속된 방식으로 기능을 묶어서 제공하자!'는 아이디어가 나왔어.", "explanation": "비즈니스 서비스란, 회사가 자기 기능(예: 결제, 로그인, 배송조회)을 레고 블록처럼 딱 맞게 포장해서 다른 사람도 쉽게 가져다 쓸 수 있게 만든 거야. 예를 들어 카카오페이 결제 기능을 다른 쇼핑몰이 그냥 가져다 붙이는 것처럼, 기업들이 자기 서비스를 웹으로 공개해서 누구나 연결할 수 있게 한 거지. 특히 웹 기반으로 만들어서 인터넷만 되면 어디서든 쓸 수 있어.", "why": "", "term_focus": [], "connections": [], "types": null, "mnemonic": "비즈니스 서비스 = '레고 블록 서비스' → 기업 기능을 블록처럼 포장해서 붙였다 뗐다!", "trap": "", "table": [], "sources": [], "priority": 4}, {"title": "| 비즈니", "keywords": [], "summary": "", "background": "옛날에는 회사마다 프로그램 만드는 방식이 다 달라서 서로 연결하거나 공유하기가 너무 힘들었어. 그래서 '우리 서로 약속된 방식으로 기능을 묶어서 제공하자!'는 아이디어가 나왔어.", "explanation": "비즈니스 서비스란, 회사가 자기 기능(예: 결제, 로그인, 배송조회)을 레고 블록처럼 딱 맞게 포장해서 다른 사람도 쉽게 가져다 쓸 수 있게 만든 거야. 예를 들어 카카오페이 결제 기능을 다른 쇼핑몰이 그냥 가져다 붙이는 것처럼, 기업들이 자기 서비스를 웹으로 공개해서 누구나 연결할 수 있게 한 거지. 특히 웹 기반으로 만들어서 인터넷만 되면 어디서든 쓸 수 있어.", "why": "", "term_focus": [], "connections": [], "types": null, "mnemonic": "비즈니스 서비스 = '레고 블록 서비스' → 기업 기능을 블록처럼 포장해서 붙였다 뗐다!", "trap": "", "table": [], "sources": [], "priority": 4}, {"title": "최신 웹", "keywords": [], "summary": "", "background": "옛날 웹사이트는 버튼 하나 클릭할 때마다 페이지 전체가 새로고침되면서 흰 화면이 번쩍였어. 사람들이 '이거 너무 느리고 불편한데?' 하면서 페이지 새로고침 없이 빠르게 반응하는 웹을 만들어달라고 요구했지.", "explanation": "최신 웹은 마치 카카오톡처럼 앱을 껐다 켜지 않아도 새 메시지가 바로 뜨는 것처럼, 웹사이트도 페이지를 새로 불러오지 않고 필요한 부분만 살짝살짝 바뀌는 방식이야. 예를 들어 유튜브에서 좋아요를 눌러도 페이지 전체가 새로고침되지 않고 숫자만 바뀌잖아? 그게 바로 최신 웹 기술 덕분이야.", "why": "", "term_focus": [], "connections": [], "types": null, "mnemonic": "최신 웹 = '부분 교체' → 도배할 때 벽지 전체 뜯지 않고 찢어진 부분만 덧붙이는 것! 🩹", "trap": "", "table": [], "sources": [], "priority": 4}, {"title": "모바일", "keywords": [], "summary": "", "background": "옛날에는 컴퓨터가 책상 위에 고정되어 있어서 이동하면서 사용하는 게 불가능했어. 그래서 사람들이 '어디서든 들고 다니면서 쓸 수 있는 컴퓨터'를 만들고 싶어서 모바일 시스템이 생겨났어.", "explanation": "모바일은 쉽게 말해 '손 안의 작은 컴퓨터'야. 스마트폰이나 태블릿처럼 배터리로 움직이고, 터치로 조작하고, 어디든 들고 다닐 수 있는 기기와 그 기기를 돌아가게 해주는 모든 소프트웨어 시스템을 말해. 우리가 앱을 깔고, 와이파이에 연결하고, 화면을 켜고 끄는 모든 게 모바일 시스템이 뒤에서 해주는 일이야.", "why": "", "term_focus": [], "connections": [], "types": null, "mnemonic": "모바일 = '모'든 곳에서 '바'로 '일'한다! (모-바-일, 이동하면서 즉시 작동)", "trap": "", "table": [], "sources": [], "priority": 4}];
+const PRIO_LABEL = {1:'최우선', 2:'중요', 3:'보통', 4:'보조'};
+let curTab = 'all';
+let curPrio = 'all';
+let curLessonIdx = -1;
+let curPage = 0;
+let pages = [];
+
+function filterTab(btn, ch) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  curTab = ch;
+  applyFilters();
+}
+
+function filterPrio(btn) {
+  document.querySelectorAll('.pchip').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  curPrio = btn.dataset.prio;
+  applyFilters();
+}
+
+function applyFilters() {
+  const q = document.querySelector('.search').value.toLowerCase();
+  document.querySelectorAll('.section-group').forEach(grp => {
+    const chOk = curTab === 'all' || grp.dataset.chapter === curTab;
+    grp.classList.toggle('hidden', !chOk);
+    if (chOk) {
+      let any = false;
+      grp.querySelectorAll('.card').forEach(c => {
+        const qOk = !q || c.textContent.toLowerCase().includes(q);
+        const pOk = curPrio === 'all' || c.dataset.prio === curPrio;
+        const show = qOk && pOk;
+        c.classList.toggle('hidden-card', !show);
+        if (show) any = true;
+      });
+      if (q || curPrio !== 'all') grp.classList.toggle('hidden', !any);
+    }
+  });
+}
+
+function escHtml(str) {
+  return (str || '').replace(/[&<>"]/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[ch]);
+}
+
+function splitMnemonic(text) {
+  return (text || '')
+    .replace(/\r\n/g, '\n')
+    .replace(/\s+\/\s+/g, '\n')
+    .replace(/\s+vs\.\s+/gi, '\n')
+    .replace(/\s+→\s+/g, ' → ')
+    .replace(/\s+↔\s+/g, ' ↔ ')
+    .replace(/\.\s+/g, '.\n')
+    .replace(/다\.\s+/g, '다.\n')
+    .replace(/됨\.\s+/g, '됨.\n')
+    .split(/\n+/)
+    .map(line => line.trim())
+    .filter(Boolean);
+}
+
+function mnemonicIcon(tag, text) {
+  if (tag) return '◈';
+  if (text.includes('↔') || text.includes('=')) return '⇄';
+  if (text.includes('→')) return '→';
+  return '•';
+}
+
+function renderParagraph(text) {
+  return escHtml(text || '').replace(/\n/g, '<br>');
+}
+
+function renderFactSection(label, secClass, items) {
+  if (!items || !items.length) return '';
+  const html = items.map(item => `
+    <div class="fact-item">
+      ${item.label ? `<div class="fact-link-label">${escHtml(item.label)}</div>` : ''}
+      <div class="fact-term">${escHtml(item.term || '')}</div>
+      <div class="fact-note">${renderParagraph(item.note || '')}</div>
+    </div>`).join('');
+  return `<div class="sec ${secClass}"><div class="sec-label">${label}</div><div class="fact-list">${html}</div></div>`;
+}
+
+function renderTypesSection(types) {
+  if (!types) return '';
+  const items = Array.isArray(types) ? types : (types.items || []);
+  if (!items.length) return '';
+  const caption = !Array.isArray(types) && types.caption ? types.caption : '';
+  const scale = !Array.isArray(types) ? (types.scale || '') : '';
+  const scaleLabels = {
+    'strong-to-weak': ['강함','약함','reverse'],
+    'weak-to-strong': ['약함','강함',''],
+  };
+  const tierClass = {
+    'strong': 'tier-strong',
+    'mid': 'tier-mid',
+    'weak': 'tier-weak',
+  };
+  const tierLabel = {
+    'strong': '강함',
+    'mid': '중간',
+    'weak': '약함',
+  };
+  const rows = items.map(it => {
+    const tierCls = it.tier && tierClass[it.tier] ? tierClass[it.tier] : '';
+    const tierLbl = it.tier && tierLabel[it.tier] ? tierLabel[it.tier] : (it.tier || '');
+    return `
+      <div class="type-item">
+        <div class="type-body">
+          <div class="type-head">
+            <span class="type-name">${escHtml(it.name || '')}</span>
+            ${it.en ? `<span class="type-en">${escHtml(it.en)}</span>` : ''}
+            ${tierCls ? `<span class="type-tier ${tierCls}">${escHtml(tierLbl)}</span>` : ''}
+          </div>
+          <div class="type-note">${renderParagraph(it.note || '')}</div>
+        </div>
+      </div>`;
+  }).join('');
+  let scaleHtml = '';
+  if (scale && scaleLabels[scale]) {
+    const [L, R, rev] = scaleLabels[scale];
+    scaleHtml = `<div class="types-scale ${rev}"><span>${L}</span><span class="scale-arrow"></span><span>${R}</span></div>`;
+  }
+  return `<div class="sec sec-types">
+    <div class="sec-label">🗂️ 유형</div>
+    ${caption ? `<div class="types-caption">${renderParagraph(caption)}</div>` : ''}
+    <div class="types-list">${rows}</div>
+    ${scaleHtml}
+  </div>`;
+}
+
+function renderSourceSection(sources) {
+  if (!sources || !sources.length) return '';
+  const html = sources.map(src => {
+    const hasUrl = !!src.url;
+    let host = '';
+    if (hasUrl) {
+      try { host = new URL(src.url).hostname.replace(/^www\./, ''); } catch (_err) { host = ''; }
+    }
+    const inner = `
+        <span class="src-bullet">↗</span>
+        <span class="src-text">
+          ${escHtml(src.title || src.url || '')}
+          ${src.note ? `<span class="src-host">${escHtml(src.note)}</span>` : ''}
+          ${!src.note && host ? `<span class="src-host">${escHtml(host)}</span>` : ''}
+        </span>`;
+    if (hasUrl) {
+      return `<a class="src-link" href="${escHtml(src.url)}" target="_blank" rel="noreferrer">${inner}</a>`;
+    }
+    return `<div class="src-link">${inner}</div>`;
+  }).join('');
+  return `<div class="sec sec-src"><div class="sec-label">🔗 출처</div><div class="src-list">${html}</div></div>`;
+}
+
+function renderMnemonic(text) {
+  const lines = splitMnemonic(text);
+  if (!lines.length) return '';
+  const html = lines.map(line => {
+    const m = line.match(/^【([^】]+)】\s*(.*)$/);
+    const tag = m ? m[1].trim() : '';
+    const body = (m ? m[2] : line).trim();
+    const safeBody = escHtml(body).replace(/'([^']+)'/g, '<strong>$1</strong>');
+    return `
+      <div class="mn-line">
+        <span class="mn-picto">${mnemonicIcon(tag, body)}</span>
+        <div class="mn-main">
+          ${tag ? `<span class="mn-tag">${escHtml(tag)}</span>` : ''}
+          <div class="mn-text">${safeBody}</div>
+        </div>
+      </div>`;
+  }).join('');
+  return `<div class="sec sec-mn"><div class="sec-label">🧠 5초 암기</div><div class="mn-list">${html}</div></div>`;
+}
+
+function buildPages(lesson) {
+  return [
+    { type: 'learn', data: lesson },
+    { type: 'done',  data: lesson },
+  ];
+}
+
+function renderPage() {
+  const body = document.getElementById('l-body');
+  const page = pages[curPage];
+  body.innerHTML = '';
+  body.scrollTop = 0;
+
+  const wrap = document.createElement('div');
+  wrap.className = 'l-page';
+
+  if (page.type === 'learn') {
+    const d = page.data;
+    let h = '';
+    h += `<h1 class="l-page-title">${escHtml(d.title)}</h1>`;
+    const metaBits = [];
+    if (d.priority && PRIO_LABEL[d.priority]) {
+      metaBits.push(`<span class="chip chip-prio-${d.priority}">P${d.priority} · ${PRIO_LABEL[d.priority]}</span>`);
+    }
+    if (metaBits.length) h += `<div class="l-page-meta">${metaBits.join('')}</div>`;
+    if (d.keywords && d.keywords.length) {
+      h += `<div class="l-page-kw">${d.keywords.map(k => `<span>★ ${escHtml(k)}</span>`).join('')}</div>`;
+    }
+    if (d.summary)     h += `<div class="sec sec-summary"><div class="sec-label">📌 한 줄 요약</div><p>${renderParagraph(d.summary)}</p></div>`;
+    if (d.background)  h += `<div class="sec sec-bg"><div class="sec-label">📜 배경·맥락</div><p>${renderParagraph(d.background)}</p></div>`;
+    if (d.explanation) h += `<div class="sec sec-expl"><div class="sec-label">📖 핵심 설명</div><p>${renderParagraph(d.explanation)}</p></div>`;
+    if (d.types)       h += renderTypesSection(d.types);
+    if (d.why)         h += `<div class="sec sec-why"><div class="sec-label">🔍 왜 이렇게 됐나</div><p>${renderParagraph(d.why)}</p></div>`;
+    if (d.term_focus && d.term_focus.length)   h += renderFactSection('🈶 용어·한자 풀이', 'sec-term', d.term_focus);
+    if (d.connections && d.connections.length) h += renderFactSection('🧭 앞뒤 흐름 연결', 'sec-link', d.connections);
+    if (d.mnemonic)    h += renderMnemonic(d.mnemonic);
+    if (d.trap)        h += `<div class="sec sec-trap"><div class="sec-label">⚠️ 시험 함정</div><p>${renderParagraph(d.trap)}</p></div>`;
+    if (d.table && d.table.length) {
+      const cols = Object.keys(d.table[0]);
+      const head = cols.map(c => `<th>${escHtml(c)}</th>`).join('');
+      const rows = d.table.map(r => '<tr>' + cols.map(c => `<td>${escHtml(r[c] || '')}</td>`).join('') + '</tr>').join('');
+      h += `<div class="sec sec-summary" style="padding:0;background:transparent;border:none">
+        <div class="sec-label" style="padding-left:.3rem;color:#6b7280;margin-bottom:.5rem">📊 정리표</div>
+        <table class="ctable"><thead><tr>${head}</tr></thead><tbody>${rows}</tbody></table>
+      </div>`;
+    }
+    if (d.sources && d.sources.length) h += renderSourceSection(d.sources);
+    wrap.innerHTML = h;
+  }
+  else if (page.type === 'done') {
+    const d = page.data;
+    const hasNext = curLessonIdx + 1 < LESSONS.length;
+    wrap.innerHTML = `
+      <div class="done-page">
+        <div class="done-emoji">🎉</div>
+        <div class="done-title">레슨 완료!</div>
+        <div class="done-sub">${escHtml(d.title)}</div>
+        <div class="done-actions">
+          ${hasNext ? '<button class="done-btn done-btn-primary" onclick="startLesson(' + (curLessonIdx + 1) + ')">다음 개념 →</button>' : ''}
+          <button class="done-btn done-btn-sub" onclick="exitLesson()">목록으로 돌아가기</button>
+        </div>
+      </div>`;
+  }
+
+  body.appendChild(wrap);
+
+  document.getElementById('l-page-ind').textContent = `${curPage + 1} / ${pages.length}`;
+  document.getElementById('l-progress-bar').style.width = `${((curPage + 1) / pages.length) * 100}%`;
+  document.getElementById('l-prev').disabled = curPage === 0;
+  document.getElementById('l-next').disabled = curPage === pages.length - 1;
+  document.getElementById('l-next').textContent = curPage === pages.length - 2 ? '완료 🎉' : '다음 →';
+}
+
+function startLesson(idx) {
+  if (idx < 0 || idx >= LESSONS.length) return;
+  curLessonIdx = idx;
+  curPage = 0;
+  pages = buildPages(LESSONS[idx]);
+  document.getElementById('l-title').textContent = LESSONS[idx].title;
+  document.getElementById('lesson').classList.add('show');
+  document.body.style.overflow = 'hidden';
+  renderPage();
+}
+
+function exitLesson() {
+  document.getElementById('lesson').classList.remove('show');
+  document.body.style.overflow = '';
+  curLessonIdx = -1;
+}
+
+function nextPage() { if (curPage < pages.length - 1) { curPage++; renderPage(); } }
+function prevPage() { if (curPage > 0) { curPage--; renderPage(); } }
+
+document.addEventListener('keydown', e => {
+  if (curLessonIdx < 0) return;
+  if (e.key === 'ArrowLeft')  prevPage();
+  if (e.key === 'ArrowRight') nextPage();
+  if (e.key === 'Escape')     exitLesson();
+});
+</script>
+</body>
+</html>

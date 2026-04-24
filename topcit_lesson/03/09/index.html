@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>TOPCIT 03-09 멀티미디어 & 응용 네트워크</title>
+<style>
+:root{--font-sans:"Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",system-ui,sans-serif;--font-serif:"NanumMyeongjo","Nanum Myeongjo","Batang","Apple SD Gothic Neo",serif}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{overflow-x:hidden}
+body{font-family:var(--font-sans);background:#f7f8fb;color:#1f2937;min-height:100vh}
+
+.header{background:#7c3aed;color:#fff;padding:.85rem 1.25rem;display:flex;align-items:center;gap:.75rem;position:sticky;top:0;z-index:20;box-shadow:0 2px 10px rgba(0,0,0,.15)}
+.header-back{color:#fff;text-decoration:none;font-size:1.2rem;opacity:.85}
+.header h1{font-size:1rem;font-weight:800;flex:1;font-family:var(--font-serif)}
+.header-cnt{font-size:.75rem;opacity:.8;white-space:nowrap}
+
+.search-wrap{padding:.7rem 1.25rem .3rem}
+.search{width:100%;padding:.6rem 1rem;border:2px solid #e2e8f0;border-radius:2rem;font-size:.88rem;outline:none;background:#fff;transition:border .2s}
+.search:focus{border-color:#7c3aed}
+
+.tabs{display:flex;gap:.35rem;padding:.4rem 1.25rem .3rem;overflow-x:auto;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tab{flex-shrink:0;padding:.32rem .8rem;border-radius:2rem;border:1.5px solid #7c3aed;background:#fff;color:#7c3aed;font-size:.74rem;font-weight:700;cursor:pointer;white-space:nowrap;transition:all .15s;font-family:inherit}
+.tab.active,.tab:hover{background:#7c3aed;color:#fff}
+
+.prio-bar{display:flex;gap:.3rem;padding:.2rem 1.25rem .6rem;overflow-x:auto;scrollbar-width:none}
+.prio-bar::-webkit-scrollbar{display:none}
+.pchip{flex-shrink:0;padding:.28rem .7rem;border-radius:2rem;border:1.5px solid #e5e7eb;background:#fff;color:#475569;font-size:.72rem;font-weight:700;cursor:pointer;white-space:nowrap;transition:all .15s;font-family:inherit}
+.pchip:hover{border-color:var(--pc,#9ca3af);color:#111827}
+.pchip.active{background:var(--pc,#7c3aed);border-color:var(--pc,#7c3aed);color:#fff}
+.pchip[data-prio="all"].active{background:#7c3aed;border-color:#7c3aed;color:#fff}
+
+.section-group{padding:.3rem 1.25rem .8rem}
+.section-group.hidden{display:none}
+.section-label{font-size:.72rem;font-weight:800;color:#5b21b6;letter-spacing:.04em;padding:.4rem 0 .35rem;border-bottom:2px solid #7c3aed33;margin-bottom:.55rem;font-family:var(--font-serif)}
+.card-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:.55rem}
+@media(min-width:540px){.card-grid{grid-template-columns:repeat(3,1fr)}}
+@media(min-width:900px){.card-grid{grid-template-columns:repeat(4,1fr)}}
+@media(min-width:1200px){.card-grid{grid-template-columns:repeat(5,1fr)}}
+.card{background:#fff;border-radius:.7rem;padding:.85rem .8rem .65rem;cursor:pointer;border:1.5px solid #e5e7eb;transition:all .18s;box-shadow:0 1px 3px rgba(0,0,0,.04);position:relative;display:flex;flex-direction:column;gap:.35rem;min-height:9rem}
+.card:hover{border-color:#7c3aed;box-shadow:0 4px 14px #7c3aed33;transform:translateY(-2px)}
+.card-badges{position:absolute;top:.45rem;right:.5rem;display:flex;gap:.2rem;font-size:.64rem}
+.card-badges span{padding:.1rem .42rem;border-radius:.4rem;font-weight:700;line-height:1.4;white-space:nowrap}
+.b-prio-1{background:#fee2e2;color:#991b1b}
+.b-prio-2{background:#fef3c7;color:#92400e}
+.b-prio-3{background:#dcfce7;color:#166534}
+.b-prio-4{background:#f1f5f9;color:#475569}
+.b-mn{background:#ede9fe;color:#5b21b6}
+.card-title{font-size:.86rem;font-weight:700;color:#111827;line-height:1.35;padding-right:4.5rem;font-family:var(--font-serif)}
+.card-preview{font-size:.7rem;color:#6b7280;line-height:1.5;flex:1}
+.card-cta{font-size:.68rem;color:#7c3aed;font-weight:700;text-align:right;margin-top:.25rem}
+.card.hidden-card{display:none!important}
+
+/* ───────── 레슨 모드 (풀스크린) ───────── */
+.lesson{display:none;position:fixed;inset:0;background:#f7f8fb;z-index:1000;flex-direction:column}
+.lesson.show{display:flex}
+.l-head{background:#7c3aed;color:#fff;padding:.7rem 1rem;display:flex;align-items:center;gap:.7rem;flex-shrink:0}
+.l-back{background:none;border:none;color:#fff;font-size:1.3rem;cursor:pointer;padding:0;line-height:1;opacity:.9}
+.l-title{flex:1;font-size:.92rem;font-weight:800;font-family:var(--font-serif);line-height:1.3;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.l-page-ind{font-size:.78rem;font-weight:700;background:rgba(0,0,0,.18);padding:.18rem .55rem;border-radius:1rem;flex-shrink:0}
+.l-progress{height:4px;background:rgba(0,0,0,.15);flex-shrink:0}
+.l-progress-bar{height:100%;background:#fff;width:0%;transition:width .3s ease}
+.l-body{flex:1;overflow-y:auto;padding:1.2rem 1.25rem 5rem;display:flex;flex-direction:column;gap:1rem;align-items:center}
+.l-page{width:100%;max-width:680px;animation:slideIn .25s ease}
+@keyframes slideIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+.l-page-title{font-size:1.5rem;font-weight:800;color:#5b21b6;margin-bottom:.5rem;font-family:var(--font-serif);line-height:1.3}
+.l-page-meta{display:flex;flex-wrap:wrap;gap:.35rem;margin-bottom:.85rem}
+.l-page-meta .chip{padding:.18rem .55rem;border-radius:1rem;font-size:.7rem;font-weight:700}
+.chip-prio-1{background:#fee2e2;color:#991b1b}
+.chip-prio-2{background:#fef3c7;color:#92400e}
+.chip-prio-3{background:#dcfce7;color:#166534}
+.chip-prio-4{background:#f1f5f9;color:#475569}
+.l-page-kw{display:flex;flex-wrap:wrap;gap:.3rem;margin-bottom:1.2rem}
+.l-page-kw span{background:#7c3aed22;color:#5b21b6;border:1px solid #7c3aed55;border-radius:1rem;padding:.18rem .65rem;font-size:.72rem;font-weight:700}
+
+.sec{border-radius:.7rem;padding:1rem 1.1rem;line-height:1.65;margin-bottom:.85rem}
+.sec-summary{background:#7c3aed11;border-left:5px solid #7c3aed;font-size:.95rem;color:#111827;font-weight:600}
+.sec-bg{background:#fef7ec;border-left:5px solid #d97706}
+.sec-expl{background:#eef2ff;border-left:5px solid #4f46e5}
+.sec-why{background:#ecfdf5;border-left:5px solid #059669}
+.sec-term{background:#faf5ff;border-left:5px solid #7c3aed}
+.sec-link{background:#fff7ed;border-left:5px solid #c2410c}
+.sec-mn{background:linear-gradient(145deg,#fffef5 0%,#fff7d6 56%,#7c3aed20 100%);color:#1f2937;font-weight:600;border:1.5px solid #7c3aed33;border-left:5px solid #7c3aed;box-shadow:0 10px 26px #7c3aed14}
+.sec-trap{background:#fff1f2;border:1.5px solid #fda4af;border-left:5px solid #e11d48;color:#881337}
+.sec-src{background:#fff;border:1.5px solid #e5e7eb;border-left:5px solid #475569}
+.sec-types{background:#f0f9ff;border:1.5px solid #bae6fd;border-left:5px solid #0284c7}
+.sec-types .sec-label{color:#075985}
+.types-caption{font-size:.8rem;color:#334155;margin-bottom:.6rem;line-height:1.55}
+.types-list{display:flex;flex-direction:column;gap:.55rem;counter-reset:tc}
+.type-item{display:grid;grid-template-columns:2rem 1fr;gap:.55rem;align-items:start;background:#fff;border:1px solid #e0f2fe;border-radius:.7rem;padding:.7rem .78rem;counter-increment:tc;position:relative}
+.type-item::before{content:counter(tc);display:inline-flex;align-items:center;justify-content:center;width:1.7rem;height:1.7rem;border-radius:.5rem;background:#7c3aed16;color:#5b21b6;font-size:.8rem;font-weight:800;line-height:1}
+.type-body{min-width:0}
+.type-head{display:flex;flex-wrap:wrap;gap:.35rem;align-items:center;margin-bottom:.2rem}
+.type-name{font-size:.92rem;font-weight:800;color:#0f172a;font-family:var(--font-serif)}
+.type-en{font-size:.72rem;color:#64748b;font-weight:700}
+.type-tier{display:inline-flex;align-items:center;padding:.08rem .42rem;border-radius:999px;font-size:.62rem;font-weight:800;letter-spacing:.04em}
+.tier-strong{background:#fee2e2;color:#991b1b}
+.tier-mid{background:#fef3c7;color:#92400e}
+.tier-weak{background:#dcfce7;color:#166534}
+.type-note{font-size:.86rem;line-height:1.68;color:#334155;word-break:keep-all}
+.types-scale{display:flex;align-items:center;gap:.45rem;margin-top:.65rem;padding:.5rem .7rem;background:rgba(255,255,255,.7);border:1px dashed #bae6fd;border-radius:.6rem;font-size:.72rem;color:#475569;font-weight:700}
+.types-scale .scale-arrow{flex:1;height:6px;border-radius:999px;background:linear-gradient(90deg,#16a34a,#d97706,#dc2626)}
+.types-scale.reverse .scale-arrow{background:linear-gradient(90deg,#dc2626,#d97706,#16a34a)}
+.sec-label{font-size:.7rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;margin-bottom:.5rem}
+.sec-bg .sec-label{color:#92400e}
+.sec-expl .sec-label{color:#3730a3}
+.sec-why .sec-label{color:#065f46}
+.sec-term .sec-label{color:#5b21b6}
+.sec-link .sec-label{color:#9a3412}
+.sec-mn .sec-label{color:#5b21b6}
+.sec-trap .sec-label{color:#9f1239}
+.sec-summary .sec-label{color:#7c3aed}
+.sec-src .sec-label{color:#334155}
+.sec p{font-size:.92rem;line-height:1.7}
+.sec-mn p{font-size:.98rem}
+.fact-list{display:flex;flex-direction:column;gap:.65rem}
+.fact-item{background:rgba(255,255,255,.85);border:1px solid rgba(0,0,0,.06);border-radius:.85rem;padding:.78rem .85rem}
+.fact-term{font-size:.86rem;font-weight:800;color:#111827;margin-bottom:.22rem}
+.fact-note{font-size:.9rem;line-height:1.72;color:#374151;word-break:keep-all}
+.fact-link-label{display:inline-flex;align-items:center;padding:.12rem .45rem;border-radius:999px;background:#7c3aed14;color:#5b21b6;font-size:.64rem;font-weight:800;letter-spacing:.04em;margin-bottom:.38rem}
+.src-list{display:flex;flex-direction:column;gap:.5rem}
+.src-link{display:flex;align-items:flex-start;gap:.45rem;text-decoration:none;color:#111827;background:#f9fafb;border:1px solid #e5e7eb;border-radius:.8rem;padding:.72rem .82rem;transition:border-color .15s,transform .15s}
+.src-link:hover{border-color:#7c3aed;transform:translateY(-1px)}
+.src-bullet{flex-shrink:0;color:#7c3aed;font-weight:800}
+.src-text{font-size:.85rem;line-height:1.55}
+.src-host{display:block;font-size:.72rem;color:#6b7280;margin-top:.1rem}
+.mn-list{display:flex;flex-direction:column;gap:.55rem}
+.mn-line{display:flex;align-items:flex-start;gap:.72rem;background:rgba(255,255,255,.82);border:1px solid #7c3aed22;border-radius:.9rem;padding:.72rem .8rem .68rem;box-shadow:0 4px 12px rgba(0,0,0,.04)}
+.mn-picto{flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;width:1.6rem;height:1.6rem;border-radius:.45rem;background:#7c3aed16;border:1px solid #7c3aed26;font-size:.76rem;font-weight:800;line-height:1;color:#5b21b6}
+.mn-main{display:flex;flex-direction:column;gap:.28rem;min-width:0}
+.mn-tag{display:inline-flex;align-items:center;width:fit-content;padding:.12rem .45rem;border-radius:999px;background:#7c3aed18;color:#5b21b6;font-size:.64rem;font-weight:800;letter-spacing:.05em}
+.mn-text{font-size:.95rem;line-height:1.76;color:#1f2937;word-break:keep-all}
+.mn-text strong{color:#7c3aed;font-weight:800}
+
+.ctable{width:100%;border-collapse:collapse;font-size:.82rem;background:#fff;border-radius:.5rem;overflow:hidden;margin-top:.4rem}
+.ctable th{background:#7c3aed;color:#fff;padding:.55rem .65rem;text-align:left;font-weight:700;font-size:.78rem}
+.ctable td{padding:.55rem .65rem;border-top:1px solid #e5e7eb;vertical-align:top;line-height:1.55}
+.ctable tr:nth-child(even) td{background:#f9fafb}
+
+.done-page{text-align:center;padding:2.5rem 1rem}
+.done-emoji{font-size:4.5rem;margin-bottom:1rem;animation:pop .4s ease}
+@keyframes pop{from{transform:scale(0)}80%{transform:scale(1.2)}to{transform:scale(1)}}
+.done-title{font-size:1.5rem;font-weight:800;color:#5b21b6;margin-bottom:.5rem;font-family:var(--font-serif)}
+.done-sub{font-size:.95rem;color:#6b7280;margin-bottom:2rem}
+.done-actions{display:flex;flex-direction:column;gap:.6rem;max-width:300px;margin:0 auto}
+.done-btn{padding:.85rem 1.4rem;border-radius:.7rem;font-size:.95rem;font-weight:700;cursor:pointer;border:none;font-family:inherit;transition:all .15s}
+.done-btn-primary{background:#7c3aed;color:#fff}
+.done-btn-primary:hover{transform:translateY(-2px);box-shadow:0 4px 14px #7c3aed55}
+.done-btn-sub{background:#fff;color:#7c3aed;border:1.5px solid #7c3aed}
+.done-btn-sub:hover{background:#7c3aed11}
+
+.l-foot{position:fixed;bottom:0;left:0;right:0;background:#fff;padding:.7rem 1rem;display:flex;gap:.5rem;border-top:1px solid #e5e7eb;z-index:1010}
+.l-nav-btn{flex:1;padding:.7rem;border-radius:.55rem;border:1.5px solid #7c3aed;background:#fff;color:#7c3aed;font-size:.88rem;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s}
+.l-nav-btn:hover:not(:disabled){background:#7c3aed11}
+.l-nav-btn:disabled{opacity:.35;cursor:not-allowed}
+.l-nav-btn.primary{background:#7c3aed;color:#fff;border-color:#7c3aed}
+.l-nav-btn.primary:hover:not(:disabled){background:#5b21b6;border-color:#5b21b6}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <a href="../" class="header-back">←</a>
+  <span style="font-size:1.2rem">🏗️</span>
+  <h1><span style="opacity:.7;font-size:.85em">03</span> &nbsp;멀티미디어 &amp; 응용 네트워크</h1>
+  <span class="header-cnt">8개</span>
+</div>
+
+<div class="search-wrap">
+  <input class="search" type="text" placeholder="🔍  개념 검색..." oninput="applyFilters()">
+</div>
+
+<div class="tabs" id="tab-bar"><button class="tab active" onclick="filterTab(this,'all')">전체</button><button class="tab" onclick="filterTab(this,'0')">인터넷 전화 개념 및 호 신호 프로토</button><button class="tab" onclick="filterTab(this,'1')">미디어 전송 프로토콜</button><button class="tab" onclick="filterTab(this,'2')">멀티미디어 네트워크</button></div>
+<div class="prio-bar"><button class="pchip active" data-prio="all" onclick="filterPrio(this)">전체</button><button class="pchip" data-prio="1" onclick="filterPrio(this)" style="--pc:#dc2626">🔴 P1 최우선</button><button class="pchip" data-prio="2" onclick="filterPrio(this)" style="--pc:#d97706">🟡 P2 중요</button><button class="pchip" data-prio="3" onclick="filterPrio(this)" style="--pc:#16a34a">🟢 P3 보통</button><button class="pchip" data-prio="4" onclick="filterPrio(this)" style="--pc:#9ca3af">⚪ P4 보조</button></div>
+
+<div id="card-content"><div class="section-group" data-chapter="0"><div class="section-label">인터넷 전화 개념 및 호 신호 프로토콜</div><div class="card-grid"><div class="card" data-prio="4" onclick="startLesson(0)"><div class="card-badges"><span class="b-prio b-prio-4" title="보조">⚪ P4</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">VoIP(Voice over Internet Protocol)란?</div><div class="card-preview">옛날에는 전화하려면 무조건 통신사 전화망(PSTN)을 써야 해서 국제전화 요금이 엄청 비쌌…</div><div class="card-cta">레슨 시작 →</div></div><div class="card" data-prio="4" onclick="startLesson(1)"><div class="card-badges"><span class="b-prio b-prio-4" title="보조">⚪ P4</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">VoIP 호 신호 프로토콜</div><div class="card-preview">옛날에는 전화를 하려면 무조건 전화선이 필요했는데, 인터넷이 발달하면서 &#x27;그냥 인터넷으로 …</div><div class="card-cta">레슨 시작 →</div></div></div></div><div class="section-group" data-chapter="1"><div class="section-label">미디어 전송 프로토콜</div><div class="card-grid"><div class="card" data-prio="4" onclick="startLesson(2)"><div class="card-badges"><span class="b-prio b-prio-4" title="보조">⚪ P4</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">RTP 개념</div><div class="card-preview">옛날에는 인터넷을 쓰려면 사람이 직접 컴퓨터 앞에 앉아서 뭔가를 해야 했어. 근데 &#x27;사람 …</div><div class="card-cta">레슨 시작 →</div></div><div class="card" data-prio="4" onclick="startLesson(3)"><div class="card-badges"><span class="b-prio b-prio-4" title="보조">⚪ P4</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">RTP 표준화 동향</div><div class="card-preview">옛날에는 수많은 IoT 기기들(냉장고, 센서, 전구 등)이 제각각 다른 방식으로 통신해서 …</div><div class="card-cta">레슨 시작 →</div></div><div class="card" data-prio="4" onclick="startLesson(4)"><div class="card-badges"><span class="b-prio b-prio-4" title="보조">⚪ P4</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">RTP 주요 프로토콜</div><div class="card-preview">옛날에 인터넷은 컴퓨터나 스마트폰처럼 성능 좋은 기기들끼리 통신하도록 설계됐는데, 냉장고·…</div><div class="card-cta">레슨 시작 →</div></div><div class="card" data-prio="4" onclick="startLesson(5)"><div class="card-badges"><span class="b-prio b-prio-4" title="보조">⚪ P4</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">01 주요기술</div><div class="card-preview">옛날에는 컴퓨터나 스마트폰만 인터넷에 연결됐는데, 냉장고·신호등·공장 기계 같은 &#x27;그냥 물…</div><div class="card-cta">레슨 시작 →</div></div></div></div><div class="section-group" data-chapter="2"><div class="section-label">멀티미디어 네트워크</div><div class="card-grid"><div class="card" data-prio="4" onclick="startLesson(6)"><div class="card-badges"><span class="b-prio b-prio-4" title="보조">⚪ P4</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">영상압축 유형</div><div class="card-preview">옛날에 영상 파일은 너무 커서 인터넷으로 주고받거나 저장하는 게 엄청 힘들었어. 그래서 파…</div><div class="card-cta">레슨 시작 →</div></div><div class="card" data-prio="4" onclick="startLesson(7)"><div class="card-badges"><span class="b-prio b-prio-4" title="보조">⚪ P4</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">멀티미디어 데이터</div><div class="card-preview">옛날에는 컴퓨터로 글자만 주고받았는데, 사람들이 사진이나 영상도 디지털로 보내고 싶어졌어.…</div><div class="card-cta">레슨 시작 →</div></div></div></div></div>
+
+<!-- ── 레슨 모드 ── -->
+<div class="lesson" id="lesson">
+  <div class="l-head">
+    <button class="l-back" onclick="exitLesson()">←</button>
+    <div class="l-title" id="l-title"></div>
+    <div class="l-page-ind" id="l-page-ind">1 / 1</div>
+  </div>
+  <div class="l-progress"><div class="l-progress-bar" id="l-progress-bar"></div></div>
+  <div class="l-body" id="l-body"></div>
+  <div class="l-foot">
+    <button class="l-nav-btn" id="l-prev" onclick="prevPage()">← 이전</button>
+    <button class="l-nav-btn primary" id="l-next" onclick="nextPage()">다음 →</button>
+  </div>
+</div>
+
+<script>
+const LESSONS = [{"title": "VoIP(Voice over Internet Protocol)란?", "keywords": [], "summary": "", "background": "옛날에는 전화하려면 무조건 통신사 전화망(PSTN)을 써야 해서 국제전화 요금이 엄청 비쌌어. 그래서 '어차피 인터넷 쓰는데, 인터넷으로 전화도 하면 되지 않아?' 라는 생각에서 VoIP가 탄생했어.", "explanation": "VoIP는 카카오톡 보이스톡이나 페이스타임처럼 인터넷으로 전화하는 기술이야. 내 목소리를 잘게 쪼갠 데이터 조각(패킷)으로 만들어서 인터넷으로 보내고, 상대방 쪽에서 다시 목소리로 합쳐주는 거야. 마치 편지를 여러 조각으로 잘라서 따로따로 부쳤다가 받는 쪽에서 다시 순서대로 붙이는 것과 같아.", "why": "", "term_focus": [], "connections": [], "types": null, "mnemonic": "VoIP = '보이스(Voice)를 인터넷(IP) 택배로 쪼개서 배송!' → 목소리를 택배 상자에 나눠 담아 인터넷으로 배달한다고 기억해!", "trap": "", "table": [], "sources": [], "priority": 4}, {"title": "VoIP 호 신호 프로토콜", "keywords": [], "summary": "", "background": "옛날에는 전화를 하려면 무조건 전화선이 필요했는데, 인터넷이 발달하면서 '그냥 인터넷으로 전화하면 안 되나?' 라는 생각이 생겼어. 근데 인터넷으로 전화하려면 '나 지금 전화 걸게~', '받을게~' 이런 신호를 주고받는 규칙이 필요해서 이 프로토콜들이 만들어졌어.", "explanation": "VoIP는 인터넷으로 하는 전화인데, 전화를 걸 때 '누구한테 연결해줘, 통화 시작해, 통화 끊어' 이런 신호를 보내는 방식이 두 가지야. SIP는 카카오톡처럼 인터넷 기반으로 가볍고 유연하게 통화를 연결하는 방식이고, H.323은 예전 국제 표준 기관이 만든 좀 더 복잡하지만 안정적인 방식이야. 쉽게 말해 SIP는 최신 스마트폰 방식, H.323은 구형 유선전화 방식이라고 생각하면 돼.", "why": "", "term_focus": [], "connections": [], "types": {"caption": "VoIP(Voice over IP)에서 호 설정·해제·제어를 담당하는 시그널링 프로토콜.", "items": [{"name": "H.323", "note": "ITU-T에서 정의한 멀티미디어 통신 프로토콜 집합. 품질이 보장되지 않은 IP 네트워크에서 음성·영상·데이터 통신을 위한 종합 프로토콜. 초기 VoIP 표준으로 널리 쓰였다."}, {"name": "SIP", "en": "Session Initiation Protocol (RFC 3261)", "note": "인터넷상에서 통신하고자 하는 지능형 단말들이 서로를 식별하여 위치를 찾고, 상호 간에 멀티미디어 통신 세션을 생성·삭제·변경하기 위한 방법을 명시한 응용계층 시그널링 프로토콜. 현재 VoIP 업계 표준."}, {"name": "MGCP", "en": "Media Gateway Control Protocol", "note": "미디어 게이트웨이를 제어하기 위한 프로토콜. 게이트웨이 제어 모델에서 사용."}, {"name": "MEGACO / H.248", "note": "MGCP의 후속 프로토콜. IETF와 ITU-T가 공동 개발한 미디어 게이트웨이 제어 프로토콜."}]}, "mnemonic": "SIP(씹) 마시고 H.323(헤이 삼이삼)에게 전화한다! → SIP는 새로운 인터넷 전화, H.323은 옛날 표준 전화 — '씹고 헤이삼이삼' 으로 둘을 세트로 기억해!", "trap": "", "table": [], "sources": [{"title": "TOPCIT ESSENCE ver.3 — 시스템 아키텍처 이해와 활용", "note": "정보통신산업진흥원(NIPA) 공식 교재"}], "priority": 4}, {"title": "RTP 개념", "keywords": [], "summary": "", "background": "옛날에는 인터넷을 쓰려면 사람이 직접 컴퓨터 앞에 앉아서 뭔가를 해야 했어. 근데 '사람 없이도 물건들끼리 알아서 인터넷으로 대화하면 어떨까?' 하는 생각에서 이 개념이 나왔어.", "explanation": "냉장고가 우유가 떨어지면 스스로 마트 앱에 주문하고, 신호등이 차 막힘을 감지해서 자동으로 신호를 조절하는 것처럼 — 세상의 모든 물건들이 인터넷에 연결돼서 사람 없이도 알아서 정보를 주고받는 거야. 쉽게 말해 '물건들의 인터넷'이라고 생각하면 돼!", "why": "", "term_focus": [], "connections": [], "types": null, "mnemonic": "IoT = '아이들(Things)도 혼자 인터넷!' — 사람 도움 없이 물건 스스로 인터넷 접속!", "trap": "", "table": [], "sources": [], "priority": 4}, {"title": "RTP 표준화 동향", "keywords": [], "summary": "", "background": "옛날에는 수많은 IoT 기기들(냉장고, 센서, 전구 등)이 제각각 다른 방식으로 통신해서 서로 대화가 안 되는 문제가 있었어. 그래서 전 세계가 모여 '우리 이렇게 통일하자!'는 표준을 만들기 시작했지.", "explanation": "IoT 기기들이 서로 대화하는 규칙을 정한 게 바로 이 표준이야. 마치 전 세계 사람들이 각자 다른 언어를 쓰면 소통이 안 되니까 '공통 언어'를 정한 것처럼, OMA라는 단체가 LWM2M이라는 '초경량 대화 규칙'을 만들었어. 특히 작고 배터리가 약한 기기들도 쓸 수 있도록 CoAP(가벼운 통신 방식)와 HTTPS(안전한 통신 방식) 두 가지 전송 방법을 쓸 수 있게 했지.", "why": "", "term_focus": [], "connections": [], "types": null, "mnemonic": "🪶 'LWM2M = Light Weight 만들었M2M' → 가볍게(Light) 만든 기기 간(M2M) 대화 규칙! CoAP는 '코압(가볍게 코만 눌러도 작동)'으로 기억해 — 작은 기기도 가볍게 쓰는 통신!", "trap": "", "table": [], "sources": [], "priority": 4}, {"title": "RTP 주요 프로토콜", "keywords": [], "summary": "", "background": "옛날에 인터넷은 컴퓨터나 스마트폰처럼 성능 좋은 기기들끼리 통신하도록 설계됐는데, 냉장고·전구·센서 같은 작고 배터리도 약한 IoT 기기들이 쏟아지면서 기존 프로토콜은 너무 무겁고 배터리를 많이 잡아먹는 문제가 생겼어. 그래서 '가볍고 작은 기기도 쓸 수 있는 통신 규칙'이 필요해졌고, 그게 바로 CoAP이야!", "explanation": "CoAP은 우리가 웹에서 쓰는 HTTP(인터넷 통신 규칙)를 다이어트시킨 버전이라고 생각하면 돼. 택배로 비유하면, 일반 택배(HTTP)는 큰 박스에 뽁뽁이 잔뜩 넣어 보내는 거고, CoAP은 엽서 한 장에 꼭 필요한 말만 써서 보내는 느낌이야. 덕분에 배터리가 작고 메모리가 부족한 센서나 스마트 전구 같은 기기들도 인터넷으로 데이터를 주고받을 수 있어!", "why": "", "term_focus": [], "connections": [], "types": {"caption": "실시간 미디어 전송을 위한 프로토콜 집합. 데이터 전송용 RTP + 제어용 RTCP + 스트리밍 제어용 RTSP로 구성.", "items": [{"name": "RTP", "en": "Real-time Transport Protocol", "note": "실시간 음성·영상 데이터 전송을 위한 프로토콜. UDP 위에서 동작하며, 타임스탬프와 순서 번호를 제공하여 수신 측에서 재생 순서를 복원할 수 있게 한다."}, {"name": "RTCP", "en": "Real-time Transport Control Protocol", "note": "RTP를 제어하기 위한 프로토콜. RFC 1889에 RTP와 함께 규정된 IETF 표준. 패킷 유형: 송신자 보고(SR), 수신자 보고(RR), 소스 기술(SDES), 종료(BYE), 응용 지정(APP). RTP의 QoS 유지와 미디어 스트림 동기화에 활용."}, {"name": "RTSP", "en": "Real-time Streaming Protocol (RFC 2326)", "note": "리얼타임 미디어 전송을 행하는 애플리케이션 계층의 프로토콜. IETF가 1998년 개발. 미디어 전송·재생 제어용으로 명령어(PLAY, PAUSE 등)가 VCR처럼 동작하며 절대적 시간 정보 기반."}]}, "mnemonic": "CoAP = '코앞(CoAP)'에 있는 작은 기기들을 위한 프로토콜! → 코앞의 초소형 IoT 기기 = CoAP 🤏", "trap": "", "table": [], "sources": [{"title": "TOPCIT ESSENCE ver.3 — 시스템 아키텍처 이해와 활용", "note": "정보통신산업진흥원(NIPA) 공식 교재"}], "priority": 4}, {"title": "01 주요기술", "keywords": [], "summary": "", "background": "옛날에는 컴퓨터나 스마트폰만 인터넷에 연결됐는데, 냉장고·신호등·공장 기계 같은 '그냥 물건'들도 인터넷에 연결해서 데이터를 주고받으면 더 편리하겠다는 생각이 생겼어. 그래서 사물들이 스스로 정보를 감지하고, 전송하고, 서비스를 제공하는 IoT(사물인터넷) 기술이 탄생하게 된 거야.", "explanation": "IoT의 3대 핵심 기술을 몸에 비유하면 이해하기 쉬워. '센싱 기술'은 눈·코·귀처럼 주변 온도, 습도, 빛 같은 정보를 감지하는 것이고, '유무선 통신 및 네트워크'는 신경망처럼 감지한 정보를 전달하는 통로야. 마지막으로 'IoT 서비스 및 인터페이스 기술'은 뇌처럼 전달받은 정보를 처리해서 우리가 실제로 사용할 수 있는 서비스로 만들어주는 역할을 해.", "why": "", "term_focus": [], "connections": [], "types": null, "mnemonic": "센-통-서! (센)싱으로 느끼고 → (통)신으로 전달하고 → (서)비스로 활용한다! 사람으로 치면 '눈→신경→뇌' 순서랑 똑같아!", "trap": "", "table": [], "sources": [], "priority": 4}, {"title": "영상압축 유형", "keywords": [], "summary": "", "background": "옛날에 영상 파일은 너무 커서 인터넷으로 주고받거나 저장하는 게 엄청 힘들었어. 그래서 파일 크기를 줄이는 방법을 연구하다 보니, '원본을 완벽하게 살릴 건지 vs 좀 손해 보더라도 엄청 작게 만들 건지' 두 가지 방향으로 나뉘게 됐어.", "explanation": "무손실 압축은 마치 옷을 진공팩에 넣는 것과 같아. 꺼내면 원래 옷 그대로야! 반면 손실 압축은 짐을 줄이려고 덜 중요한 물건을 버리는 것과 같아. 가방은 훨씬 가벼워지지만, 버린 물건은 다시 못 찾아. 영상에서 손실 압축을 쓰면 화질이 살짝 떨어지지만 파일이 엄청 작아지는 거야.", "why": "", "term_focus": [], "connections": [], "types": null, "mnemonic": "무손실=무결(원본 그대로), 손실=손해(일부 날아감) → '무결 vs 손해' 딱 두 단어만 기억해!", "trap": "", "table": [], "sources": [], "priority": 4}, {"title": "멀티미디어 데이터", "keywords": [], "summary": "", "background": "옛날에는 컴퓨터로 글자만 주고받았는데, 사람들이 사진이나 영상도 디지털로 보내고 싶어졌어. 근데 이런 멀티미디어 파일들은 용량이 엄청 커서 그냥 보내면 너무 오래 걸리니까, 어떻게 줄여서 보낼지 방법을 연구하게 된 거야.", "explanation": "멀티미디어 데이터는 글(텍스트), 사진(이미지), 영상(비디오), 소리(오디오) 이렇게 4가지야. 이 중에서 이미지를 보낼 때는 마치 큰 짐을 택배로 보내기 전에 압축 팩에 꾹꾹 눌러 담듯이, '변환 → 양자화 → 부호화' 3단계를 거쳐서 크기를 확 줄여서 보내. 받는 쪽에서는 반대로 풀어서 다시 원래 이미지로 복원하는 거야.", "why": "", "term_focus": [], "connections": [], "types": null, "mnemonic": "이미지 압축은 '변양부' - 변신하고(변환), 양을 줄이고(양자화), 부호로 바꿔서(부호화) 보낸다! 받을 땐 반대로!", "trap": "", "table": [], "sources": [], "priority": 4}];
+const PRIO_LABEL = {1:'최우선', 2:'중요', 3:'보통', 4:'보조'};
+let curTab = 'all';
+let curPrio = 'all';
+let curLessonIdx = -1;
+let curPage = 0;
+let pages = [];
+
+function filterTab(btn, ch) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  curTab = ch;
+  applyFilters();
+}
+
+function filterPrio(btn) {
+  document.querySelectorAll('.pchip').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  curPrio = btn.dataset.prio;
+  applyFilters();
+}
+
+function applyFilters() {
+  const q = document.querySelector('.search').value.toLowerCase();
+  document.querySelectorAll('.section-group').forEach(grp => {
+    const chOk = curTab === 'all' || grp.dataset.chapter === curTab;
+    grp.classList.toggle('hidden', !chOk);
+    if (chOk) {
+      let any = false;
+      grp.querySelectorAll('.card').forEach(c => {
+        const qOk = !q || c.textContent.toLowerCase().includes(q);
+        const pOk = curPrio === 'all' || c.dataset.prio === curPrio;
+        const show = qOk && pOk;
+        c.classList.toggle('hidden-card', !show);
+        if (show) any = true;
+      });
+      if (q || curPrio !== 'all') grp.classList.toggle('hidden', !any);
+    }
+  });
+}
+
+function escHtml(str) {
+  return (str || '').replace(/[&<>"]/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[ch]);
+}
+
+function splitMnemonic(text) {
+  return (text || '')
+    .replace(/\r\n/g, '\n')
+    .replace(/\s+\/\s+/g, '\n')
+    .replace(/\s+vs\.\s+/gi, '\n')
+    .replace(/\s+→\s+/g, ' → ')
+    .replace(/\s+↔\s+/g, ' ↔ ')
+    .replace(/\.\s+/g, '.\n')
+    .replace(/다\.\s+/g, '다.\n')
+    .replace(/됨\.\s+/g, '됨.\n')
+    .split(/\n+/)
+    .map(line => line.trim())
+    .filter(Boolean);
+}
+
+function mnemonicIcon(tag, text) {
+  if (tag) return '◈';
+  if (text.includes('↔') || text.includes('=')) return '⇄';
+  if (text.includes('→')) return '→';
+  return '•';
+}
+
+function renderParagraph(text) {
+  return escHtml(text || '').replace(/\n/g, '<br>');
+}
+
+function renderFactSection(label, secClass, items) {
+  if (!items || !items.length) return '';
+  const html = items.map(item => `
+    <div class="fact-item">
+      ${item.label ? `<div class="fact-link-label">${escHtml(item.label)}</div>` : ''}
+      <div class="fact-term">${escHtml(item.term || '')}</div>
+      <div class="fact-note">${renderParagraph(item.note || '')}</div>
+    </div>`).join('');
+  return `<div class="sec ${secClass}"><div class="sec-label">${label}</div><div class="fact-list">${html}</div></div>`;
+}
+
+function renderTypesSection(types) {
+  if (!types) return '';
+  const items = Array.isArray(types) ? types : (types.items || []);
+  if (!items.length) return '';
+  const caption = !Array.isArray(types) && types.caption ? types.caption : '';
+  const scale = !Array.isArray(types) ? (types.scale || '') : '';
+  const scaleLabels = {
+    'strong-to-weak': ['강함','약함','reverse'],
+    'weak-to-strong': ['약함','강함',''],
+  };
+  const tierClass = {
+    'strong': 'tier-strong',
+    'mid': 'tier-mid',
+    'weak': 'tier-weak',
+  };
+  const tierLabel = {
+    'strong': '강함',
+    'mid': '중간',
+    'weak': '약함',
+  };
+  const rows = items.map(it => {
+    const tierCls = it.tier && tierClass[it.tier] ? tierClass[it.tier] : '';
+    const tierLbl = it.tier && tierLabel[it.tier] ? tierLabel[it.tier] : (it.tier || '');
+    return `
+      <div class="type-item">
+        <div class="type-body">
+          <div class="type-head">
+            <span class="type-name">${escHtml(it.name || '')}</span>
+            ${it.en ? `<span class="type-en">${escHtml(it.en)}</span>` : ''}
+            ${tierCls ? `<span class="type-tier ${tierCls}">${escHtml(tierLbl)}</span>` : ''}
+          </div>
+          <div class="type-note">${renderParagraph(it.note || '')}</div>
+        </div>
+      </div>`;
+  }).join('');
+  let scaleHtml = '';
+  if (scale && scaleLabels[scale]) {
+    const [L, R, rev] = scaleLabels[scale];
+    scaleHtml = `<div class="types-scale ${rev}"><span>${L}</span><span class="scale-arrow"></span><span>${R}</span></div>`;
+  }
+  return `<div class="sec sec-types">
+    <div class="sec-label">🗂️ 유형</div>
+    ${caption ? `<div class="types-caption">${renderParagraph(caption)}</div>` : ''}
+    <div class="types-list">${rows}</div>
+    ${scaleHtml}
+  </div>`;
+}
+
+function renderSourceSection(sources) {
+  if (!sources || !sources.length) return '';
+  const html = sources.map(src => {
+    const hasUrl = !!src.url;
+    let host = '';
+    if (hasUrl) {
+      try { host = new URL(src.url).hostname.replace(/^www\./, ''); } catch (_err) { host = ''; }
+    }
+    const inner = `
+        <span class="src-bullet">↗</span>
+        <span class="src-text">
+          ${escHtml(src.title || src.url || '')}
+          ${src.note ? `<span class="src-host">${escHtml(src.note)}</span>` : ''}
+          ${!src.note && host ? `<span class="src-host">${escHtml(host)}</span>` : ''}
+        </span>`;
+    if (hasUrl) {
+      return `<a class="src-link" href="${escHtml(src.url)}" target="_blank" rel="noreferrer">${inner}</a>`;
+    }
+    return `<div class="src-link">${inner}</div>`;
+  }).join('');
+  return `<div class="sec sec-src"><div class="sec-label">🔗 출처</div><div class="src-list">${html}</div></div>`;
+}
+
+function renderMnemonic(text) {
+  const lines = splitMnemonic(text);
+  if (!lines.length) return '';
+  const html = lines.map(line => {
+    const m = line.match(/^【([^】]+)】\s*(.*)$/);
+    const tag = m ? m[1].trim() : '';
+    const body = (m ? m[2] : line).trim();
+    const safeBody = escHtml(body).replace(/'([^']+)'/g, '<strong>$1</strong>');
+    return `
+      <div class="mn-line">
+        <span class="mn-picto">${mnemonicIcon(tag, body)}</span>
+        <div class="mn-main">
+          ${tag ? `<span class="mn-tag">${escHtml(tag)}</span>` : ''}
+          <div class="mn-text">${safeBody}</div>
+        </div>
+      </div>`;
+  }).join('');
+  return `<div class="sec sec-mn"><div class="sec-label">🧠 5초 암기</div><div class="mn-list">${html}</div></div>`;
+}
+
+function buildPages(lesson) {
+  return [
+    { type: 'learn', data: lesson },
+    { type: 'done',  data: lesson },
+  ];
+}
+
+function renderPage() {
+  const body = document.getElementById('l-body');
+  const page = pages[curPage];
+  body.innerHTML = '';
+  body.scrollTop = 0;
+
+  const wrap = document.createElement('div');
+  wrap.className = 'l-page';
+
+  if (page.type === 'learn') {
+    const d = page.data;
+    let h = '';
+    h += `<h1 class="l-page-title">${escHtml(d.title)}</h1>`;
+    const metaBits = [];
+    if (d.priority && PRIO_LABEL[d.priority]) {
+      metaBits.push(`<span class="chip chip-prio-${d.priority}">P${d.priority} · ${PRIO_LABEL[d.priority]}</span>`);
+    }
+    if (metaBits.length) h += `<div class="l-page-meta">${metaBits.join('')}</div>`;
+    if (d.keywords && d.keywords.length) {
+      h += `<div class="l-page-kw">${d.keywords.map(k => `<span>★ ${escHtml(k)}</span>`).join('')}</div>`;
+    }
+    if (d.summary)     h += `<div class="sec sec-summary"><div class="sec-label">📌 한 줄 요약</div><p>${renderParagraph(d.summary)}</p></div>`;
+    if (d.background)  h += `<div class="sec sec-bg"><div class="sec-label">📜 배경·맥락</div><p>${renderParagraph(d.background)}</p></div>`;
+    if (d.explanation) h += `<div class="sec sec-expl"><div class="sec-label">📖 핵심 설명</div><p>${renderParagraph(d.explanation)}</p></div>`;
+    if (d.types)       h += renderTypesSection(d.types);
+    if (d.why)         h += `<div class="sec sec-why"><div class="sec-label">🔍 왜 이렇게 됐나</div><p>${renderParagraph(d.why)}</p></div>`;
+    if (d.term_focus && d.term_focus.length)   h += renderFactSection('🈶 용어·한자 풀이', 'sec-term', d.term_focus);
+    if (d.connections && d.connections.length) h += renderFactSection('🧭 앞뒤 흐름 연결', 'sec-link', d.connections);
+    if (d.mnemonic)    h += renderMnemonic(d.mnemonic);
+    if (d.trap)        h += `<div class="sec sec-trap"><div class="sec-label">⚠️ 시험 함정</div><p>${renderParagraph(d.trap)}</p></div>`;
+    if (d.table && d.table.length) {
+      const cols = Object.keys(d.table[0]);
+      const head = cols.map(c => `<th>${escHtml(c)}</th>`).join('');
+      const rows = d.table.map(r => '<tr>' + cols.map(c => `<td>${escHtml(r[c] || '')}</td>`).join('') + '</tr>').join('');
+      h += `<div class="sec sec-summary" style="padding:0;background:transparent;border:none">
+        <div class="sec-label" style="padding-left:.3rem;color:#6b7280;margin-bottom:.5rem">📊 정리표</div>
+        <table class="ctable"><thead><tr>${head}</tr></thead><tbody>${rows}</tbody></table>
+      </div>`;
+    }
+    if (d.sources && d.sources.length) h += renderSourceSection(d.sources);
+    wrap.innerHTML = h;
+  }
+  else if (page.type === 'done') {
+    const d = page.data;
+    const hasNext = curLessonIdx + 1 < LESSONS.length;
+    wrap.innerHTML = `
+      <div class="done-page">
+        <div class="done-emoji">🎉</div>
+        <div class="done-title">레슨 완료!</div>
+        <div class="done-sub">${escHtml(d.title)}</div>
+        <div class="done-actions">
+          ${hasNext ? '<button class="done-btn done-btn-primary" onclick="startLesson(' + (curLessonIdx + 1) + ')">다음 개념 →</button>' : ''}
+          <button class="done-btn done-btn-sub" onclick="exitLesson()">목록으로 돌아가기</button>
+        </div>
+      </div>`;
+  }
+
+  body.appendChild(wrap);
+
+  document.getElementById('l-page-ind').textContent = `${curPage + 1} / ${pages.length}`;
+  document.getElementById('l-progress-bar').style.width = `${((curPage + 1) / pages.length) * 100}%`;
+  document.getElementById('l-prev').disabled = curPage === 0;
+  document.getElementById('l-next').disabled = curPage === pages.length - 1;
+  document.getElementById('l-next').textContent = curPage === pages.length - 2 ? '완료 🎉' : '다음 →';
+}
+
+function startLesson(idx) {
+  if (idx < 0 || idx >= LESSONS.length) return;
+  curLessonIdx = idx;
+  curPage = 0;
+  pages = buildPages(LESSONS[idx]);
+  document.getElementById('l-title').textContent = LESSONS[idx].title;
+  document.getElementById('lesson').classList.add('show');
+  document.body.style.overflow = 'hidden';
+  renderPage();
+}
+
+function exitLesson() {
+  document.getElementById('lesson').classList.remove('show');
+  document.body.style.overflow = '';
+  curLessonIdx = -1;
+}
+
+function nextPage() { if (curPage < pages.length - 1) { curPage++; renderPage(); } }
+function prevPage() { if (curPage > 0) { curPage--; renderPage(); } }
+
+document.addEventListener('keydown', e => {
+  if (curLessonIdx < 0) return;
+  if (e.key === 'ArrowLeft')  prevPage();
+  if (e.key === 'ArrowRight') nextPage();
+  if (e.key === 'Escape')     exitLesson();
+});
+</script>
+</body>
+</html>

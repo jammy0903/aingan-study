@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>TOPCIT 05-01 IT 경영 성과관리</title>
+<style>
+:root{--font-sans:"Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",system-ui,sans-serif;--font-serif:"NanumMyeongjo","Nanum Myeongjo","Batang","Apple SD Gothic Neo",serif}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{overflow-x:hidden}
+body{font-family:var(--font-sans);background:#f7f8fb;color:#1f2937;min-height:100vh}
+
+.header{background:#b45309;color:#fff;padding:.85rem 1.25rem;display:flex;align-items:center;gap:.75rem;position:sticky;top:0;z-index:20;box-shadow:0 2px 10px rgba(0,0,0,.15)}
+.header-back{color:#fff;text-decoration:none;font-size:1.2rem;opacity:.85}
+.header h1{font-size:1rem;font-weight:800;flex:1;font-family:var(--font-serif)}
+.header-cnt{font-size:.75rem;opacity:.8;white-space:nowrap}
+
+.search-wrap{padding:.7rem 1.25rem .3rem}
+.search{width:100%;padding:.6rem 1rem;border:2px solid #e2e8f0;border-radius:2rem;font-size:.88rem;outline:none;background:#fff;transition:border .2s}
+.search:focus{border-color:#b45309}
+
+.tabs{display:flex;gap:.35rem;padding:.4rem 1.25rem .3rem;overflow-x:auto;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tab{flex-shrink:0;padding:.32rem .8rem;border-radius:2rem;border:1.5px solid #b45309;background:#fff;color:#b45309;font-size:.74rem;font-weight:700;cursor:pointer;white-space:nowrap;transition:all .15s;font-family:inherit}
+.tab.active,.tab:hover{background:#b45309;color:#fff}
+
+.prio-bar{display:flex;gap:.3rem;padding:.2rem 1.25rem .6rem;overflow-x:auto;scrollbar-width:none}
+.prio-bar::-webkit-scrollbar{display:none}
+.pchip{flex-shrink:0;padding:.28rem .7rem;border-radius:2rem;border:1.5px solid #e5e7eb;background:#fff;color:#475569;font-size:.72rem;font-weight:700;cursor:pointer;white-space:nowrap;transition:all .15s;font-family:inherit}
+.pchip:hover{border-color:var(--pc,#9ca3af);color:#111827}
+.pchip.active{background:var(--pc,#b45309);border-color:var(--pc,#b45309);color:#fff}
+.pchip[data-prio="all"].active{background:#b45309;border-color:#b45309;color:#fff}
+
+.section-group{padding:.3rem 1.25rem .8rem}
+.section-group.hidden{display:none}
+.section-label{font-size:.72rem;font-weight:800;color:#78350f;letter-spacing:.04em;padding:.4rem 0 .35rem;border-bottom:2px solid #b4530933;margin-bottom:.55rem;font-family:var(--font-serif)}
+.card-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:.55rem}
+@media(min-width:540px){.card-grid{grid-template-columns:repeat(3,1fr)}}
+@media(min-width:900px){.card-grid{grid-template-columns:repeat(4,1fr)}}
+@media(min-width:1200px){.card-grid{grid-template-columns:repeat(5,1fr)}}
+.card{background:#fff;border-radius:.7rem;padding:.85rem .8rem .65rem;cursor:pointer;border:1.5px solid #e5e7eb;transition:all .18s;box-shadow:0 1px 3px rgba(0,0,0,.04);position:relative;display:flex;flex-direction:column;gap:.35rem;min-height:9rem}
+.card:hover{border-color:#b45309;box-shadow:0 4px 14px #b4530933;transform:translateY(-2px)}
+.card-badges{position:absolute;top:.45rem;right:.5rem;display:flex;gap:.2rem;font-size:.64rem}
+.card-badges span{padding:.1rem .42rem;border-radius:.4rem;font-weight:700;line-height:1.4;white-space:nowrap}
+.b-prio-1{background:#fee2e2;color:#991b1b}
+.b-prio-2{background:#fef3c7;color:#92400e}
+.b-prio-3{background:#dcfce7;color:#166534}
+.b-prio-4{background:#f1f5f9;color:#475569}
+.b-mn{background:#ede9fe;color:#5b21b6}
+.card-title{font-size:.86rem;font-weight:700;color:#111827;line-height:1.35;padding-right:4.5rem;font-family:var(--font-serif)}
+.card-preview{font-size:.7rem;color:#6b7280;line-height:1.5;flex:1}
+.card-cta{font-size:.68rem;color:#b45309;font-weight:700;text-align:right;margin-top:.25rem}
+.card.hidden-card{display:none!important}
+
+/* ───────── 레슨 모드 (풀스크린) ───────── */
+.lesson{display:none;position:fixed;inset:0;background:#f7f8fb;z-index:1000;flex-direction:column}
+.lesson.show{display:flex}
+.l-head{background:#b45309;color:#fff;padding:.7rem 1rem;display:flex;align-items:center;gap:.7rem;flex-shrink:0}
+.l-back{background:none;border:none;color:#fff;font-size:1.3rem;cursor:pointer;padding:0;line-height:1;opacity:.9}
+.l-title{flex:1;font-size:.92rem;font-weight:800;font-family:var(--font-serif);line-height:1.3;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.l-page-ind{font-size:.78rem;font-weight:700;background:rgba(0,0,0,.18);padding:.18rem .55rem;border-radius:1rem;flex-shrink:0}
+.l-progress{height:4px;background:rgba(0,0,0,.15);flex-shrink:0}
+.l-progress-bar{height:100%;background:#fff;width:0%;transition:width .3s ease}
+.l-body{flex:1;overflow-y:auto;padding:1.2rem 1.25rem 5rem;display:flex;flex-direction:column;gap:1rem;align-items:center}
+.l-page{width:100%;max-width:680px;animation:slideIn .25s ease}
+@keyframes slideIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+.l-page-title{font-size:1.5rem;font-weight:800;color:#78350f;margin-bottom:.5rem;font-family:var(--font-serif);line-height:1.3}
+.l-page-meta{display:flex;flex-wrap:wrap;gap:.35rem;margin-bottom:.85rem}
+.l-page-meta .chip{padding:.18rem .55rem;border-radius:1rem;font-size:.7rem;font-weight:700}
+.chip-prio-1{background:#fee2e2;color:#991b1b}
+.chip-prio-2{background:#fef3c7;color:#92400e}
+.chip-prio-3{background:#dcfce7;color:#166534}
+.chip-prio-4{background:#f1f5f9;color:#475569}
+.l-page-kw{display:flex;flex-wrap:wrap;gap:.3rem;margin-bottom:1.2rem}
+.l-page-kw span{background:#b4530922;color:#78350f;border:1px solid #b4530955;border-radius:1rem;padding:.18rem .65rem;font-size:.72rem;font-weight:700}
+
+.sec{border-radius:.7rem;padding:1rem 1.1rem;line-height:1.65;margin-bottom:.85rem}
+.sec-summary{background:#b4530911;border-left:5px solid #b45309;font-size:.95rem;color:#111827;font-weight:600}
+.sec-bg{background:#fef7ec;border-left:5px solid #d97706}
+.sec-expl{background:#eef2ff;border-left:5px solid #4f46e5}
+.sec-why{background:#ecfdf5;border-left:5px solid #059669}
+.sec-term{background:#faf5ff;border-left:5px solid #7c3aed}
+.sec-link{background:#fff7ed;border-left:5px solid #c2410c}
+.sec-mn{background:linear-gradient(145deg,#fffef5 0%,#fff7d6 56%,#b4530920 100%);color:#1f2937;font-weight:600;border:1.5px solid #b4530933;border-left:5px solid #b45309;box-shadow:0 10px 26px #b4530914}
+.sec-trap{background:#fff1f2;border:1.5px solid #fda4af;border-left:5px solid #e11d48;color:#881337}
+.sec-src{background:#fff;border:1.5px solid #e5e7eb;border-left:5px solid #475569}
+.sec-types{background:#f0f9ff;border:1.5px solid #bae6fd;border-left:5px solid #0284c7}
+.sec-types .sec-label{color:#075985}
+.types-caption{font-size:.8rem;color:#334155;margin-bottom:.6rem;line-height:1.55}
+.types-list{display:flex;flex-direction:column;gap:.55rem;counter-reset:tc}
+.type-item{display:grid;grid-template-columns:2rem 1fr;gap:.55rem;align-items:start;background:#fff;border:1px solid #e0f2fe;border-radius:.7rem;padding:.7rem .78rem;counter-increment:tc;position:relative}
+.type-item::before{content:counter(tc);display:inline-flex;align-items:center;justify-content:center;width:1.7rem;height:1.7rem;border-radius:.5rem;background:#b4530916;color:#78350f;font-size:.8rem;font-weight:800;line-height:1}
+.type-body{min-width:0}
+.type-head{display:flex;flex-wrap:wrap;gap:.35rem;align-items:center;margin-bottom:.2rem}
+.type-name{font-size:.92rem;font-weight:800;color:#0f172a;font-family:var(--font-serif)}
+.type-en{font-size:.72rem;color:#64748b;font-weight:700}
+.type-tier{display:inline-flex;align-items:center;padding:.08rem .42rem;border-radius:999px;font-size:.62rem;font-weight:800;letter-spacing:.04em}
+.tier-strong{background:#fee2e2;color:#991b1b}
+.tier-mid{background:#fef3c7;color:#92400e}
+.tier-weak{background:#dcfce7;color:#166534}
+.type-note{font-size:.86rem;line-height:1.68;color:#334155;word-break:keep-all}
+.types-scale{display:flex;align-items:center;gap:.45rem;margin-top:.65rem;padding:.5rem .7rem;background:rgba(255,255,255,.7);border:1px dashed #bae6fd;border-radius:.6rem;font-size:.72rem;color:#475569;font-weight:700}
+.types-scale .scale-arrow{flex:1;height:6px;border-radius:999px;background:linear-gradient(90deg,#16a34a,#d97706,#dc2626)}
+.types-scale.reverse .scale-arrow{background:linear-gradient(90deg,#dc2626,#d97706,#16a34a)}
+.sec-label{font-size:.7rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;margin-bottom:.5rem}
+.sec-bg .sec-label{color:#92400e}
+.sec-expl .sec-label{color:#3730a3}
+.sec-why .sec-label{color:#065f46}
+.sec-term .sec-label{color:#5b21b6}
+.sec-link .sec-label{color:#9a3412}
+.sec-mn .sec-label{color:#78350f}
+.sec-trap .sec-label{color:#9f1239}
+.sec-summary .sec-label{color:#b45309}
+.sec-src .sec-label{color:#334155}
+.sec p{font-size:.92rem;line-height:1.7}
+.sec-mn p{font-size:.98rem}
+.fact-list{display:flex;flex-direction:column;gap:.65rem}
+.fact-item{background:rgba(255,255,255,.85);border:1px solid rgba(0,0,0,.06);border-radius:.85rem;padding:.78rem .85rem}
+.fact-term{font-size:.86rem;font-weight:800;color:#111827;margin-bottom:.22rem}
+.fact-note{font-size:.9rem;line-height:1.72;color:#374151;word-break:keep-all}
+.fact-link-label{display:inline-flex;align-items:center;padding:.12rem .45rem;border-radius:999px;background:#b4530914;color:#78350f;font-size:.64rem;font-weight:800;letter-spacing:.04em;margin-bottom:.38rem}
+.src-list{display:flex;flex-direction:column;gap:.5rem}
+.src-link{display:flex;align-items:flex-start;gap:.45rem;text-decoration:none;color:#111827;background:#f9fafb;border:1px solid #e5e7eb;border-radius:.8rem;padding:.72rem .82rem;transition:border-color .15s,transform .15s}
+.src-link:hover{border-color:#b45309;transform:translateY(-1px)}
+.src-bullet{flex-shrink:0;color:#b45309;font-weight:800}
+.src-text{font-size:.85rem;line-height:1.55}
+.src-host{display:block;font-size:.72rem;color:#6b7280;margin-top:.1rem}
+.mn-list{display:flex;flex-direction:column;gap:.55rem}
+.mn-line{display:flex;align-items:flex-start;gap:.72rem;background:rgba(255,255,255,.82);border:1px solid #b4530922;border-radius:.9rem;padding:.72rem .8rem .68rem;box-shadow:0 4px 12px rgba(0,0,0,.04)}
+.mn-picto{flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;width:1.6rem;height:1.6rem;border-radius:.45rem;background:#b4530916;border:1px solid #b4530926;font-size:.76rem;font-weight:800;line-height:1;color:#78350f}
+.mn-main{display:flex;flex-direction:column;gap:.28rem;min-width:0}
+.mn-tag{display:inline-flex;align-items:center;width:fit-content;padding:.12rem .45rem;border-radius:999px;background:#b4530918;color:#78350f;font-size:.64rem;font-weight:800;letter-spacing:.05em}
+.mn-text{font-size:.95rem;line-height:1.76;color:#1f2937;word-break:keep-all}
+.mn-text strong{color:#b45309;font-weight:800}
+
+.ctable{width:100%;border-collapse:collapse;font-size:.82rem;background:#fff;border-radius:.5rem;overflow:hidden;margin-top:.4rem}
+.ctable th{background:#b45309;color:#fff;padding:.55rem .65rem;text-align:left;font-weight:700;font-size:.78rem}
+.ctable td{padding:.55rem .65rem;border-top:1px solid #e5e7eb;vertical-align:top;line-height:1.55}
+.ctable tr:nth-child(even) td{background:#f9fafb}
+
+.done-page{text-align:center;padding:2.5rem 1rem}
+.done-emoji{font-size:4.5rem;margin-bottom:1rem;animation:pop .4s ease}
+@keyframes pop{from{transform:scale(0)}80%{transform:scale(1.2)}to{transform:scale(1)}}
+.done-title{font-size:1.5rem;font-weight:800;color:#78350f;margin-bottom:.5rem;font-family:var(--font-serif)}
+.done-sub{font-size:.95rem;color:#6b7280;margin-bottom:2rem}
+.done-actions{display:flex;flex-direction:column;gap:.6rem;max-width:300px;margin:0 auto}
+.done-btn{padding:.85rem 1.4rem;border-radius:.7rem;font-size:.95rem;font-weight:700;cursor:pointer;border:none;font-family:inherit;transition:all .15s}
+.done-btn-primary{background:#b45309;color:#fff}
+.done-btn-primary:hover{transform:translateY(-2px);box-shadow:0 4px 14px #b4530955}
+.done-btn-sub{background:#fff;color:#b45309;border:1.5px solid #b45309}
+.done-btn-sub:hover{background:#b4530911}
+
+.l-foot{position:fixed;bottom:0;left:0;right:0;background:#fff;padding:.7rem 1rem;display:flex;gap:.5rem;border-top:1px solid #e5e7eb;z-index:1010}
+.l-nav-btn{flex:1;padding:.7rem;border-radius:.55rem;border:1.5px solid #b45309;background:#fff;color:#b45309;font-size:.88rem;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s}
+.l-nav-btn:hover:not(:disabled){background:#b4530911}
+.l-nav-btn:disabled{opacity:.35;cursor:not-allowed}
+.l-nav-btn.primary{background:#b45309;color:#fff;border-color:#b45309}
+.l-nav-btn.primary:hover:not(:disabled){background:#78350f;border-color:#78350f}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <a href="../" class="header-back">←</a>
+  <span style="font-size:1.2rem">💼</span>
+  <h1><span style="opacity:.7;font-size:.85em">05</span> &nbsp;IT 경영 성과관리</h1>
+  <span class="header-cnt">15개</span>
+</div>
+
+<div class="search-wrap">
+  <input class="search" type="text" placeholder="🔍  개념 검색..." oninput="applyFilters()">
+</div>
+
+<div class="tabs" id="tab-bar"><button class="tab active" onclick="filterTab(this,'all')">전체</button><button class="tab" onclick="filterTab(this,'0')">균형 성과평가 기법</button><button class="tab" onclick="filterTab(this,'1')">목표관리 체계</button><button class="tab" onclick="filterTab(this,'2')">핵심 성과지표 관리</button></div>
+<div class="prio-bar"><button class="pchip active" data-prio="all" onclick="filterPrio(this)">전체</button><button class="pchip" data-prio="1" onclick="filterPrio(this)" style="--pc:#dc2626">🔴 P1 최우선</button><button class="pchip" data-prio="2" onclick="filterPrio(this)" style="--pc:#d97706">🟡 P2 중요</button><button class="pchip" data-prio="3" onclick="filterPrio(this)" style="--pc:#16a34a">🟢 P3 보통</button><button class="pchip" data-prio="4" onclick="filterPrio(this)" style="--pc:#9ca3af">⚪ P4 보조</button></div>
+
+<div id="card-content"><div class="section-group" data-chapter="0"><div class="section-label">균형 성과평가 기법</div><div class="card-grid"><div class="card" data-prio="1" onclick="startLesson(0)"><div class="card-badges"><span class="b-prio b-prio-1" title="최우선">🔴 P1</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">866의 개요</div><div class="card-preview">옛날에 회사 성과를 평가할 때 돈(재무)만 보다 보니 직원 만족도나 미래 성장 가능성 같은…</div><div class="card-cta">레슨 시작 →</div></div><div class="card" data-prio="1" onclick="startLesson(1)"><div class="card-badges"><span class="b-prio b-prio-1" title="최우선">🔴 P1</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">BSC의 구성요소</div><div class="card-preview">옛날에 회사들은 돈을 얼마나 벌었는지(재무)만 보고 회사가 잘 되는지 판단했어. 근데 그것…</div><div class="card-cta">레슨 시작 →</div></div><div class="card" data-prio="1" onclick="startLesson(2)"><div class="card-badges"><span class="b-prio b-prio-1" title="최우선">🔴 P1</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">재무적 성과평가 기법의 종류</div><div class="card-preview">회사에서 IT 시스템에 돈을 투자할 때 &#x27;이게 과연 남는 장사인가?&#x27;를 객관적으로 따져볼 …</div><div class="card-cta">레슨 시작 →</div></div><div class="card" data-prio="2" onclick="startLesson(3)"><div class="card-badges"><span class="b-prio b-prio-2" title="중요">🟡 P2</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">IT-BSC의 개요</div><div class="card-preview">옛날에 회사들이 IT에 돈을 엄청 쏟아부었는데, &#x27;IT 투자가 진짜 효과가 있는 건지&#x27; 숫…</div><div class="card-cta">레슨 시작 →</div></div><div class="card" data-prio="2" onclick="startLesson(4)"><div class="card-badges"><span class="b-prio b-prio-2" title="중요">🟡 P2</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">IT-BSC의 구성요소</div><div class="card-preview">옛날에 기업들이 IT에 돈을 엄청 쏟아부었는데, &#x27;IT가 실제로 회사에 도움이 되고 있는 …</div><div class="card-cta">레슨 시작 →</div></div><div class="card" data-prio="1" onclick="startLesson(5)"><div class="card-badges"><span class="b-prio b-prio-1" title="최우선">🔴 P1</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">BSC의 4가지 관점</div><div class="card-preview">옛날에 회사들은 돈(재무) 숫자만 보고 회사가 잘 되는지 판단했는데, 그러다 보니 직원 교…</div><div class="card-cta">레슨 시작 →</div></div></div></div><div class="section-group" data-chapter="1"><div class="section-label">목표관리 체계</div><div class="card-grid"><div class="card" data-prio="2" onclick="startLesson(6)"><div class="card-badges"><span class="b-prio b-prio-2" title="중요">🟡 P2</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">MBO의 주요관점</div><div class="card-preview">옛날에 컴퓨터 프로그램들이 많아지면서 &#x27;이 프로그램이 제대로 잘 돌아가고 있나?&#x27;를 체계적…</div><div class="card-cta">레슨 시작 →</div></div><div class="card" data-prio="2" onclick="startLesson(7)"><div class="card-badges"><span class="b-prio b-prio-2" title="중요">🟡 P2</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">MBO를 기업에서 도입하는 이유</div><div class="card-preview">옛날에 회사에서 사장님이 &#x27;열심히 해!&#x27;라고만 하면 직원들이 뭘 어떻게 해야 할지 몰라서 …</div><div class="card-cta">레슨 시작 →</div></div><div class="card" data-prio="3" onclick="startLesson(8)"><div class="card-badges"><span class="b-prio b-prio-3" title="보통">🟢 P3</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">MBOS의 구성요소</div><div class="card-preview">옛날에 회사에서 상사 혼자 목표를 정해서 직원들한테 통보하다 보니, 직원들이 그 목표에 공…</div><div class="card-cta">레슨 시작 →</div></div><div class="card" data-prio="3" onclick="startLesson(9)"><div class="card-badges"><span class="b-prio b-prio-3" title="보통">🟢 P3</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">IT 비즈니스 환경변화의 이해</div><div class="card-preview">옛날에는 그냥 물건 잘 만들면 잘 팔렸는데, 세계 경제가 흔들리고 중국·인도 같은 나라들이…</div><div class="card-cta">레슨 시작 →</div></div><div class="card" data-prio="3" onclick="startLesson(10)"><div class="card-badges"><span class="b-prio b-prio-3" title="보통">🟢 P3</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">IT 비즈니스 통합과 확산</div><div class="card-preview">옛날에는 기업들이 각자 따로따로 경쟁했는데, 점점 상품이 복잡해지고 혼자서는 다 못 만드는…</div><div class="card-cta">레슨 시작 →</div></div><div class="card" data-prio="4" onclick="startLesson(11)"><div class="card-badges"><span class="b-prio b-prio-4" title="보조">⚪ P4</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">모바일 서비스</div><div class="card-preview">옛날엔 길을 찾으려면 무거운 종이 지도를 들고 다니거나 사람한테 직접 물어봐야 했어. 그러…</div><div class="card-cta">레슨 시작 →</div></div></div></div><div class="section-group" data-chapter="2"><div class="section-label">핵심 성과지표 관리</div><div class="card-grid"><div class="card" data-prio="2" onclick="startLesson(12)"><div class="card-badges"><span class="b-prio b-prio-2" title="중요">🟡 P2</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">KPI의 개요</div><div class="card-preview">회사나 팀이 잘 되고 있는지 파악하려면 뭔가 숫자로 측정할 수 있는 기준이 필요했어. 그냥…</div><div class="card-cta">레슨 시작 →</div></div><div class="card" data-prio="2" onclick="startLesson(13)"><div class="card-badges"><span class="b-prio b-prio-2" title="중요">🟡 P2</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">KPI 수립 절차</div><div class="card-preview">회사가 커질수록 &#x27;우리가 잘하고 있는 건지&#x27; 어떻게 알 수 있을지 막막해지는 문제가 생겼어…</div><div class="card-cta">레슨 시작 →</div></div><div class="card" data-prio="3" onclick="startLesson(14)"><div class="card-badges"><span class="b-prio b-prio-3" title="보통">🟢 P3</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">KPI 도출 시 유의사항</div><div class="card-preview">옛날에 회사들이 성과 지표를 만들 때 현장 중간 관리자들끼리 알아서 만들다 보니 회사 전체…</div><div class="card-cta">레슨 시작 →</div></div></div></div></div>
+
+<!-- ── 레슨 모드 ── -->
+<div class="lesson" id="lesson">
+  <div class="l-head">
+    <button class="l-back" onclick="exitLesson()">←</button>
+    <div class="l-title" id="l-title"></div>
+    <div class="l-page-ind" id="l-page-ind">1 / 1</div>
+  </div>
+  <div class="l-progress"><div class="l-progress-bar" id="l-progress-bar"></div></div>
+  <div class="l-body" id="l-body"></div>
+  <div class="l-foot">
+    <button class="l-nav-btn" id="l-prev" onclick="prevPage()">← 이전</button>
+    <button class="l-nav-btn primary" id="l-next" onclick="nextPage()">다음 →</button>
+  </div>
+</div>
+
+<script>
+const LESSONS = [{"title": "866의 개요", "keywords": [], "summary": "", "background": "옛날에 회사 성과를 평가할 때 돈(재무)만 보다 보니 직원 만족도나 미래 성장 가능성 같은 중요한 것들을 놓치는 문제가 있었어. 그래서 1992년에 하버드 교수들이 '돈만 말고 여러 방면을 균형 있게 보자!'는 BSC 개념을 만들게 됐어.", "explanation": "BSC는 회사 성적표를 4가지 과목으로 나눠서 보는 것과 같아. 수학(돈/재무), 체육(내부 프로세스), 국어(고객만족), 미술(학습/성장) 이렇게 4가지를 골고루 평가해서 어느 한 과목만 잘한다고 좋은 학생이 아니듯, 회사도 모든 면에서 균형 있게 잘해야 한다는 개념이야. 쉽게 말해 '회사의 360도 건강검진'이라고 생각하면 돼!", "why": "", "term_focus": [], "connections": [], "types": null, "mnemonic": "BSC = '밸런스 성적표 체크!' — 재무💰, 고객😊, 내부⚙️, 성장🌱 딱 4가지, 균형이 핵심!", "trap": "", "table": [], "sources": [], "priority": 1}, {"title": "BSC의 구성요소", "keywords": [], "summary": "", "background": "옛날에 회사들은 돈을 얼마나 벌었는지(재무)만 보고 회사가 잘 되는지 판단했어. 근데 그것만 보다 보니 직원 만족도, 고객 만족도 같은 중요한 것들을 놓치는 문제가 생겼지. 그래서 Kaplan & Norton이 1992년에 BSC(Balanced ScoreCard, 균형성과표)를 만든 거야.", "explanation": "BSC는 회사 성적표를 4가지 관점에서 보는 방법이야. 마치 학교 생활기록부처럼 성적(재무)만 보는 게 아니라, 친구관계(고객), 수업태도(내부 프로세스), 성장가능성(학습/성장)까지 함께 보는 거야. 이 4가지를 균형 있게 보면 회사가 진짜 잘 되고 있는지 제대로 알 수 있어.", "why": "", "term_focus": [], "connections": [], "types": {"caption": "BSC(Balanced Score Card, 균형 성과평가 기법)는 재무적 성과뿐만 아니라 비재무적 성과영역까지 평가. 4가지 핵심 구성요소로 이루어진다.", "items": [{"name": "관점", "en": "Perspective", "note": "재무·고객·내부프로세스·학습과 성장 4가지 관점. 재무적 시각과 비재무적 시각을 동시에 관리한다."}, {"name": "CSF", "en": "Critical Success Factor", "note": "핵심성공요인. 비전과 전략의 성공적인 달성을 위해 꼭 성공시켜야 하는 요소."}, {"name": "전략맵", "en": "Strategy Map", "note": "BSC의 CSF들 간의 인과관계를 나타내주는 그림으로, 조직이 가치를 창출하는 방법을 표현."}, {"name": "KPI", "en": "Key Performance Indicator", "note": "핵심성과지표. CSF의 수준과 성공여부를 측정 및 관리하는 방법을 표현한 지표."}]}, "mnemonic": "BSC 4가지는 '재고내학'으로 외워! → **재**무, **고**객, **내**부 프로세스, **학**습·성장! '재고 내놓고 학교 가자~' 🎒", "trap": "", "table": [], "sources": [{"title": "TOPCIT ESSENCE ver.3 — IT 비즈니스와 윤리", "note": "정보통신산업진흥원(NIPA) 공식 교재"}], "priority": 1}, {"title": "재무적 성과평가 기법의 종류", "keywords": [], "summary": "", "background": "회사에서 IT 시스템에 돈을 투자할 때 '이게 과연 남는 장사인가?'를 객관적으로 따져볼 방법이 필요했어. 그래서 투자가 얼마나 효율적인지 숫자로 측정하는 다양한 평가 기법들이 만들어졌지.", "explanation": "예를 들어 100만원을 투자해서 150만원을 벌었는지(ROI), 미래에 받을 돈을 오늘 기준으로 환산하면 얼마인지(NPV), 투자한 돈을 언제쯤 다 회수할 수 있는지(투자회수기간) 같은 걸 각각 다른 방식으로 따지는 거야. 마치 새 치킨집을 열 때 '수익률이 얼마야?', '지금 가치로 따지면 남아?', '몇 년 안에 본전 뽑아?' 를 각각 계산해보는 것과 같아.", "why": "", "term_focus": [], "connections": [], "types": {"caption": "재무적 성과평가는 재무지표를 중심으로 정량적으로 평가. 시점별·기간별로 활용되는 4가지 대표 기법.", "items": [{"name": "ROI", "en": "Return On Investment (투자수익률)", "note": "투자 비용 대비 순 효과의 비율. 투자 타당성 평가에 활용. 투자에 따른 순이익에 소요되는 시간을 알 수 없는 한계."}, {"name": "NPV", "en": "Net Present Value (순현재가치)", "note": "미래의 현금 흐름을 현재 가치로 할인하여 합산한 값에서 투자비용을 뺀 값. 양수이면 투자 가치가 있다고 판단."}, {"name": "IRR", "en": "Internal Return Rate (내부수익률)", "note": "NPV가 0이 되게 하는 할인율. 투자에 따른 리스크 감소 여부 판단을 위한 연 단위의 기대 수익 규모를 표현. 투자의 규모와 회수기간은 고려하지 않음."}, {"name": "PP", "en": "Payback Period (회수기간)", "note": "누적효과가 누적비용을 초과하여 흑자 전환 시점 또는 가시적 성공 전환 시점을 표현. 손익분기점에 도달할 때까지의 시간. 수익의 규모가 아닌 수익 발생 시점만 보여줌."}]}, "mnemonic": "ROI, NPV, IRR, 투자회수기간 → 'R·N·I·T' = '돈 넣으면 이득 타이밍!' (Return·NPV·IRR·Time) 순서대로 '수익률→현재가치→내부수익률→회수기간'", "trap": "", "table": [], "sources": [{"title": "TOPCIT ESSENCE ver.3 — IT 비즈니스와 윤리", "note": "정보통신산업진흥원(NIPA) 공식 교재"}], "priority": 1}, {"title": "IT-BSC의 개요", "keywords": [], "summary": "", "background": "옛날에 회사들이 IT에 돈을 엄청 쏟아부었는데, 'IT 투자가 진짜 효과가 있는 건지' 숫자로 증명하기가 너무 어려웠어. 그래서 기존 BSC(Balanced ScoreCard, 균형성과표)를 IT 버전으로 변형한 IT-BSC(IT Balanced ScoreCard)가 탄생했지.", "explanation": "IT-BSC는 IT 투자가 회사 목표 달성에 얼마나 기여했는지 점수로 매기는 성적표야. 예를 들어 학교에서 국영수만으로 학생을 평가하면 부족하니까 체육, 미술, 생활태도까지 종합적으로 보는 생활기록부처럼, IT 투자도 돈 말고 다양한 기준으로 종합 평가하는 거야. 쉽게 말해 'IT가 회사에 얼마나 잘하고 있나' 보여주는 종합 성적표라고 생각하면 돼.", "why": "", "term_focus": [], "connections": [], "types": null, "mnemonic": "IT 성적표! → IT(아이티) 투자의 BSC(종합 성적표) = IT가 회사에서 받은 '종합 생활기록부'", "trap": "", "table": [], "sources": [], "priority": 2}, {"title": "IT-BSC의 구성요소", "keywords": [], "summary": "", "background": "옛날에 기업들이 IT에 돈을 엄청 쏟아부었는데, 'IT가 실제로 회사에 도움이 되고 있는 건지' 측정할 방법이 없어서 답답했어. 그래서 기존 BSC(Balanced ScoreCard, 균형성과표)를 IT 부서 전용으로 바꾼 IT-BSC(IT Balanced ScoreCard)를 만든 거야.", "explanation": "IT-BSC는 IT 부서의 성적표인데, 딱 4가지 항목으로 점수를 매겨. '회사에 돈이 됐나(기업공헌)', '사용자들이 만족했나(사용자)', '업무를 효율적으로 처리했나(운영프로세스)', '미래를 위해 발전하고 있나(미래지향)' — 이 네 가지가 서로 연결되어서 하나가 좋아지면 다른 것도 좋아지는 구조야. 마치 학교 생활기록부에서 학업/체육/봉사/창의활동을 균형 있게 평가하는 것처럼, IT도 한쪽만 보지 않고 골고루 평가하는 거지.", "why": "", "term_focus": [], "connections": [], "types": {"caption": "IT-BSC는 IT 분야의 투자성과평가에 BSC의 개념을 도입한 것. BSC의 4가지 관점과 연계된 4가지 IT 관점으로 구성.", "items": [{"name": "기업에의 공헌도", "en": "Business Contribution", "note": "IT 투자로부터 기업의 가치 창출을 측정. BSC의 재무적 관점과 연계."}, {"name": "사용자 관점", "en": "User Orientation", "note": "IT 서비스 공급자 및 사용자의 가치를 극대화. BSC의 고객 관점과 연계."}, {"name": "운영프로세스 관점", "en": "Operational Excellence", "note": "IT 제품 및 서비스를 효율적으로 제공. BSC의 내부프로세스 관점과 연계."}, {"name": "미래지향적 관점", "en": "Future Orientation", "note": "지속적 발전을 위한 IT 서비스 제공 및 기술개발 지원. BSC의 학습과 성장 관점과 연계."}]}, "mnemonic": "🎯 '공사운미' — 공헌(기업공헌) → 사용자 → 운영프로세스 → 미래지향! '공사장 운영은 미래를 위해!' 로 외워봐", "trap": "", "table": [], "sources": [{"title": "TOPCIT ESSENCE ver.3 — IT 비즈니스와 윤리", "note": "정보통신산업진흥원(NIPA) 공식 교재"}], "priority": 2}, {"title": "BSC의 4가지 관점", "keywords": [], "summary": "", "background": "옛날에 회사들은 돈(재무) 숫자만 보고 회사가 잘 되는지 판단했는데, 그러다 보니 직원 교육이나 고객 만족 같은 중요한 것들을 놓쳐서 망하는 회사들이 생겼어. 그래서 Kaplan & Norton이 BSC(Balanced ScoreCard, 균형성과표)를 만들어 재무·고객·프로세스·학습 4가지 관점에서 균형 있게 보자고 제안했지.", "explanation": "BSC의 4가지 관점은 회사를 4방향에서 체크하는 건강검진이라고 생각해봐. 재무(돈 잘 버나?), 고객(손님이 만족하나?), 프로세스(일하는 방식이 효율적인가?), 학습/성장(직원들이 배우고 발전하나?) 이렇게 4가지를 동시에 체크해. 이 4가지는 서로 연결되어 있어서, 직원이 잘 배우면 → 프로세스가 좋아지고 → 고객이 만족하고 → 결국 돈을 더 버는 선순환이 만들어지는 거야.", "why": "", "term_focus": [], "connections": [], "types": null, "mnemonic": "🔄 '재고프학' 순서로 외워! → '재'무로 시작해서 '고'객 만족시키고 '프'로세스 개선하고 '학'습으로 성장! (재고프학 = 재고 파학! 재고 파악하듯 회사를 4방향으로 파악한다!)", "trap": "", "table": [], "sources": [], "priority": 1}, {"title": "MBO의 주요관점", "keywords": [], "summary": "", "background": "옛날에 컴퓨터 프로그램들이 많아지면서 '이 프로그램이 제대로 잘 돌아가고 있나?'를 체계적으로 파악할 방법이 필요했어. 그래서 여러 각도에서 시스템을 바라보는 MBO(Management By Objectives, 목표 중심 관리)의 관점이 등장했지.", "explanation": "MBO의 주요 관점은 시스템을 '기능적으로 뭘 하는가', '어떻게 구조로 이루어졌는가', '실제로 어떻게 동작하는가'로 나눠서 보는 거야. 예를 들어 자동차를 볼 때 '이 차는 사람을 태운다(기능)', '엔진·바퀴·핸들로 이루어졌다(구조)', '시동 걸면 엔진이 돌고 바퀴가 구른다(동작)'로 따로따로 분석하는 것과 같아. 이렇게 나눠서 보면 어디서 문제가 생겼는지 훨씬 빨리 찾을 수 있어.", "why": "", "term_focus": [], "connections": [], "types": null, "mnemonic": "🚗 '기구동' 세 글자만 기억해! → **기**능(뭘 하나) - **구**조(어떻게 생겼나) - **동**작(어떻게 움직이나). '자동차가 기가 막히게 구동한다!'로 외워봐!", "trap": "", "table": [], "sources": [], "priority": 2}, {"title": "MBO를 기업에서 도입하는 이유", "keywords": [], "summary": "", "background": "옛날에 회사에서 사장님이 '열심히 해!'라고만 하면 직원들이 뭘 어떻게 해야 할지 몰라서 다들 그냥 바쁜 척만 했어. 그래서 '목표를 딱 정해놓고 그걸 달성했는지 보자!'는 방식이 필요해졌지.", "explanation": "MBO(목표에 의한 관리)는 학교에서 선생님이 '이번 달 수학 80점 이상 받아라'고 목표를 정해주는 것과 같아. 막연하게 '공부 열심히 해'가 아니라 구체적인 목표가 생기니까 학생도 어떻게 해야 할지 알고, 선생님도 잘했는지 못했는지 딱 판단할 수 있잖아. 회사도 이렇게 하면 직원마다 명확한 목표가 생겨서 성과를 공정하게 평가할 수 있어.", "why": "", "term_focus": [], "connections": [], "types": null, "mnemonic": "MBO = '목표 박아, 평가해!' — M(목표), B(박고), O(OK평가) 순서로 기억해!", "trap": "", "table": [], "sources": [], "priority": 2}, {"title": "MBOS의 구성요소", "keywords": [], "summary": "", "background": "옛날에 회사에서 상사 혼자 목표를 정해서 직원들한테 통보하다 보니, 직원들이 그 목표에 공감 못 하고 그냥 시키는 일만 하는 문제가 생겼어. 그래서 상사랑 직원이 함께 목표를 정하고 같이 달성해나가는 방식인 MBO가 등장했어.", "explanation": "MBO는 쉽게 말해 '목표를 같이 정하고, 같이 달리고, 같이 평가하는 것'이야. 예를 들어 체육대회 준비할 때 선생님 혼자 계획 세우는 게 아니라 학생들이랑 같이 '이번엔 릴레이 1등 해보자!'고 목표를 정하고, 연습하고, 결과를 함께 돌아보는 느낌이지. 이렇게 하면 구성원이 목표에 스스로 책임감을 갖고 더 열심히 하게 돼.", "why": "", "term_focus": [], "connections": [], "types": {"caption": "MBO(Management By Objective, 목표관리 체계)는 개인의 직무성과와 능력향상을 위한 경영관리 기법. Bottom-UP 방식으로 달성목표를 설정하며 상급자와 협의를 거친다. 3가지 핵심 구성요소.", "items": [{"name": "목표의 설정", "en": "Setting of Objectives", "note": "측정 가능하고 구체적이며 달성 가능해야 함. 매년 지속적으로 개선되는 방향으로 수립되어야 하며, 조직의 목표와 능력범위 내에서 설정되어야 한다."}, {"name": "참여", "en": "Participation", "note": "목표설정과 수행과정에서 구성원 간에 상호작용이 있어야 함. 상급자·관리자와 협의 과정을 거쳐야 한다."}, {"name": "피드백", "en": "Feedback", "note": "목표와 평가가 상호 연계될 수 있어야 함. 개인의 직무수행을 지속적으로 개선할 수 있도록 모니터링하는 평가기간 전 피드백을 거쳐 이루어져야 한다."}]}, "mnemonic": "MBO = '같이 M(만들고) B(보고) O(올라가자!)' — 목표를 함께 만들고, 함께 보고, 함께 올라가는 것!", "trap": "", "table": [], "sources": [{"title": "TOPCIT ESSENCE ver.3 — IT 비즈니스와 윤리", "note": "정보통신산업진흥원(NIPA) 공식 교재"}], "priority": 3}, {"title": "IT 비즈니스 환경변화의 이해", "keywords": [], "summary": "", "background": "옛날에는 그냥 물건 잘 만들면 잘 팔렸는데, 세계 경제가 흔들리고 중국·인도 같은 나라들이 치고 올라오면서 기업들이 '예전처럼만 하면 망한다'는 걸 깨달았어. 환율도 오르락내리락하고 각 나라가 자국 기업 보호하려고 문을 걸어 잠그니까, 기업들이 살아남으려면 완전히 새로운 전략이 필요해진 거야.", "explanation": "마치 동네 분식집이 잘 되다가 갑자기 주변에 대형 프랜차이즈가 우르르 생기고, 재료값은 오르고, 손님은 줄어드는 상황이라고 생각해봐. 이때 그냥 가만히 있으면 망하니까 배달도 시작하고, 떡볶이 말고 다른 메뉴도 넣는 것처럼 기업들도 새로운 기술로 신사업을 만들거나 제조업에서 서비스업으로 확장하는 전략을 쓰는 거야. 한마디로 세상이 빠르게 변하니까 기업도 같이 변해야 살아남는다는 이야기야.", "why": "", "term_focus": [], "connections": [], "types": null, "mnemonic": "🌍 '저글보전' — 저(저성장) + 글(글로벌 보호주의) + 보(보호주의 확산) + 전(전문화·전략 변화) → '세상이 저글보전(저글링)하듯 복잡하게 돌아가니 기업도 재주를 부려야 한다!'", "trap": "", "table": [], "sources": [], "priority": 3}, {"title": "IT 비즈니스 통합과 확산", "keywords": [], "summary": "", "background": "옛날에는 기업들이 각자 따로따로 경쟁했는데, 점점 상품이 복잡해지고 혼자서는 다 못 만드는 상황이 됐어. 그래서 여러 기업들이 하나의 공통 기반(플랫폼) 위에 모여서 함께 생태계를 이루며 경쟁하는 방식이 생겨난 거야.", "explanation": "비즈니스 플랫폼은 마치 '놀이공원 부지'랑 같아. 부지(플랫폼) 하나가 있으면, 거기에 롤러코스터도 세우고 식당도 들어오고 기념품 가게도 생기잖아. 혼자 다 만드는 게 아니라 여러 가게(기업)들이 그 부지를 공통으로 쓰면서 손님(소비자)을 끌어모으는 거야. 애플 앱스토어가 딱 이거야 — 애플이 판(플랫폼)을 깔아두면, 수많은 앱 개발자들이 올라타서 같이 돈을 버는 구조지.", "why": "", "term_focus": [], "connections": [], "types": null, "mnemonic": "플랫폼 = '판 깔면 다 모인다' 🎪 → 판(기반) 하나에 공급자·소비자·기업이 다 모여서 생태계가 된다!", "trap": "", "table": [], "sources": [], "priority": 3}, {"title": "모바일 서비스", "keywords": [], "summary": "", "background": "옛날엔 길을 찾으려면 무거운 종이 지도를 들고 다니거나 사람한테 직접 물어봐야 했어. 그러다 스마트폰이 퍼지면서 '내가 지금 어디 있는지'를 자동으로 알 수 있게 되니까, 이 위치 정보를 활용한 다양한 서비스들이 폭발적으로 생겨났지.", "explanation": "위치기반 서비스는 쉽게 말해 '네가 어디 있는지 알고 맞춤 도움을 주는 것'이야. 예를 들어 배달 앱에서 내 근처 치킨집을 찾아주거나, 게임 포켓몬GO에서 실제 내 동네에 포켓몬이 나타나는 게 다 이 기술 덕분이야. 스마트폰이 기지국, GPS, 와이파이 신호를 종합해서 내 위치를 파악하고 지도랑 합쳐서 쇼핑, 게임, 광고 등 다양한 서비스로 연결해주는 거야.", "why": "", "term_focus": [], "connections": [], "types": null, "mnemonic": "위치기반 서비스 = '나 여기 있어!' → 줄여서 'LBS(Location Based Service)' = '길 보여줘(L), 밥집 알려줘(B), 스마트하게(S)' 3단어로 기억해!", "trap": "", "table": [], "sources": [], "priority": 4}, {"title": "KPI의 개요", "keywords": ["신규고객", "아웃소싱이", "기본활동", "집중화된", "서네스", "추가", "기능", "대상", "정보자원", "지속적", "제품", "대안"], "summary": "", "background": "회사나 팀이 잘 되고 있는지 파악하려면 뭔가 숫자로 측정할 수 있는 기준이 필요했어. 그냥 '열심히 했어요~'로는 성과를 판단하기 어려우니까, 중요한 목표를 숫자로 나타내는 방법이 필요해진 거야.", "explanation": "KPI는 쉽게 말해 '성적표의 핵심 과목'이야. 예를 들어 학생한테 중요한 게 수학이랑 영어라면, 그 두 과목 점수가 KPI인 거지. 회사도 마찬가지로 '월 매출 1억', '고객 만족도 90%' 같은 핵심 숫자를 정해놓고, 그게 달성됐는지 보면서 잘하고 있는지 체크하는 거야.", "why": "", "term_focus": [], "connections": [], "types": null, "mnemonic": "KPI = '칼같이 Point 측정!' — 중요한 것만 칼같이 골라서 점수로 측정한다!", "trap": "", "table": [], "sources": [], "priority": 2}, {"title": "KPI 수립 절차", "keywords": ["신규고객", "아웃소싱이", "기본활동", "집중화된", "서네스", "추가", "기능", "대상", "정보자원", "지속적", "제품", "대안"], "summary": "", "background": "회사가 커질수록 '우리가 잘하고 있는 건지' 어떻게 알 수 있을지 막막해지는 문제가 생겼어. 그래서 목표를 숫자나 기준으로 딱 정해서 성과를 측정하는 KPI라는 개념이 생기게 됐어.", "explanation": "KPI 수립 절차는 마치 학교에서 시험 범위 정하는 것과 비슷해. 먼저 '어느 과목을 시험 볼지(영역 정의)' 정하고, '선생님이랑 학생한테 물어보고(인터뷰)', 그 결과를 분석해서 '핵심 문제 유형(KPI 후보)을 뽑고', 마지막으로 '최종 시험 문제(KPI 확정)'를 완성하는 순서야.", "why": "", "term_focus": [], "connections": [], "types": null, "mnemonic": "영인분도기 → '영'역 정의 → '인'터뷰 → '분'석 → '도'출 → '기'준 설정! '영인분도기'만 기억해!", "trap": "", "table": [], "sources": [], "priority": 2}, {"title": "KPI 도출 시 유의사항", "keywords": ["신규고객", "아웃소싱이", "기본활동", "집중화된", "서네스", "추가", "기능", "대상", "정보자원", "지속적", "제품", "대안"], "summary": "", "background": "옛날에 회사들이 성과 지표를 만들 때 현장 중간 관리자들끼리 알아서 만들다 보니 회사 전체 방향이랑 전혀 안 맞는 지표가 나오는 문제가 생겼어. 또 잘나가는 다른 회사 지표를 그냥 베껴 쓰다가 정작 자기 회사 목표랑 안 맞아서 헛수고를 하는 일도 많았지.", "explanation": "KPI는 회사가 '우리 잘하고 있나?' 체크하는 성적표 같은 건데, 이걸 만들 때 두 가지를 꼭 지켜야 해. 첫째, 반장(중간관리자)한테만 맡기면 안 되고 교장 선생님(경영진)이 직접 참여해서 학교 전체 목표를 반영해야 하고, 둘째, 전교 1등 친구 공부법이 나한테 무조건 맞는 건 아니듯이 다른 회사 KPI를 그냥 베끼면 안 되고 우리 회사 상황에 맞게 만들어야 해.", "why": "", "term_focus": [], "connections": [], "types": null, "mnemonic": "KPI 유의사항 = '위(경영진 참여) + 창(창의적으로, 모방 금지)' → '위에서 직접 창조해라!'", "trap": "", "table": [], "sources": [], "priority": 3}];
+const PRIO_LABEL = {1:'최우선', 2:'중요', 3:'보통', 4:'보조'};
+let curTab = 'all';
+let curPrio = 'all';
+let curLessonIdx = -1;
+let curPage = 0;
+let pages = [];
+
+function filterTab(btn, ch) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  curTab = ch;
+  applyFilters();
+}
+
+function filterPrio(btn) {
+  document.querySelectorAll('.pchip').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  curPrio = btn.dataset.prio;
+  applyFilters();
+}
+
+function applyFilters() {
+  const q = document.querySelector('.search').value.toLowerCase();
+  document.querySelectorAll('.section-group').forEach(grp => {
+    const chOk = curTab === 'all' || grp.dataset.chapter === curTab;
+    grp.classList.toggle('hidden', !chOk);
+    if (chOk) {
+      let any = false;
+      grp.querySelectorAll('.card').forEach(c => {
+        const qOk = !q || c.textContent.toLowerCase().includes(q);
+        const pOk = curPrio === 'all' || c.dataset.prio === curPrio;
+        const show = qOk && pOk;
+        c.classList.toggle('hidden-card', !show);
+        if (show) any = true;
+      });
+      if (q || curPrio !== 'all') grp.classList.toggle('hidden', !any);
+    }
+  });
+}
+
+function escHtml(str) {
+  return (str || '').replace(/[&<>"]/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[ch]);
+}
+
+function splitMnemonic(text) {
+  return (text || '')
+    .replace(/\r\n/g, '\n')
+    .replace(/\s+\/\s+/g, '\n')
+    .replace(/\s+vs\.\s+/gi, '\n')
+    .replace(/\s+→\s+/g, ' → ')
+    .replace(/\s+↔\s+/g, ' ↔ ')
+    .replace(/\.\s+/g, '.\n')
+    .replace(/다\.\s+/g, '다.\n')
+    .replace(/됨\.\s+/g, '됨.\n')
+    .split(/\n+/)
+    .map(line => line.trim())
+    .filter(Boolean);
+}
+
+function mnemonicIcon(tag, text) {
+  if (tag) return '◈';
+  if (text.includes('↔') || text.includes('=')) return '⇄';
+  if (text.includes('→')) return '→';
+  return '•';
+}
+
+function renderParagraph(text) {
+  return escHtml(text || '').replace(/\n/g, '<br>');
+}
+
+function renderFactSection(label, secClass, items) {
+  if (!items || !items.length) return '';
+  const html = items.map(item => `
+    <div class="fact-item">
+      ${item.label ? `<div class="fact-link-label">${escHtml(item.label)}</div>` : ''}
+      <div class="fact-term">${escHtml(item.term || '')}</div>
+      <div class="fact-note">${renderParagraph(item.note || '')}</div>
+    </div>`).join('');
+  return `<div class="sec ${secClass}"><div class="sec-label">${label}</div><div class="fact-list">${html}</div></div>`;
+}
+
+function renderTypesSection(types) {
+  if (!types) return '';
+  const items = Array.isArray(types) ? types : (types.items || []);
+  if (!items.length) return '';
+  const caption = !Array.isArray(types) && types.caption ? types.caption : '';
+  const scale = !Array.isArray(types) ? (types.scale || '') : '';
+  const scaleLabels = {
+    'strong-to-weak': ['강함','약함','reverse'],
+    'weak-to-strong': ['약함','강함',''],
+  };
+  const tierClass = {
+    'strong': 'tier-strong',
+    'mid': 'tier-mid',
+    'weak': 'tier-weak',
+  };
+  const tierLabel = {
+    'strong': '강함',
+    'mid': '중간',
+    'weak': '약함',
+  };
+  const rows = items.map(it => {
+    const tierCls = it.tier && tierClass[it.tier] ? tierClass[it.tier] : '';
+    const tierLbl = it.tier && tierLabel[it.tier] ? tierLabel[it.tier] : (it.tier || '');
+    return `
+      <div class="type-item">
+        <div class="type-body">
+          <div class="type-head">
+            <span class="type-name">${escHtml(it.name || '')}</span>
+            ${it.en ? `<span class="type-en">${escHtml(it.en)}</span>` : ''}
+            ${tierCls ? `<span class="type-tier ${tierCls}">${escHtml(tierLbl)}</span>` : ''}
+          </div>
+          <div class="type-note">${renderParagraph(it.note || '')}</div>
+        </div>
+      </div>`;
+  }).join('');
+  let scaleHtml = '';
+  if (scale && scaleLabels[scale]) {
+    const [L, R, rev] = scaleLabels[scale];
+    scaleHtml = `<div class="types-scale ${rev}"><span>${L}</span><span class="scale-arrow"></span><span>${R}</span></div>`;
+  }
+  return `<div class="sec sec-types">
+    <div class="sec-label">🗂️ 유형</div>
+    ${caption ? `<div class="types-caption">${renderParagraph(caption)}</div>` : ''}
+    <div class="types-list">${rows}</div>
+    ${scaleHtml}
+  </div>`;
+}
+
+function renderSourceSection(sources) {
+  if (!sources || !sources.length) return '';
+  const html = sources.map(src => {
+    const hasUrl = !!src.url;
+    let host = '';
+    if (hasUrl) {
+      try { host = new URL(src.url).hostname.replace(/^www\./, ''); } catch (_err) { host = ''; }
+    }
+    const inner = `
+        <span class="src-bullet">↗</span>
+        <span class="src-text">
+          ${escHtml(src.title || src.url || '')}
+          ${src.note ? `<span class="src-host">${escHtml(src.note)}</span>` : ''}
+          ${!src.note && host ? `<span class="src-host">${escHtml(host)}</span>` : ''}
+        </span>`;
+    if (hasUrl) {
+      return `<a class="src-link" href="${escHtml(src.url)}" target="_blank" rel="noreferrer">${inner}</a>`;
+    }
+    return `<div class="src-link">${inner}</div>`;
+  }).join('');
+  return `<div class="sec sec-src"><div class="sec-label">🔗 출처</div><div class="src-list">${html}</div></div>`;
+}
+
+function renderMnemonic(text) {
+  const lines = splitMnemonic(text);
+  if (!lines.length) return '';
+  const html = lines.map(line => {
+    const m = line.match(/^【([^】]+)】\s*(.*)$/);
+    const tag = m ? m[1].trim() : '';
+    const body = (m ? m[2] : line).trim();
+    const safeBody = escHtml(body).replace(/'([^']+)'/g, '<strong>$1</strong>');
+    return `
+      <div class="mn-line">
+        <span class="mn-picto">${mnemonicIcon(tag, body)}</span>
+        <div class="mn-main">
+          ${tag ? `<span class="mn-tag">${escHtml(tag)}</span>` : ''}
+          <div class="mn-text">${safeBody}</div>
+        </div>
+      </div>`;
+  }).join('');
+  return `<div class="sec sec-mn"><div class="sec-label">🧠 5초 암기</div><div class="mn-list">${html}</div></div>`;
+}
+
+function buildPages(lesson) {
+  return [
+    { type: 'learn', data: lesson },
+    { type: 'done',  data: lesson },
+  ];
+}
+
+function renderPage() {
+  const body = document.getElementById('l-body');
+  const page = pages[curPage];
+  body.innerHTML = '';
+  body.scrollTop = 0;
+
+  const wrap = document.createElement('div');
+  wrap.className = 'l-page';
+
+  if (page.type === 'learn') {
+    const d = page.data;
+    let h = '';
+    h += `<h1 class="l-page-title">${escHtml(d.title)}</h1>`;
+    const metaBits = [];
+    if (d.priority && PRIO_LABEL[d.priority]) {
+      metaBits.push(`<span class="chip chip-prio-${d.priority}">P${d.priority} · ${PRIO_LABEL[d.priority]}</span>`);
+    }
+    if (metaBits.length) h += `<div class="l-page-meta">${metaBits.join('')}</div>`;
+    if (d.keywords && d.keywords.length) {
+      h += `<div class="l-page-kw">${d.keywords.map(k => `<span>★ ${escHtml(k)}</span>`).join('')}</div>`;
+    }
+    if (d.summary)     h += `<div class="sec sec-summary"><div class="sec-label">📌 한 줄 요약</div><p>${renderParagraph(d.summary)}</p></div>`;
+    if (d.background)  h += `<div class="sec sec-bg"><div class="sec-label">📜 배경·맥락</div><p>${renderParagraph(d.background)}</p></div>`;
+    if (d.explanation) h += `<div class="sec sec-expl"><div class="sec-label">📖 핵심 설명</div><p>${renderParagraph(d.explanation)}</p></div>`;
+    if (d.types)       h += renderTypesSection(d.types);
+    if (d.why)         h += `<div class="sec sec-why"><div class="sec-label">🔍 왜 이렇게 됐나</div><p>${renderParagraph(d.why)}</p></div>`;
+    if (d.term_focus && d.term_focus.length)   h += renderFactSection('🈶 용어·한자 풀이', 'sec-term', d.term_focus);
+    if (d.connections && d.connections.length) h += renderFactSection('🧭 앞뒤 흐름 연결', 'sec-link', d.connections);
+    if (d.mnemonic)    h += renderMnemonic(d.mnemonic);
+    if (d.trap)        h += `<div class="sec sec-trap"><div class="sec-label">⚠️ 시험 함정</div><p>${renderParagraph(d.trap)}</p></div>`;
+    if (d.table && d.table.length) {
+      const cols = Object.keys(d.table[0]);
+      const head = cols.map(c => `<th>${escHtml(c)}</th>`).join('');
+      const rows = d.table.map(r => '<tr>' + cols.map(c => `<td>${escHtml(r[c] || '')}</td>`).join('') + '</tr>').join('');
+      h += `<div class="sec sec-summary" style="padding:0;background:transparent;border:none">
+        <div class="sec-label" style="padding-left:.3rem;color:#6b7280;margin-bottom:.5rem">📊 정리표</div>
+        <table class="ctable"><thead><tr>${head}</tr></thead><tbody>${rows}</tbody></table>
+      </div>`;
+    }
+    if (d.sources && d.sources.length) h += renderSourceSection(d.sources);
+    wrap.innerHTML = h;
+  }
+  else if (page.type === 'done') {
+    const d = page.data;
+    const hasNext = curLessonIdx + 1 < LESSONS.length;
+    wrap.innerHTML = `
+      <div class="done-page">
+        <div class="done-emoji">🎉</div>
+        <div class="done-title">레슨 완료!</div>
+        <div class="done-sub">${escHtml(d.title)}</div>
+        <div class="done-actions">
+          ${hasNext ? '<button class="done-btn done-btn-primary" onclick="startLesson(' + (curLessonIdx + 1) + ')">다음 개념 →</button>' : ''}
+          <button class="done-btn done-btn-sub" onclick="exitLesson()">목록으로 돌아가기</button>
+        </div>
+      </div>`;
+  }
+
+  body.appendChild(wrap);
+
+  document.getElementById('l-page-ind').textContent = `${curPage + 1} / ${pages.length}`;
+  document.getElementById('l-progress-bar').style.width = `${((curPage + 1) / pages.length) * 100}%`;
+  document.getElementById('l-prev').disabled = curPage === 0;
+  document.getElementById('l-next').disabled = curPage === pages.length - 1;
+  document.getElementById('l-next').textContent = curPage === pages.length - 2 ? '완료 🎉' : '다음 →';
+}
+
+function startLesson(idx) {
+  if (idx < 0 || idx >= LESSONS.length) return;
+  curLessonIdx = idx;
+  curPage = 0;
+  pages = buildPages(LESSONS[idx]);
+  document.getElementById('l-title').textContent = LESSONS[idx].title;
+  document.getElementById('lesson').classList.add('show');
+  document.body.style.overflow = 'hidden';
+  renderPage();
+}
+
+function exitLesson() {
+  document.getElementById('lesson').classList.remove('show');
+  document.body.style.overflow = '';
+  curLessonIdx = -1;
+}
+
+function nextPage() { if (curPage < pages.length - 1) { curPage++; renderPage(); } }
+function prevPage() { if (curPage > 0) { curPage--; renderPage(); } }
+
+document.addEventListener('keydown', e => {
+  if (curLessonIdx < 0) return;
+  if (e.key === 'ArrowLeft')  prevPage();
+  if (e.key === 'ArrowRight') nextPage();
+  if (e.key === 'Escape')     exitLesson();
+});
+</script>
+</body>
+</html>

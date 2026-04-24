@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>TOPCIT 03-03 임베디드 시스템</title>
+<style>
+:root{--font-sans:"Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",system-ui,sans-serif;--font-serif:"NanumMyeongjo","Nanum Myeongjo","Batang","Apple SD Gothic Neo",serif}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{overflow-x:hidden}
+body{font-family:var(--font-sans);background:#f7f8fb;color:#1f2937;min-height:100vh}
+
+.header{background:#7c3aed;color:#fff;padding:.85rem 1.25rem;display:flex;align-items:center;gap:.75rem;position:sticky;top:0;z-index:20;box-shadow:0 2px 10px rgba(0,0,0,.15)}
+.header-back{color:#fff;text-decoration:none;font-size:1.2rem;opacity:.85}
+.header h1{font-size:1rem;font-weight:800;flex:1;font-family:var(--font-serif)}
+.header-cnt{font-size:.75rem;opacity:.8;white-space:nowrap}
+
+.search-wrap{padding:.7rem 1.25rem .3rem}
+.search{width:100%;padding:.6rem 1rem;border:2px solid #e2e8f0;border-radius:2rem;font-size:.88rem;outline:none;background:#fff;transition:border .2s}
+.search:focus{border-color:#7c3aed}
+
+.tabs{display:flex;gap:.35rem;padding:.4rem 1.25rem .3rem;overflow-x:auto;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tab{flex-shrink:0;padding:.32rem .8rem;border-radius:2rem;border:1.5px solid #7c3aed;background:#fff;color:#7c3aed;font-size:.74rem;font-weight:700;cursor:pointer;white-space:nowrap;transition:all .15s;font-family:inherit}
+.tab.active,.tab:hover{background:#7c3aed;color:#fff}
+
+.prio-bar{display:flex;gap:.3rem;padding:.2rem 1.25rem .6rem;overflow-x:auto;scrollbar-width:none}
+.prio-bar::-webkit-scrollbar{display:none}
+.pchip{flex-shrink:0;padding:.28rem .7rem;border-radius:2rem;border:1.5px solid #e5e7eb;background:#fff;color:#475569;font-size:.72rem;font-weight:700;cursor:pointer;white-space:nowrap;transition:all .15s;font-family:inherit}
+.pchip:hover{border-color:var(--pc,#9ca3af);color:#111827}
+.pchip.active{background:var(--pc,#7c3aed);border-color:var(--pc,#7c3aed);color:#fff}
+.pchip[data-prio="all"].active{background:#7c3aed;border-color:#7c3aed;color:#fff}
+
+.section-group{padding:.3rem 1.25rem .8rem}
+.section-group.hidden{display:none}
+.section-label{font-size:.72rem;font-weight:800;color:#5b21b6;letter-spacing:.04em;padding:.4rem 0 .35rem;border-bottom:2px solid #7c3aed33;margin-bottom:.55rem;font-family:var(--font-serif)}
+.card-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:.55rem}
+@media(min-width:540px){.card-grid{grid-template-columns:repeat(3,1fr)}}
+@media(min-width:900px){.card-grid{grid-template-columns:repeat(4,1fr)}}
+@media(min-width:1200px){.card-grid{grid-template-columns:repeat(5,1fr)}}
+.card{background:#fff;border-radius:.7rem;padding:.85rem .8rem .65rem;cursor:pointer;border:1.5px solid #e5e7eb;transition:all .18s;box-shadow:0 1px 3px rgba(0,0,0,.04);position:relative;display:flex;flex-direction:column;gap:.35rem;min-height:9rem}
+.card:hover{border-color:#7c3aed;box-shadow:0 4px 14px #7c3aed33;transform:translateY(-2px)}
+.card-badges{position:absolute;top:.45rem;right:.5rem;display:flex;gap:.2rem;font-size:.64rem}
+.card-badges span{padding:.1rem .42rem;border-radius:.4rem;font-weight:700;line-height:1.4;white-space:nowrap}
+.b-prio-1{background:#fee2e2;color:#991b1b}
+.b-prio-2{background:#fef3c7;color:#92400e}
+.b-prio-3{background:#dcfce7;color:#166534}
+.b-prio-4{background:#f1f5f9;color:#475569}
+.b-mn{background:#ede9fe;color:#5b21b6}
+.card-title{font-size:.86rem;font-weight:700;color:#111827;line-height:1.35;padding-right:4.5rem;font-family:var(--font-serif)}
+.card-preview{font-size:.7rem;color:#6b7280;line-height:1.5;flex:1}
+.card-cta{font-size:.68rem;color:#7c3aed;font-weight:700;text-align:right;margin-top:.25rem}
+.card.hidden-card{display:none!important}
+
+/* ───────── 레슨 모드 (풀스크린) ───────── */
+.lesson{display:none;position:fixed;inset:0;background:#f7f8fb;z-index:1000;flex-direction:column}
+.lesson.show{display:flex}
+.l-head{background:#7c3aed;color:#fff;padding:.7rem 1rem;display:flex;align-items:center;gap:.7rem;flex-shrink:0}
+.l-back{background:none;border:none;color:#fff;font-size:1.3rem;cursor:pointer;padding:0;line-height:1;opacity:.9}
+.l-title{flex:1;font-size:.92rem;font-weight:800;font-family:var(--font-serif);line-height:1.3;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.l-page-ind{font-size:.78rem;font-weight:700;background:rgba(0,0,0,.18);padding:.18rem .55rem;border-radius:1rem;flex-shrink:0}
+.l-progress{height:4px;background:rgba(0,0,0,.15);flex-shrink:0}
+.l-progress-bar{height:100%;background:#fff;width:0%;transition:width .3s ease}
+.l-body{flex:1;overflow-y:auto;padding:1.2rem 1.25rem 5rem;display:flex;flex-direction:column;gap:1rem;align-items:center}
+.l-page{width:100%;max-width:680px;animation:slideIn .25s ease}
+@keyframes slideIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+.l-page-title{font-size:1.5rem;font-weight:800;color:#5b21b6;margin-bottom:.5rem;font-family:var(--font-serif);line-height:1.3}
+.l-page-meta{display:flex;flex-wrap:wrap;gap:.35rem;margin-bottom:.85rem}
+.l-page-meta .chip{padding:.18rem .55rem;border-radius:1rem;font-size:.7rem;font-weight:700}
+.chip-prio-1{background:#fee2e2;color:#991b1b}
+.chip-prio-2{background:#fef3c7;color:#92400e}
+.chip-prio-3{background:#dcfce7;color:#166534}
+.chip-prio-4{background:#f1f5f9;color:#475569}
+.l-page-kw{display:flex;flex-wrap:wrap;gap:.3rem;margin-bottom:1.2rem}
+.l-page-kw span{background:#7c3aed22;color:#5b21b6;border:1px solid #7c3aed55;border-radius:1rem;padding:.18rem .65rem;font-size:.72rem;font-weight:700}
+
+.sec{border-radius:.7rem;padding:1rem 1.1rem;line-height:1.65;margin-bottom:.85rem}
+.sec-summary{background:#7c3aed11;border-left:5px solid #7c3aed;font-size:.95rem;color:#111827;font-weight:600}
+.sec-bg{background:#fef7ec;border-left:5px solid #d97706}
+.sec-expl{background:#eef2ff;border-left:5px solid #4f46e5}
+.sec-why{background:#ecfdf5;border-left:5px solid #059669}
+.sec-term{background:#faf5ff;border-left:5px solid #7c3aed}
+.sec-link{background:#fff7ed;border-left:5px solid #c2410c}
+.sec-mn{background:linear-gradient(145deg,#fffef5 0%,#fff7d6 56%,#7c3aed20 100%);color:#1f2937;font-weight:600;border:1.5px solid #7c3aed33;border-left:5px solid #7c3aed;box-shadow:0 10px 26px #7c3aed14}
+.sec-trap{background:#fff1f2;border:1.5px solid #fda4af;border-left:5px solid #e11d48;color:#881337}
+.sec-src{background:#fff;border:1.5px solid #e5e7eb;border-left:5px solid #475569}
+.sec-types{background:#f0f9ff;border:1.5px solid #bae6fd;border-left:5px solid #0284c7}
+.sec-types .sec-label{color:#075985}
+.types-caption{font-size:.8rem;color:#334155;margin-bottom:.6rem;line-height:1.55}
+.types-list{display:flex;flex-direction:column;gap:.55rem;counter-reset:tc}
+.type-item{display:grid;grid-template-columns:2rem 1fr;gap:.55rem;align-items:start;background:#fff;border:1px solid #e0f2fe;border-radius:.7rem;padding:.7rem .78rem;counter-increment:tc;position:relative}
+.type-item::before{content:counter(tc);display:inline-flex;align-items:center;justify-content:center;width:1.7rem;height:1.7rem;border-radius:.5rem;background:#7c3aed16;color:#5b21b6;font-size:.8rem;font-weight:800;line-height:1}
+.type-body{min-width:0}
+.type-head{display:flex;flex-wrap:wrap;gap:.35rem;align-items:center;margin-bottom:.2rem}
+.type-name{font-size:.92rem;font-weight:800;color:#0f172a;font-family:var(--font-serif)}
+.type-en{font-size:.72rem;color:#64748b;font-weight:700}
+.type-tier{display:inline-flex;align-items:center;padding:.08rem .42rem;border-radius:999px;font-size:.62rem;font-weight:800;letter-spacing:.04em}
+.tier-strong{background:#fee2e2;color:#991b1b}
+.tier-mid{background:#fef3c7;color:#92400e}
+.tier-weak{background:#dcfce7;color:#166534}
+.type-note{font-size:.86rem;line-height:1.68;color:#334155;word-break:keep-all}
+.types-scale{display:flex;align-items:center;gap:.45rem;margin-top:.65rem;padding:.5rem .7rem;background:rgba(255,255,255,.7);border:1px dashed #bae6fd;border-radius:.6rem;font-size:.72rem;color:#475569;font-weight:700}
+.types-scale .scale-arrow{flex:1;height:6px;border-radius:999px;background:linear-gradient(90deg,#16a34a,#d97706,#dc2626)}
+.types-scale.reverse .scale-arrow{background:linear-gradient(90deg,#dc2626,#d97706,#16a34a)}
+.sec-label{font-size:.7rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;margin-bottom:.5rem}
+.sec-bg .sec-label{color:#92400e}
+.sec-expl .sec-label{color:#3730a3}
+.sec-why .sec-label{color:#065f46}
+.sec-term .sec-label{color:#5b21b6}
+.sec-link .sec-label{color:#9a3412}
+.sec-mn .sec-label{color:#5b21b6}
+.sec-trap .sec-label{color:#9f1239}
+.sec-summary .sec-label{color:#7c3aed}
+.sec-src .sec-label{color:#334155}
+.sec p{font-size:.92rem;line-height:1.7}
+.sec-mn p{font-size:.98rem}
+.fact-list{display:flex;flex-direction:column;gap:.65rem}
+.fact-item{background:rgba(255,255,255,.85);border:1px solid rgba(0,0,0,.06);border-radius:.85rem;padding:.78rem .85rem}
+.fact-term{font-size:.86rem;font-weight:800;color:#111827;margin-bottom:.22rem}
+.fact-note{font-size:.9rem;line-height:1.72;color:#374151;word-break:keep-all}
+.fact-link-label{display:inline-flex;align-items:center;padding:.12rem .45rem;border-radius:999px;background:#7c3aed14;color:#5b21b6;font-size:.64rem;font-weight:800;letter-spacing:.04em;margin-bottom:.38rem}
+.src-list{display:flex;flex-direction:column;gap:.5rem}
+.src-link{display:flex;align-items:flex-start;gap:.45rem;text-decoration:none;color:#111827;background:#f9fafb;border:1px solid #e5e7eb;border-radius:.8rem;padding:.72rem .82rem;transition:border-color .15s,transform .15s}
+.src-link:hover{border-color:#7c3aed;transform:translateY(-1px)}
+.src-bullet{flex-shrink:0;color:#7c3aed;font-weight:800}
+.src-text{font-size:.85rem;line-height:1.55}
+.src-host{display:block;font-size:.72rem;color:#6b7280;margin-top:.1rem}
+.mn-list{display:flex;flex-direction:column;gap:.55rem}
+.mn-line{display:flex;align-items:flex-start;gap:.72rem;background:rgba(255,255,255,.82);border:1px solid #7c3aed22;border-radius:.9rem;padding:.72rem .8rem .68rem;box-shadow:0 4px 12px rgba(0,0,0,.04)}
+.mn-picto{flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;width:1.6rem;height:1.6rem;border-radius:.45rem;background:#7c3aed16;border:1px solid #7c3aed26;font-size:.76rem;font-weight:800;line-height:1;color:#5b21b6}
+.mn-main{display:flex;flex-direction:column;gap:.28rem;min-width:0}
+.mn-tag{display:inline-flex;align-items:center;width:fit-content;padding:.12rem .45rem;border-radius:999px;background:#7c3aed18;color:#5b21b6;font-size:.64rem;font-weight:800;letter-spacing:.05em}
+.mn-text{font-size:.95rem;line-height:1.76;color:#1f2937;word-break:keep-all}
+.mn-text strong{color:#7c3aed;font-weight:800}
+
+.ctable{width:100%;border-collapse:collapse;font-size:.82rem;background:#fff;border-radius:.5rem;overflow:hidden;margin-top:.4rem}
+.ctable th{background:#7c3aed;color:#fff;padding:.55rem .65rem;text-align:left;font-weight:700;font-size:.78rem}
+.ctable td{padding:.55rem .65rem;border-top:1px solid #e5e7eb;vertical-align:top;line-height:1.55}
+.ctable tr:nth-child(even) td{background:#f9fafb}
+
+.done-page{text-align:center;padding:2.5rem 1rem}
+.done-emoji{font-size:4.5rem;margin-bottom:1rem;animation:pop .4s ease}
+@keyframes pop{from{transform:scale(0)}80%{transform:scale(1.2)}to{transform:scale(1)}}
+.done-title{font-size:1.5rem;font-weight:800;color:#5b21b6;margin-bottom:.5rem;font-family:var(--font-serif)}
+.done-sub{font-size:.95rem;color:#6b7280;margin-bottom:2rem}
+.done-actions{display:flex;flex-direction:column;gap:.6rem;max-width:300px;margin:0 auto}
+.done-btn{padding:.85rem 1.4rem;border-radius:.7rem;font-size:.95rem;font-weight:700;cursor:pointer;border:none;font-family:inherit;transition:all .15s}
+.done-btn-primary{background:#7c3aed;color:#fff}
+.done-btn-primary:hover{transform:translateY(-2px);box-shadow:0 4px 14px #7c3aed55}
+.done-btn-sub{background:#fff;color:#7c3aed;border:1.5px solid #7c3aed}
+.done-btn-sub:hover{background:#7c3aed11}
+
+.l-foot{position:fixed;bottom:0;left:0;right:0;background:#fff;padding:.7rem 1rem;display:flex;gap:.5rem;border-top:1px solid #e5e7eb;z-index:1010}
+.l-nav-btn{flex:1;padding:.7rem;border-radius:.55rem;border:1.5px solid #7c3aed;background:#fff;color:#7c3aed;font-size:.88rem;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s}
+.l-nav-btn:hover:not(:disabled){background:#7c3aed11}
+.l-nav-btn:disabled{opacity:.35;cursor:not-allowed}
+.l-nav-btn.primary{background:#7c3aed;color:#fff;border-color:#7c3aed}
+.l-nav-btn.primary:hover:not(:disabled){background:#5b21b6;border-color:#5b21b6}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <a href="../" class="header-back">←</a>
+  <span style="font-size:1.2rem">🏗️</span>
+  <h1><span style="opacity:.7;font-size:.85em">03</span> &nbsp;임베디드 시스템</h1>
+  <span class="header-cnt">10개</span>
+</div>
+
+<div class="search-wrap">
+  <input class="search" type="text" placeholder="🔍  개념 검색..." oninput="applyFilters()">
+</div>
+
+<div class="tabs" id="tab-bar"><button class="tab active" onclick="filterTab(this,'all')">전체</button><button class="tab" onclick="filterTab(this,'0')">임베디드 시스템 개요</button><button class="tab" onclick="filterTab(this,'1')">임베디드 운영체제</button><button class="tab" onclick="filterTab(this,'2')">임베디드 하드웨어</button><button class="tab" onclick="filterTab(this,'3')">임베디드 소프트웨어</button></div>
+<div class="prio-bar"><button class="pchip active" data-prio="all" onclick="filterPrio(this)">전체</button><button class="pchip" data-prio="1" onclick="filterPrio(this)" style="--pc:#dc2626">🔴 P1 최우선</button><button class="pchip" data-prio="2" onclick="filterPrio(this)" style="--pc:#d97706">🟡 P2 중요</button><button class="pchip" data-prio="3" onclick="filterPrio(this)" style="--pc:#16a34a">🟢 P3 보통</button><button class="pchip" data-prio="4" onclick="filterPrio(this)" style="--pc:#9ca3af">⚪ P4 보조</button></div>
+
+<div id="card-content"><div class="section-group" data-chapter="0"><div class="section-label">임베디드 시스템 개요</div><div class="card-grid"><div class="card" data-prio="4" onclick="startLesson(0)"><div class="card-badges"><span class="b-prio b-prio-4" title="보조">⚪ P4</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">영상압축 유형</div><div class="card-preview">옛날에 영상 파일은 너무 커서 인터넷으로 주고받거나 저장하는 게 엄청 힘들었어. 그래서 파…</div><div class="card-cta">레슨 시작 →</div></div><div class="card" data-prio="4" onclick="startLesson(1)"><div class="card-badges"><span class="b-prio b-prio-4" title="보조">⚪ P4</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">멀티미디어 데이터</div><div class="card-preview">옛날에는 컴퓨터로 글자만 주고받았는데, 사람들이 사진이나 영상도 디지털로 보내고 싶어졌어.…</div><div class="card-cta">레슨 시작 →</div></div><div class="card" data-prio="4" onclick="startLesson(2)"><div class="card-badges"><span class="b-prio b-prio-4" title="보조">⚪ P4</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">임베디드 시스템의 개발 과정</div><div class="card-preview">옛날에 냉장고나 세탁기 같은 기계들도 점점 똑똑해져야 했는데, 일반 컴퓨터처럼 만들면 너무…</div><div class="card-cta">레슨 시작 →</div></div><div class="card" data-prio="4" onclick="startLesson(3)"><div class="card-badges"><span class="b-prio b-prio-4" title="보조">⚪ P4</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">임베디드 시스템의 특징</div><div class="card-preview">옛날에 컴퓨터는 모든 걸 다 할 수 있는 만능 기계로 만들다 보니 크고 비쌌어. 그런데 세…</div><div class="card-cta">레슨 시작 →</div></div></div></div><div class="section-group" data-chapter="1"><div class="section-label">임베디드 운영체제</div><div class="card-grid"><div class="card" data-prio="3" onclick="startLesson(4)"><div class="card-badges"><span class="b-prio b-prio-3" title="보통">🟢 P3</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">임베디드 운영체제의 개념</div><div class="card-preview">옛날에 세탁기나 전자레인지 같은 기계들은 딱 한 가지 일만 하면 됐는데, 시간이 지나면서 …</div><div class="card-cta">레슨 시작 →</div></div><div class="card" data-prio="4" onclick="startLesson(5)"><div class="card-badges"><span class="b-prio b-prio-4" title="보조">⚪ P4</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">임베디드 운영체제의 구조 및 적용기술</div><div class="card-preview">옛날에 냉장고, 세탁기 같은 가전제품에도 컴퓨터 기능이 들어가기 시작했는데, 일반 컴퓨터 …</div><div class="card-cta">레슨 시작 →</div></div></div></div><div class="section-group" data-chapter="2"><div class="section-label">임베디드 하드웨어</div><div class="card-grid"><div class="card" data-prio="4" onclick="startLesson(6)"><div class="card-badges"><span class="b-prio b-prio-4" title="보조">⚪ P4</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">임베디드 시스템의 핵심, 마이크로 프로세서</div><div class="card-preview">옛날에는 계산기나 컴퓨터를 만들려면 방 하나를 꽉 채울 만큼 엄청나게 큰 부품들이 필요했어…</div><div class="card-cta">레슨 시작 →</div></div></div></div><div class="section-group" data-chapter="3"><div class="section-label">임베디드 소프트웨어</div><div class="card-grid"><div class="card" data-prio="4" onclick="startLesson(7)"><div class="card-badges"><span class="b-prio b-prio-4" title="보조">⚪ P4</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">임베디드 소프트웨어의 정의</div><div class="card-preview">옛날에는 세탁기나 전자레인지 같은 기계들이 그냥 단순한 버튼 몇 개로만 작동했어. 근데 점…</div><div class="card-cta">레슨 시작 →</div></div><div class="card" data-prio="4" onclick="startLesson(8)"><div class="card-badges"><span class="b-prio b-prio-4" title="보조">⚪ P4</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">임베디드 소프트웨어의 특징</div><div class="card-preview">옛날에는 소프트웨어가 그냥 컴퓨터 안에서만 돌아갔는데, 세탁기·자동차·에어컨처럼 물건 속에…</div><div class="card-cta">레슨 시작 →</div></div><div class="card" data-prio="4" onclick="startLesson(9)"><div class="card-badges"><span class="b-prio b-prio-4" title="보조">⚪ P4</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">임베디드 하드웨어의 기술 동향</div><div class="card-preview">옛날 임베디드 기기들은 단순한 기능만 하면 됐으니까 성능이 낮고 혼자 동작하는 게 전부였어…</div><div class="card-cta">레슨 시작 →</div></div></div></div></div>
+
+<!-- ── 레슨 모드 ── -->
+<div class="lesson" id="lesson">
+  <div class="l-head">
+    <button class="l-back" onclick="exitLesson()">←</button>
+    <div class="l-title" id="l-title"></div>
+    <div class="l-page-ind" id="l-page-ind">1 / 1</div>
+  </div>
+  <div class="l-progress"><div class="l-progress-bar" id="l-progress-bar"></div></div>
+  <div class="l-body" id="l-body"></div>
+  <div class="l-foot">
+    <button class="l-nav-btn" id="l-prev" onclick="prevPage()">← 이전</button>
+    <button class="l-nav-btn primary" id="l-next" onclick="nextPage()">다음 →</button>
+  </div>
+</div>
+
+<script>
+const LESSONS = [{"title": "영상압축 유형", "keywords": ["임베디드", "하나", "시스템", "방식"], "summary": "", "background": "옛날에 영상 파일은 너무 커서 인터넷으로 주고받거나 저장하는 게 엄청 힘들었어. 그래서 파일 크기를 줄이는 방법을 연구하다 보니, '원본을 완벽하게 살릴 건지 vs 좀 손해 보더라도 엄청 작게 만들 건지' 두 가지 방향으로 나뉘게 됐어.", "explanation": "무손실 압축은 마치 옷을 진공팩에 넣는 것과 같아. 꺼내면 원래 옷 그대로야! 반면 손실 압축은 짐을 줄이려고 덜 중요한 물건을 버리는 것과 같아. 가방은 훨씬 가벼워지지만, 버린 물건은 다시 못 찾아. 영상에서 손실 압축을 쓰면 화질이 살짝 떨어지지만 파일이 엄청 작아지는 거야.", "why": "", "term_focus": [], "connections": [], "types": {"caption": "영상 압축은 크게 이미지(정적)와 동영상(비디오)으로 나뉘며, 동영상은 MPEG 계열이 표준. MPEG은 ISO/IEC JTC1/SC29/WG11. 각 버전은 표준화 시기와 대상에 따라 나뉜다.", "items": [{"name": "MPEG-1", "note": "오디오 및 비디오 압축/복원. 활용: MP3, 비디오 CD."}, {"name": "MPEG-2", "note": "DTV 방송용 압축/복원. 활용: 디지털 TV, DVD."}, {"name": "MPEG-4", "note": "휴대폰 영상 압축/복원. 활용: H.264 이전의 인터넷 방송."}, {"name": "AVC / H.264", "note": "MPEG-2 대비 압축률 2배. 활용: HDTV, 휴대폰 영상."}, {"name": "MPEG-V", "note": "가상현실 미디어 표현 및 제어. 활용: 4D 영화, 가상현실."}, {"name": "MPEG-DASH", "note": "인터넷 기반 동영상 스트리밍. 활용: 인터넷 영상 스트리밍."}, {"name": "MMT", "note": "MPEG-2 TS 전송 방식을 대체할 차세대 미디어 전송 표준. 활용: UHDTV, 스마트 TV."}, {"name": "HEVC / H.265", "note": "AVC 대비 압축률 2배 향상. 활용: UHDTV, 스마트 TV."}, {"name": "3D Audio", "note": "기존 서라운드 오디오에 차원을 더한 기술. 활용: 스마트 TV."}]}, "mnemonic": "무손실=무결(원본 그대로), 손실=손해(일부 날아감) → '무결 vs 손해' 딱 두 단어만 기억해!", "trap": "", "table": [], "sources": [{"title": "TOPCIT ESSENCE ver.3 — 시스템 아키텍처 이해와 활용", "note": "정보통신산업진흥원(NIPA) 공식 교재"}], "priority": 4}, {"title": "멀티미디어 데이터", "keywords": ["임베디드", "하나", "시스템", "방식"], "summary": "", "background": "옛날에는 컴퓨터로 글자만 주고받았는데, 사람들이 사진이나 영상도 디지털로 보내고 싶어졌어. 근데 이런 멀티미디어 파일들은 용량이 엄청 커서 그냥 보내면 너무 오래 걸리니까, 어떻게 줄여서 보낼지 방법을 연구하게 된 거야.", "explanation": "멀티미디어 데이터는 글(텍스트), 사진(이미지), 영상(비디오), 소리(오디오) 이렇게 4가지야. 이 중에서 이미지를 보낼 때는 마치 큰 짐을 택배로 보내기 전에 압축 팩에 꾹꾹 눌러 담듯이, '변환 → 양자화 → 부호화' 3단계를 거쳐서 크기를 확 줄여서 보내. 받는 쪽에서는 반대로 풀어서 다시 원래 이미지로 복원하는 거야.", "why": "", "term_focus": [], "connections": [], "types": null, "mnemonic": "이미지 압축은 '변양부' - 변신하고(변환), 양을 줄이고(양자화), 부호로 바꿔서(부호화) 보낸다! 받을 땐 반대로!", "trap": "", "table": [], "sources": [], "priority": 4}, {"title": "임베디드 시스템의 개발 과정", "keywords": ["임베디드", "하나", "시스템", "방식"], "summary": "", "background": "옛날에 냉장고나 세탁기 같은 기계들도 점점 똑똑해져야 했는데, 일반 컴퓨터처럼 만들면 너무 크고 비쌌어. 그래서 기계 안에 딱 맞는 작은 컴퓨터를 집어넣는 방식이 생겼고, 이걸 체계적으로 만드는 절차가 필요해졌어.", "explanation": "임베디드 시스템 개발은 레고로 집 짓는 것과 비슷해. 먼저 '어떤 집이 필요한지(요구분석)' 정하고, '뼈대(하드웨어)와 인테리어(소프트웨어)를 같이 설계'한 다음, 각각 따로 만들고 마지막에 합쳐서 테스트해. 일반 앱 개발이랑 다른 점은 하드웨어(실제 부품)까지 직접 만들어야 한다는 거야.", "why": "", "term_focus": [], "connections": [], "types": null, "mnemonic": "요설하통검 - '요'구분석 → '설'계 → '하'드웨어·소프트웨어 따로 '개'발 → '통'합 테스트 → '검'사·인수! '요리사가 설거지하고 개통검사' 로 외워봐!", "trap": "", "table": [], "sources": [], "priority": 4}, {"title": "임베디드 시스템의 특징", "keywords": ["임베디드", "하나", "시스템", "방식"], "summary": "", "background": "옛날에 컴퓨터는 모든 걸 다 할 수 있는 만능 기계로 만들다 보니 크고 비쌌어. 그런데 세탁기나 전자레인지처럼 딱 한 가지 일만 하면 되는 기계에는 그런 비싼 컴퓨터가 필요 없었고, 그래서 특정 임무만 수행하는 작고 저렴한 전용 컴퓨터가 탄생하게 됐어.", "explanation": "임베디드 시스템은 '한 우물만 파는 전문가' 같은 거야. 예를 들어 에어컨 리모컨은 온도 조절만 하면 되니까, 게임도 되고 영상도 되는 스마트폰처럼 고성능일 필요가 없어. 딱 그 역할만 잘 하면 되니까 부품을 최대한 단순하고 싸게 만들어서 수백만 개씩 찍어낼 수 있는 거야.", "why": "", "term_focus": [], "connections": [], "types": null, "mnemonic": "임베디드 = '임무 하나, 베짱이처럼 작게, 디자인 단순' → 임베디 3박자: 한 가지 임무, 작은 크기, 저렴한 비용!", "trap": "", "table": [], "sources": [], "priority": 4}, {"title": "임베디드 운영체제의 개념", "keywords": [], "summary": "", "background": "옛날에 세탁기나 전자레인지 같은 기계들은 딱 한 가지 일만 하면 됐는데, 시간이 지나면서 냉장고가 인터넷도 되고 자동차가 스스로 달리는 등 기계가 해야 할 일이 엄청 복잡해졌어. 그러다 보니 '이 기계 전용'으로 최적화된 작은 운영체제가 필요해진 거야.", "explanation": "임베디드 운영체제는 쉽게 말해 '특정 기계 전용 두뇌'야. 일반 컴퓨터의 윈도우는 뭐든 다 할 수 있는 만능 두뇌라면, 임베디드 운영체제는 예를 들어 에어컨이라면 '온도 조절만 완벽하게!'처럼 딱 그 기계가 해야 할 일만 빠르고 가볍게 처리하도록 만들어진 거야. 그래서 스마트워치, 자동차 내비, 공장 로봇 같은 곳에 다 들어가 있어.", "why": "", "term_focus": [], "connections": [], "types": null, "mnemonic": "임베디드 = '임무 베이스 디바이스' → 특정 임무만 수행하는 기기 전용 OS! 🎯", "trap": "", "table": [], "sources": [], "priority": 3}, {"title": "임베디드 운영체제의 구조 및 적용기술", "keywords": [], "summary": "", "background": "옛날에 냉장고, 세탁기 같은 가전제품에도 컴퓨터 기능이 들어가기 시작했는데, 일반 컴퓨터 운영체제를 그대로 쓰기엔 너무 크고 무거웠어. 그래서 작고 가벼우면서도 특정 기능만 빠르고 안정적으로 수행할 수 있는 전용 운영체제가 필요하게 된 거야.", "explanation": "임베디드 운영체제는 스마트워치처럼 아주 작은 기기 안에 딱 필요한 기능만 쏙쏙 넣은 '초소형 맞춤형 운영체제'라고 생각하면 돼. 일반 컴퓨터 Windows처럼 뭐든 다 할 수 있는 게 아니라, 예를 들어 에어컨이라면 온도 조절만 빠르고 정확하게 하는 데 최적화되어 있어. 핵심 특징은 세 가지야: 정해진 시간 안에 반드시 반응하는 '실시간 처리', 메모리를 아끼는 '소형/경량화', 그리고 배터리를 아끼는 '전원 관리'야.", "why": "", "term_focus": [], "connections": [], "types": null, "mnemonic": "임베디드 운영체제는 '실소전' 으로 기억해! 👉 실(실시간 처리) + 소(소형/경량화) + 전(전원 관리) — '실제로 소전(소액전)만 드는 초절약 OS'라고 외워봐!", "trap": "", "table": [], "sources": [], "priority": 4}, {"title": "임베디드 시스템의 핵심, 마이크로 프로세서", "keywords": [], "summary": "", "background": "옛날에는 계산기나 컴퓨터를 만들려면 방 하나를 꽉 채울 만큼 엄청나게 큰 부품들이 필요했어. 그래서 과학자들이 '이 복잡한 부품들을 손톱만한 칩 하나에 다 때려넣을 수 없을까?' 고민하다가 마이크로 프로세서가 탄생했지!", "explanation": "마이크로 프로세서는 우리 몸으로 치면 '뇌' 같은 거야. 뇌 안에 기억하는 부분(레지스터), 계산하는 부분(ALU), 임시로 메모해두는 부분(버퍼) 이 세 가지가 다 들어있거든. 세탁기, 전자레인지, 스마트폰 같은 거의 모든 전자기기 안에 이 조그만 뇌가 하나씩 박혀서 기기를 움직이고 있는 거야!", "why": "", "term_focus": [], "connections": [], "types": null, "mnemonic": "마이크로 프로세서 3총사 = '레계버' → 레지스터(기억), 계산기(ALU), 버퍼(임시저장) / '레계버~ 손톱 위의 뇌!'로 외워!", "trap": "", "table": [], "sources": [], "priority": 4}, {"title": "임베디드 소프트웨어의 정의", "keywords": [], "summary": "", "background": "옛날에는 세탁기나 전자레인지 같은 기계들이 그냥 단순한 버튼 몇 개로만 작동했어. 근데 점점 기계들이 똑똑해지면서 '이 기계 안에도 뭔가 프로그램이 필요하겠다!'는 생각에 임베디드 소프트웨어가 등장했어.", "explanation": "임베디드 소프트웨어는 특정 기계 안에 딱 박혀서 그 기계만을 위해 돌아가는 프로그램이야. 예를 들어 네비게이션 안에는 지도 보여주고 길 안내해주는 프로그램이 들어있는데, 그게 바로 임베디드 소프트웨어야. 스마트폰 앱처럼 내가 설치하고 지우는 게 아니라, 기계 속에 처음부터 심어져 있는 프로그램이라고 생각하면 돼.", "why": "", "term_focus": [], "connections": [], "types": null, "mnemonic": "임베디드 = '임(심어진)베(베이스로)디(디바이스에)드(드디어 작동!)' → 기계 안에 처음부터 심어진 프로그램!", "trap": "", "table": [], "sources": [], "priority": 4}, {"title": "임베디드 소프트웨어의 특징", "keywords": [], "summary": "", "background": "옛날에는 소프트웨어가 그냥 컴퓨터 안에서만 돌아갔는데, 세탁기·자동차·에어컨처럼 물건 속에도 소프트웨어를 넣어야 할 상황이 생겼어. 근데 이 소프트웨어는 일반 프로그램이랑 달리 온도·속도·신호 같은 현실 세계 변화에 실시간으로 반응해야 해서, 따로 특징을 정리할 필요가 생긴 거야.", "explanation": "임베디드 소프트웨어는 세탁기 두뇌처럼 기계 안에 꽁꽁 박혀서 현실 세계 신호(물 온도, 버튼 입력 등)를 계속 받아 처리하는 프로그램이야. 예를 들어 에어백 소프트웨어는 충격 감지 신호를 받으면 0.03초 안에 터뜨려야 하니까 '제때 반응(적시성)'이 생명이고, 아주 작은 칩 안에서 돌아가야 해서 메모리도 아껴야 해. 한마디로 '현실 세계와 붙어서, 빠르고, 작은 자원으로, 살아남아야 하는' 소프트웨어야.", "why": "", "term_focus": [], "connections": [], "types": null, "mnemonic": "임베디드의 특징 = '적시이자생' 으로 외워! → 적(적시성/timeliness) + 시(신뢰성) + 이(이질성) + 자(자원제약) + 생(생존성) — '적시에 이자 내야 생존한다'고 기억해!", "trap": "", "table": [], "sources": [], "priority": 4}, {"title": "임베디드 하드웨어의 기술 동향", "keywords": [], "summary": "", "background": "옛날 임베디드 기기들은 단순한 기능만 하면 됐으니까 성능이 낮고 혼자 동작하는 게 전부였어. 근데 스마트홈, 스마트카, 웨어러블 기기들이 쏟아지면서 '서로 연결되고, 전력은 적게 쓰고, 더 똑똑해야 하는' 기기들이 필요해졌거든.", "explanation": "임베디드 기기가 변하는 방향은 크게 3가지야. 첫째, 와이파이·블루투스처럼 '연결 기능'이 기본으로 들어가고, 둘째, 예전 8비트 계산기 수준 칩에서 32비트 스마트폰급 칩으로 업그레이드됐어. 셋째, 운영체제도 두 갈래로 나뉘는데 — 스마트워치 같은 작은 기기엔 초경량 OS, 산업용 장비엔 안정성 높은 본격 OS를 따로 쓰는 식이야.", "why": "", "term_focus": [], "connections": [], "types": null, "mnemonic": "【연-파-양】으로 기억해! '연'결(커넥티비티) → '파'워업(32비트 저전력 프로세서) → '양'극화(경량 OS vs 범용 OS) — 임베디드가 연파양 변했다!", "trap": "", "table": [], "sources": [], "priority": 4}];
+const PRIO_LABEL = {1:'최우선', 2:'중요', 3:'보통', 4:'보조'};
+let curTab = 'all';
+let curPrio = 'all';
+let curLessonIdx = -1;
+let curPage = 0;
+let pages = [];
+
+function filterTab(btn, ch) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  curTab = ch;
+  applyFilters();
+}
+
+function filterPrio(btn) {
+  document.querySelectorAll('.pchip').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  curPrio = btn.dataset.prio;
+  applyFilters();
+}
+
+function applyFilters() {
+  const q = document.querySelector('.search').value.toLowerCase();
+  document.querySelectorAll('.section-group').forEach(grp => {
+    const chOk = curTab === 'all' || grp.dataset.chapter === curTab;
+    grp.classList.toggle('hidden', !chOk);
+    if (chOk) {
+      let any = false;
+      grp.querySelectorAll('.card').forEach(c => {
+        const qOk = !q || c.textContent.toLowerCase().includes(q);
+        const pOk = curPrio === 'all' || c.dataset.prio === curPrio;
+        const show = qOk && pOk;
+        c.classList.toggle('hidden-card', !show);
+        if (show) any = true;
+      });
+      if (q || curPrio !== 'all') grp.classList.toggle('hidden', !any);
+    }
+  });
+}
+
+function escHtml(str) {
+  return (str || '').replace(/[&<>"]/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[ch]);
+}
+
+function splitMnemonic(text) {
+  return (text || '')
+    .replace(/\r\n/g, '\n')
+    .replace(/\s+\/\s+/g, '\n')
+    .replace(/\s+vs\.\s+/gi, '\n')
+    .replace(/\s+→\s+/g, ' → ')
+    .replace(/\s+↔\s+/g, ' ↔ ')
+    .replace(/\.\s+/g, '.\n')
+    .replace(/다\.\s+/g, '다.\n')
+    .replace(/됨\.\s+/g, '됨.\n')
+    .split(/\n+/)
+    .map(line => line.trim())
+    .filter(Boolean);
+}
+
+function mnemonicIcon(tag, text) {
+  if (tag) return '◈';
+  if (text.includes('↔') || text.includes('=')) return '⇄';
+  if (text.includes('→')) return '→';
+  return '•';
+}
+
+function renderParagraph(text) {
+  return escHtml(text || '').replace(/\n/g, '<br>');
+}
+
+function renderFactSection(label, secClass, items) {
+  if (!items || !items.length) return '';
+  const html = items.map(item => `
+    <div class="fact-item">
+      ${item.label ? `<div class="fact-link-label">${escHtml(item.label)}</div>` : ''}
+      <div class="fact-term">${escHtml(item.term || '')}</div>
+      <div class="fact-note">${renderParagraph(item.note || '')}</div>
+    </div>`).join('');
+  return `<div class="sec ${secClass}"><div class="sec-label">${label}</div><div class="fact-list">${html}</div></div>`;
+}
+
+function renderTypesSection(types) {
+  if (!types) return '';
+  const items = Array.isArray(types) ? types : (types.items || []);
+  if (!items.length) return '';
+  const caption = !Array.isArray(types) && types.caption ? types.caption : '';
+  const scale = !Array.isArray(types) ? (types.scale || '') : '';
+  const scaleLabels = {
+    'strong-to-weak': ['강함','약함','reverse'],
+    'weak-to-strong': ['약함','강함',''],
+  };
+  const tierClass = {
+    'strong': 'tier-strong',
+    'mid': 'tier-mid',
+    'weak': 'tier-weak',
+  };
+  const tierLabel = {
+    'strong': '강함',
+    'mid': '중간',
+    'weak': '약함',
+  };
+  const rows = items.map(it => {
+    const tierCls = it.tier && tierClass[it.tier] ? tierClass[it.tier] : '';
+    const tierLbl = it.tier && tierLabel[it.tier] ? tierLabel[it.tier] : (it.tier || '');
+    return `
+      <div class="type-item">
+        <div class="type-body">
+          <div class="type-head">
+            <span class="type-name">${escHtml(it.name || '')}</span>
+            ${it.en ? `<span class="type-en">${escHtml(it.en)}</span>` : ''}
+            ${tierCls ? `<span class="type-tier ${tierCls}">${escHtml(tierLbl)}</span>` : ''}
+          </div>
+          <div class="type-note">${renderParagraph(it.note || '')}</div>
+        </div>
+      </div>`;
+  }).join('');
+  let scaleHtml = '';
+  if (scale && scaleLabels[scale]) {
+    const [L, R, rev] = scaleLabels[scale];
+    scaleHtml = `<div class="types-scale ${rev}"><span>${L}</span><span class="scale-arrow"></span><span>${R}</span></div>`;
+  }
+  return `<div class="sec sec-types">
+    <div class="sec-label">🗂️ 유형</div>
+    ${caption ? `<div class="types-caption">${renderParagraph(caption)}</div>` : ''}
+    <div class="types-list">${rows}</div>
+    ${scaleHtml}
+  </div>`;
+}
+
+function renderSourceSection(sources) {
+  if (!sources || !sources.length) return '';
+  const html = sources.map(src => {
+    const hasUrl = !!src.url;
+    let host = '';
+    if (hasUrl) {
+      try { host = new URL(src.url).hostname.replace(/^www\./, ''); } catch (_err) { host = ''; }
+    }
+    const inner = `
+        <span class="src-bullet">↗</span>
+        <span class="src-text">
+          ${escHtml(src.title || src.url || '')}
+          ${src.note ? `<span class="src-host">${escHtml(src.note)}</span>` : ''}
+          ${!src.note && host ? `<span class="src-host">${escHtml(host)}</span>` : ''}
+        </span>`;
+    if (hasUrl) {
+      return `<a class="src-link" href="${escHtml(src.url)}" target="_blank" rel="noreferrer">${inner}</a>`;
+    }
+    return `<div class="src-link">${inner}</div>`;
+  }).join('');
+  return `<div class="sec sec-src"><div class="sec-label">🔗 출처</div><div class="src-list">${html}</div></div>`;
+}
+
+function renderMnemonic(text) {
+  const lines = splitMnemonic(text);
+  if (!lines.length) return '';
+  const html = lines.map(line => {
+    const m = line.match(/^【([^】]+)】\s*(.*)$/);
+    const tag = m ? m[1].trim() : '';
+    const body = (m ? m[2] : line).trim();
+    const safeBody = escHtml(body).replace(/'([^']+)'/g, '<strong>$1</strong>');
+    return `
+      <div class="mn-line">
+        <span class="mn-picto">${mnemonicIcon(tag, body)}</span>
+        <div class="mn-main">
+          ${tag ? `<span class="mn-tag">${escHtml(tag)}</span>` : ''}
+          <div class="mn-text">${safeBody}</div>
+        </div>
+      </div>`;
+  }).join('');
+  return `<div class="sec sec-mn"><div class="sec-label">🧠 5초 암기</div><div class="mn-list">${html}</div></div>`;
+}
+
+function buildPages(lesson) {
+  return [
+    { type: 'learn', data: lesson },
+    { type: 'done',  data: lesson },
+  ];
+}
+
+function renderPage() {
+  const body = document.getElementById('l-body');
+  const page = pages[curPage];
+  body.innerHTML = '';
+  body.scrollTop = 0;
+
+  const wrap = document.createElement('div');
+  wrap.className = 'l-page';
+
+  if (page.type === 'learn') {
+    const d = page.data;
+    let h = '';
+    h += `<h1 class="l-page-title">${escHtml(d.title)}</h1>`;
+    const metaBits = [];
+    if (d.priority && PRIO_LABEL[d.priority]) {
+      metaBits.push(`<span class="chip chip-prio-${d.priority}">P${d.priority} · ${PRIO_LABEL[d.priority]}</span>`);
+    }
+    if (metaBits.length) h += `<div class="l-page-meta">${metaBits.join('')}</div>`;
+    if (d.keywords && d.keywords.length) {
+      h += `<div class="l-page-kw">${d.keywords.map(k => `<span>★ ${escHtml(k)}</span>`).join('')}</div>`;
+    }
+    if (d.summary)     h += `<div class="sec sec-summary"><div class="sec-label">📌 한 줄 요약</div><p>${renderParagraph(d.summary)}</p></div>`;
+    if (d.background)  h += `<div class="sec sec-bg"><div class="sec-label">📜 배경·맥락</div><p>${renderParagraph(d.background)}</p></div>`;
+    if (d.explanation) h += `<div class="sec sec-expl"><div class="sec-label">📖 핵심 설명</div><p>${renderParagraph(d.explanation)}</p></div>`;
+    if (d.types)       h += renderTypesSection(d.types);
+    if (d.why)         h += `<div class="sec sec-why"><div class="sec-label">🔍 왜 이렇게 됐나</div><p>${renderParagraph(d.why)}</p></div>`;
+    if (d.term_focus && d.term_focus.length)   h += renderFactSection('🈶 용어·한자 풀이', 'sec-term', d.term_focus);
+    if (d.connections && d.connections.length) h += renderFactSection('🧭 앞뒤 흐름 연결', 'sec-link', d.connections);
+    if (d.mnemonic)    h += renderMnemonic(d.mnemonic);
+    if (d.trap)        h += `<div class="sec sec-trap"><div class="sec-label">⚠️ 시험 함정</div><p>${renderParagraph(d.trap)}</p></div>`;
+    if (d.table && d.table.length) {
+      const cols = Object.keys(d.table[0]);
+      const head = cols.map(c => `<th>${escHtml(c)}</th>`).join('');
+      const rows = d.table.map(r => '<tr>' + cols.map(c => `<td>${escHtml(r[c] || '')}</td>`).join('') + '</tr>').join('');
+      h += `<div class="sec sec-summary" style="padding:0;background:transparent;border:none">
+        <div class="sec-label" style="padding-left:.3rem;color:#6b7280;margin-bottom:.5rem">📊 정리표</div>
+        <table class="ctable"><thead><tr>${head}</tr></thead><tbody>${rows}</tbody></table>
+      </div>`;
+    }
+    if (d.sources && d.sources.length) h += renderSourceSection(d.sources);
+    wrap.innerHTML = h;
+  }
+  else if (page.type === 'done') {
+    const d = page.data;
+    const hasNext = curLessonIdx + 1 < LESSONS.length;
+    wrap.innerHTML = `
+      <div class="done-page">
+        <div class="done-emoji">🎉</div>
+        <div class="done-title">레슨 완료!</div>
+        <div class="done-sub">${escHtml(d.title)}</div>
+        <div class="done-actions">
+          ${hasNext ? '<button class="done-btn done-btn-primary" onclick="startLesson(' + (curLessonIdx + 1) + ')">다음 개념 →</button>' : ''}
+          <button class="done-btn done-btn-sub" onclick="exitLesson()">목록으로 돌아가기</button>
+        </div>
+      </div>`;
+  }
+
+  body.appendChild(wrap);
+
+  document.getElementById('l-page-ind').textContent = `${curPage + 1} / ${pages.length}`;
+  document.getElementById('l-progress-bar').style.width = `${((curPage + 1) / pages.length) * 100}%`;
+  document.getElementById('l-prev').disabled = curPage === 0;
+  document.getElementById('l-next').disabled = curPage === pages.length - 1;
+  document.getElementById('l-next').textContent = curPage === pages.length - 2 ? '완료 🎉' : '다음 →';
+}
+
+function startLesson(idx) {
+  if (idx < 0 || idx >= LESSONS.length) return;
+  curLessonIdx = idx;
+  curPage = 0;
+  pages = buildPages(LESSONS[idx]);
+  document.getElementById('l-title').textContent = LESSONS[idx].title;
+  document.getElementById('lesson').classList.add('show');
+  document.body.style.overflow = 'hidden';
+  renderPage();
+}
+
+function exitLesson() {
+  document.getElementById('lesson').classList.remove('show');
+  document.body.style.overflow = '';
+  curLessonIdx = -1;
+}
+
+function nextPage() { if (curPage < pages.length - 1) { curPage++; renderPage(); } }
+function prevPage() { if (curPage > 0) { curPage--; renderPage(); } }
+
+document.addEventListener('keydown', e => {
+  if (curLessonIdx < 0) return;
+  if (e.key === 'ArrowLeft')  prevPage();
+  if (e.key === 'ArrowRight') nextPage();
+  if (e.key === 'Escape')     exitLesson();
+});
+</script>
+</body>
+</html>

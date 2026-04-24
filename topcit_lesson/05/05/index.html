@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>TOPCIT 05-05 IT 비즈니스 혁신</title>
+<style>
+:root{--font-sans:"Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",system-ui,sans-serif;--font-serif:"NanumMyeongjo","Nanum Myeongjo","Batang","Apple SD Gothic Neo",serif}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{overflow-x:hidden}
+body{font-family:var(--font-sans);background:#f7f8fb;color:#1f2937;min-height:100vh}
+
+.header{background:#b45309;color:#fff;padding:.85rem 1.25rem;display:flex;align-items:center;gap:.75rem;position:sticky;top:0;z-index:20;box-shadow:0 2px 10px rgba(0,0,0,.15)}
+.header-back{color:#fff;text-decoration:none;font-size:1.2rem;opacity:.85}
+.header h1{font-size:1rem;font-weight:800;flex:1;font-family:var(--font-serif)}
+.header-cnt{font-size:.75rem;opacity:.8;white-space:nowrap}
+
+.search-wrap{padding:.7rem 1.25rem .3rem}
+.search{width:100%;padding:.6rem 1rem;border:2px solid #e2e8f0;border-radius:2rem;font-size:.88rem;outline:none;background:#fff;transition:border .2s}
+.search:focus{border-color:#b45309}
+
+.tabs{display:flex;gap:.35rem;padding:.4rem 1.25rem .3rem;overflow-x:auto;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tab{flex-shrink:0;padding:.32rem .8rem;border-radius:2rem;border:1.5px solid #b45309;background:#fff;color:#b45309;font-size:.74rem;font-weight:700;cursor:pointer;white-space:nowrap;transition:all .15s;font-family:inherit}
+.tab.active,.tab:hover{background:#b45309;color:#fff}
+
+.prio-bar{display:flex;gap:.3rem;padding:.2rem 1.25rem .6rem;overflow-x:auto;scrollbar-width:none}
+.prio-bar::-webkit-scrollbar{display:none}
+.pchip{flex-shrink:0;padding:.28rem .7rem;border-radius:2rem;border:1.5px solid #e5e7eb;background:#fff;color:#475569;font-size:.72rem;font-weight:700;cursor:pointer;white-space:nowrap;transition:all .15s;font-family:inherit}
+.pchip:hover{border-color:var(--pc,#9ca3af);color:#111827}
+.pchip.active{background:var(--pc,#b45309);border-color:var(--pc,#b45309);color:#fff}
+.pchip[data-prio="all"].active{background:#b45309;border-color:#b45309;color:#fff}
+
+.section-group{padding:.3rem 1.25rem .8rem}
+.section-group.hidden{display:none}
+.section-label{font-size:.72rem;font-weight:800;color:#78350f;letter-spacing:.04em;padding:.4rem 0 .35rem;border-bottom:2px solid #b4530933;margin-bottom:.55rem;font-family:var(--font-serif)}
+.card-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:.55rem}
+@media(min-width:540px){.card-grid{grid-template-columns:repeat(3,1fr)}}
+@media(min-width:900px){.card-grid{grid-template-columns:repeat(4,1fr)}}
+@media(min-width:1200px){.card-grid{grid-template-columns:repeat(5,1fr)}}
+.card{background:#fff;border-radius:.7rem;padding:.85rem .8rem .65rem;cursor:pointer;border:1.5px solid #e5e7eb;transition:all .18s;box-shadow:0 1px 3px rgba(0,0,0,.04);position:relative;display:flex;flex-direction:column;gap:.35rem;min-height:9rem}
+.card:hover{border-color:#b45309;box-shadow:0 4px 14px #b4530933;transform:translateY(-2px)}
+.card-badges{position:absolute;top:.45rem;right:.5rem;display:flex;gap:.2rem;font-size:.64rem}
+.card-badges span{padding:.1rem .42rem;border-radius:.4rem;font-weight:700;line-height:1.4;white-space:nowrap}
+.b-prio-1{background:#fee2e2;color:#991b1b}
+.b-prio-2{background:#fef3c7;color:#92400e}
+.b-prio-3{background:#dcfce7;color:#166534}
+.b-prio-4{background:#f1f5f9;color:#475569}
+.b-mn{background:#ede9fe;color:#5b21b6}
+.card-title{font-size:.86rem;font-weight:700;color:#111827;line-height:1.35;padding-right:4.5rem;font-family:var(--font-serif)}
+.card-preview{font-size:.7rem;color:#6b7280;line-height:1.5;flex:1}
+.card-cta{font-size:.68rem;color:#b45309;font-weight:700;text-align:right;margin-top:.25rem}
+.card.hidden-card{display:none!important}
+
+/* ───────── 레슨 모드 (풀스크린) ───────── */
+.lesson{display:none;position:fixed;inset:0;background:#f7f8fb;z-index:1000;flex-direction:column}
+.lesson.show{display:flex}
+.l-head{background:#b45309;color:#fff;padding:.7rem 1rem;display:flex;align-items:center;gap:.7rem;flex-shrink:0}
+.l-back{background:none;border:none;color:#fff;font-size:1.3rem;cursor:pointer;padding:0;line-height:1;opacity:.9}
+.l-title{flex:1;font-size:.92rem;font-weight:800;font-family:var(--font-serif);line-height:1.3;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.l-page-ind{font-size:.78rem;font-weight:700;background:rgba(0,0,0,.18);padding:.18rem .55rem;border-radius:1rem;flex-shrink:0}
+.l-progress{height:4px;background:rgba(0,0,0,.15);flex-shrink:0}
+.l-progress-bar{height:100%;background:#fff;width:0%;transition:width .3s ease}
+.l-body{flex:1;overflow-y:auto;padding:1.2rem 1.25rem 5rem;display:flex;flex-direction:column;gap:1rem;align-items:center}
+.l-page{width:100%;max-width:680px;animation:slideIn .25s ease}
+@keyframes slideIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+.l-page-title{font-size:1.5rem;font-weight:800;color:#78350f;margin-bottom:.5rem;font-family:var(--font-serif);line-height:1.3}
+.l-page-meta{display:flex;flex-wrap:wrap;gap:.35rem;margin-bottom:.85rem}
+.l-page-meta .chip{padding:.18rem .55rem;border-radius:1rem;font-size:.7rem;font-weight:700}
+.chip-prio-1{background:#fee2e2;color:#991b1b}
+.chip-prio-2{background:#fef3c7;color:#92400e}
+.chip-prio-3{background:#dcfce7;color:#166534}
+.chip-prio-4{background:#f1f5f9;color:#475569}
+.l-page-kw{display:flex;flex-wrap:wrap;gap:.3rem;margin-bottom:1.2rem}
+.l-page-kw span{background:#b4530922;color:#78350f;border:1px solid #b4530955;border-radius:1rem;padding:.18rem .65rem;font-size:.72rem;font-weight:700}
+
+.sec{border-radius:.7rem;padding:1rem 1.1rem;line-height:1.65;margin-bottom:.85rem}
+.sec-summary{background:#b4530911;border-left:5px solid #b45309;font-size:.95rem;color:#111827;font-weight:600}
+.sec-bg{background:#fef7ec;border-left:5px solid #d97706}
+.sec-expl{background:#eef2ff;border-left:5px solid #4f46e5}
+.sec-why{background:#ecfdf5;border-left:5px solid #059669}
+.sec-term{background:#faf5ff;border-left:5px solid #7c3aed}
+.sec-link{background:#fff7ed;border-left:5px solid #c2410c}
+.sec-mn{background:linear-gradient(145deg,#fffef5 0%,#fff7d6 56%,#b4530920 100%);color:#1f2937;font-weight:600;border:1.5px solid #b4530933;border-left:5px solid #b45309;box-shadow:0 10px 26px #b4530914}
+.sec-trap{background:#fff1f2;border:1.5px solid #fda4af;border-left:5px solid #e11d48;color:#881337}
+.sec-src{background:#fff;border:1.5px solid #e5e7eb;border-left:5px solid #475569}
+.sec-types{background:#f0f9ff;border:1.5px solid #bae6fd;border-left:5px solid #0284c7}
+.sec-types .sec-label{color:#075985}
+.types-caption{font-size:.8rem;color:#334155;margin-bottom:.6rem;line-height:1.55}
+.types-list{display:flex;flex-direction:column;gap:.55rem;counter-reset:tc}
+.type-item{display:grid;grid-template-columns:2rem 1fr;gap:.55rem;align-items:start;background:#fff;border:1px solid #e0f2fe;border-radius:.7rem;padding:.7rem .78rem;counter-increment:tc;position:relative}
+.type-item::before{content:counter(tc);display:inline-flex;align-items:center;justify-content:center;width:1.7rem;height:1.7rem;border-radius:.5rem;background:#b4530916;color:#78350f;font-size:.8rem;font-weight:800;line-height:1}
+.type-body{min-width:0}
+.type-head{display:flex;flex-wrap:wrap;gap:.35rem;align-items:center;margin-bottom:.2rem}
+.type-name{font-size:.92rem;font-weight:800;color:#0f172a;font-family:var(--font-serif)}
+.type-en{font-size:.72rem;color:#64748b;font-weight:700}
+.type-tier{display:inline-flex;align-items:center;padding:.08rem .42rem;border-radius:999px;font-size:.62rem;font-weight:800;letter-spacing:.04em}
+.tier-strong{background:#fee2e2;color:#991b1b}
+.tier-mid{background:#fef3c7;color:#92400e}
+.tier-weak{background:#dcfce7;color:#166534}
+.type-note{font-size:.86rem;line-height:1.68;color:#334155;word-break:keep-all}
+.types-scale{display:flex;align-items:center;gap:.45rem;margin-top:.65rem;padding:.5rem .7rem;background:rgba(255,255,255,.7);border:1px dashed #bae6fd;border-radius:.6rem;font-size:.72rem;color:#475569;font-weight:700}
+.types-scale .scale-arrow{flex:1;height:6px;border-radius:999px;background:linear-gradient(90deg,#16a34a,#d97706,#dc2626)}
+.types-scale.reverse .scale-arrow{background:linear-gradient(90deg,#dc2626,#d97706,#16a34a)}
+.sec-label{font-size:.7rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;margin-bottom:.5rem}
+.sec-bg .sec-label{color:#92400e}
+.sec-expl .sec-label{color:#3730a3}
+.sec-why .sec-label{color:#065f46}
+.sec-term .sec-label{color:#5b21b6}
+.sec-link .sec-label{color:#9a3412}
+.sec-mn .sec-label{color:#78350f}
+.sec-trap .sec-label{color:#9f1239}
+.sec-summary .sec-label{color:#b45309}
+.sec-src .sec-label{color:#334155}
+.sec p{font-size:.92rem;line-height:1.7}
+.sec-mn p{font-size:.98rem}
+.fact-list{display:flex;flex-direction:column;gap:.65rem}
+.fact-item{background:rgba(255,255,255,.85);border:1px solid rgba(0,0,0,.06);border-radius:.85rem;padding:.78rem .85rem}
+.fact-term{font-size:.86rem;font-weight:800;color:#111827;margin-bottom:.22rem}
+.fact-note{font-size:.9rem;line-height:1.72;color:#374151;word-break:keep-all}
+.fact-link-label{display:inline-flex;align-items:center;padding:.12rem .45rem;border-radius:999px;background:#b4530914;color:#78350f;font-size:.64rem;font-weight:800;letter-spacing:.04em;margin-bottom:.38rem}
+.src-list{display:flex;flex-direction:column;gap:.5rem}
+.src-link{display:flex;align-items:flex-start;gap:.45rem;text-decoration:none;color:#111827;background:#f9fafb;border:1px solid #e5e7eb;border-radius:.8rem;padding:.72rem .82rem;transition:border-color .15s,transform .15s}
+.src-link:hover{border-color:#b45309;transform:translateY(-1px)}
+.src-bullet{flex-shrink:0;color:#b45309;font-weight:800}
+.src-text{font-size:.85rem;line-height:1.55}
+.src-host{display:block;font-size:.72rem;color:#6b7280;margin-top:.1rem}
+.mn-list{display:flex;flex-direction:column;gap:.55rem}
+.mn-line{display:flex;align-items:flex-start;gap:.72rem;background:rgba(255,255,255,.82);border:1px solid #b4530922;border-radius:.9rem;padding:.72rem .8rem .68rem;box-shadow:0 4px 12px rgba(0,0,0,.04)}
+.mn-picto{flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;width:1.6rem;height:1.6rem;border-radius:.45rem;background:#b4530916;border:1px solid #b4530926;font-size:.76rem;font-weight:800;line-height:1;color:#78350f}
+.mn-main{display:flex;flex-direction:column;gap:.28rem;min-width:0}
+.mn-tag{display:inline-flex;align-items:center;width:fit-content;padding:.12rem .45rem;border-radius:999px;background:#b4530918;color:#78350f;font-size:.64rem;font-weight:800;letter-spacing:.05em}
+.mn-text{font-size:.95rem;line-height:1.76;color:#1f2937;word-break:keep-all}
+.mn-text strong{color:#b45309;font-weight:800}
+
+.ctable{width:100%;border-collapse:collapse;font-size:.82rem;background:#fff;border-radius:.5rem;overflow:hidden;margin-top:.4rem}
+.ctable th{background:#b45309;color:#fff;padding:.55rem .65rem;text-align:left;font-weight:700;font-size:.78rem}
+.ctable td{padding:.55rem .65rem;border-top:1px solid #e5e7eb;vertical-align:top;line-height:1.55}
+.ctable tr:nth-child(even) td{background:#f9fafb}
+
+.done-page{text-align:center;padding:2.5rem 1rem}
+.done-emoji{font-size:4.5rem;margin-bottom:1rem;animation:pop .4s ease}
+@keyframes pop{from{transform:scale(0)}80%{transform:scale(1.2)}to{transform:scale(1)}}
+.done-title{font-size:1.5rem;font-weight:800;color:#78350f;margin-bottom:.5rem;font-family:var(--font-serif)}
+.done-sub{font-size:.95rem;color:#6b7280;margin-bottom:2rem}
+.done-actions{display:flex;flex-direction:column;gap:.6rem;max-width:300px;margin:0 auto}
+.done-btn{padding:.85rem 1.4rem;border-radius:.7rem;font-size:.95rem;font-weight:700;cursor:pointer;border:none;font-family:inherit;transition:all .15s}
+.done-btn-primary{background:#b45309;color:#fff}
+.done-btn-primary:hover{transform:translateY(-2px);box-shadow:0 4px 14px #b4530955}
+.done-btn-sub{background:#fff;color:#b45309;border:1.5px solid #b45309}
+.done-btn-sub:hover{background:#b4530911}
+
+.l-foot{position:fixed;bottom:0;left:0;right:0;background:#fff;padding:.7rem 1rem;display:flex;gap:.5rem;border-top:1px solid #e5e7eb;z-index:1010}
+.l-nav-btn{flex:1;padding:.7rem;border-radius:.55rem;border:1.5px solid #b45309;background:#fff;color:#b45309;font-size:.88rem;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s}
+.l-nav-btn:hover:not(:disabled){background:#b4530911}
+.l-nav-btn:disabled{opacity:.35;cursor:not-allowed}
+.l-nav-btn.primary{background:#b45309;color:#fff;border-color:#b45309}
+.l-nav-btn.primary:hover:not(:disabled){background:#78350f;border-color:#78350f}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <a href="../" class="header-back">←</a>
+  <span style="font-size:1.2rem">💼</span>
+  <h1><span style="opacity:.7;font-size:.85em">05</span> &nbsp;IT 비즈니스 혁신</h1>
+  <span class="header-cnt">26개</span>
+</div>
+
+<div class="search-wrap">
+  <input class="search" type="text" placeholder="🔍  개념 검색..." oninput="applyFilters()">
+</div>
+
+<div class="tabs" id="tab-bar"><button class="tab active" onclick="filterTab(this,'all')">전체</button><button class="tab" onclick="filterTab(this,'0')">학습내용 요약</button></div>
+<div class="prio-bar"><button class="pchip active" data-prio="all" onclick="filterPrio(this)">전체</button><button class="pchip" data-prio="1" onclick="filterPrio(this)" style="--pc:#dc2626">🔴 P1 최우선</button><button class="pchip" data-prio="2" onclick="filterPrio(this)" style="--pc:#d97706">🟡 P2 중요</button><button class="pchip" data-prio="3" onclick="filterPrio(this)" style="--pc:#16a34a">🟢 P3 보통</button><button class="pchip" data-prio="4" onclick="filterPrio(this)" style="--pc:#9ca3af">⚪ P4 보조</button></div>
+
+<div id="card-content"><div class="section-group" data-chapter="0"><div class="section-label">학습내용 요약</div><div class="card-grid"><div class="card" data-prio="2" onclick="startLesson(0)"><div class="card-badges"><span class="b-prio b-prio-2" title="중요">🟡 P2</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">IT 비즈니스 발주프로세스</div><div class="card-preview">옛날에 회사가 새로운 IT 시스템을 도입할 때 어디서부터 시작해야 할지 몰라서 돈만 쏟아붓…</div><div class="card-cta">레슨 시작 →</div></div><div class="card" data-prio="2" onclick="startLesson(1)"><div class="card-badges"><span class="b-prio b-prio-2" title="중요">🟡 P2</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">소프트웨어 도입 프로세스, ISO/IEC 12207</div><div class="card-preview">소프트웨어를 만들거나 살 때 회사마다 방식이 제각각이라 나중에 합치거나 비교하면 완전 엉망…</div><div class="card-cta">레슨 시작 →</div></div><div class="card" data-prio="3" onclick="startLesson(2)"><div class="card-badges"><span class="b-prio b-prio-3" title="보통">🟢 P3</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">테일러링 프로세스</div><div class="card-preview">소프트웨어 개발 방법론은 원래 모든 상황에 맞게 만들어진 &#x27;완벽한 표준 레시피&#x27;처럼 존재했…</div><div class="card-cta">레슨 시작 →</div></div><div class="card" data-prio="2" onclick="startLesson(3)"><div class="card-badges"><span class="b-prio b-prio-2" title="중요">🟡 P2</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">비즈니스 아웃소싱의 개요</div><div class="card-preview">옛날에 기업들은 모든 걸 혼자 다 하려고 했는데, 잘 못하는 것까지 직접 하다 보니 돈도 …</div><div class="card-cta">레슨 시작 →</div></div><div class="card" data-prio="3" onclick="startLesson(4)"><div class="card-badges"><span class="b-prio b-prio-3" title="보통">🟢 P3</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">도입 프로세스</div><div class="card-preview">옛날에 회사들이 IT 관련 일을 전부 직접 하려다 보니 돈도 너무 많이 들고 전문성도 부족…</div><div class="card-cta">레슨 시작 →</div></div><div class="card" data-prio="2" onclick="startLesson(5)"><div class="card-badges"><span class="b-prio b-prio-2" title="중요">🟡 P2</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">아웃소싱의 형태</div><div class="card-preview">옛날에 회사들이 IT 업무까지 직접 다 하려다 보니 비용도 너무 많이 들고 전문성도 떨어지…</div><div class="card-cta">레슨 시작 →</div></div><div class="card" data-prio="2" onclick="startLesson(6)"><div class="card-badges"><span class="b-prio b-prio-2" title="중요">🟡 P2</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">아웃소싱의 효과</div><div class="card-preview">옛날에 회사들이 IT 시스템을 전부 혼자 관리하려다 보니 비용도 너무 많이 들고 전문 인력…</div><div class="card-cta">레슨 시작 →</div></div><div class="card" data-prio="3" onclick="startLesson(7)"><div class="card-badges"><span class="b-prio b-prio-3" title="보통">🟢 P3</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">업무 프로세스</div><div class="card-preview">옛날에 회사들이 커지면서 &#x27;누가, 언제, 어떤 순서로 일해야 하는지&#x27; 정해놓지 않으면 엄청…</div><div class="card-cta">레슨 시작 →</div></div><div class="card" data-prio="3" onclick="startLesson(8)"><div class="card-badges"><span class="b-prio b-prio-3" title="보통">🟢 P3</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">IT 비즈니스 프로세스 관리</div><div class="card-preview">옛날에 회사에서 일할 때 각 부서가 따로따로 움직이다 보니 업무가 중복되거나 중간에 막히는…</div><div class="card-cta">레슨 시작 →</div></div><div class="card" data-prio="3" onclick="startLesson(9)"><div class="card-badges"><span class="b-prio b-prio-3" title="보통">🟢 P3</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">IT 비즈니스 프로세스 정보관리</div><div class="card-preview">회사가 커지면서 매일 엄청난 양의 데이터가 쌓이는데, 오래된 데이터까지 전부 비싼 저장소에…</div><div class="card-cta">레슨 시작 →</div></div><div class="card" data-prio="2" onclick="startLesson(10)"><div class="card-badges"><span class="b-prio b-prio-2" title="중요">🟡 P2</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">BPR의 이해</div><div class="card-preview">옛날에 일본이나 한국, 대만 제품이 미국 시장에 쏟아지면서 미국 기업들이 &#x27;왜 우리가 지고…</div><div class="card-cta">레슨 시작 →</div></div><div class="card" data-prio="2" onclick="startLesson(11)"><div class="card-badges"><span class="b-prio b-prio-2" title="중요">🟡 P2</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">BI의 이해</div><div class="card-preview">옛날에 회사들은 엄청난 양의 데이터를 쌓아두고도 어디에 써야 할지 몰라서 그냥 창고에 처박…</div><div class="card-cta">레슨 시작 →</div></div><div class="card" data-prio="2" onclick="startLesson(12)"><div class="card-badges"><span class="b-prio b-prio-2" title="중요">🟡 P2</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">6시그마의 이해</div><div class="card-preview">옛날에 공장에서 물건을 만들다 보면 불량품이 너무 많이 나와서 회사가 손해를 엄청 봤어. …</div><div class="card-cta">레슨 시작 →</div></div><div class="card" data-prio="3" onclick="startLesson(13)"><div class="card-badges"><span class="b-prio b-prio-3" title="보통">🟢 P3</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">트리즈의 이해</div><div class="card-preview">옛날에 발명가들은 새로운 아이디어를 그냥 &#x27;운&#x27;이나 &#x27;천재성&#x27;에 의존해서 만들었는데, 러시…</div><div class="card-cta">레슨 시작 →</div></div><div class="card" data-prio="4" onclick="startLesson(14)"><div class="card-badges"><span class="b-prio b-prio-4" title="보조">⚪ P4</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">MBO의 이해</div><div class="card-preview">옛날에 기업들이 서비스를 제공할 때 &#x27;우리는 잘하고 있다&#x27;고 생각하는데 손님들은 &#x27;별로야&#x27;…</div><div class="card-cta">레슨 시작 →</div></div><div class="card" data-prio="3" onclick="startLesson(15)"><div class="card-badges"><span class="b-prio b-prio-3" title="보통">🟢 P3</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">엔터프라이즈 4=A(Enterprise Solution)</div><div class="card-preview">옛날에 기업들은 각 부서마다 따로따로 일을 처리해서 소통이 안 되고 업무가 중복되는 문제가…</div><div class="card-cta">레슨 시작 →</div></div><div class="card" data-prio="2" onclick="startLesson(16)"><div class="card-badges"><span class="b-prio b-prio-2" title="중요">🟡 P2</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">엔터프라이즈 솔루션의 종류</div><div class="card-preview">옛날에 회사가 커지면서 영업팀, 회계팀, 창고팀이 각자 따로 엑셀 파일 쓰다 보니 정보가 …</div><div class="card-cta">레슨 시작 →</div></div><div class="card" data-prio="3" onclick="startLesson(17)"><div class="card-badges"><span class="b-prio b-prio-3" title="보통">🟢 P3</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">비즈니스 전략과 엔터프라이즈 솔루션</div><div class="card-preview">옛날에 회사가 커지면 영업팀, 재고팀, 회계팀이 각자 따로 노는 바람에 정보가 뒤죽박죽 섞…</div><div class="card-cta">레슨 시작 →</div></div><div class="card" data-prio="3" onclick="startLesson(18)"><div class="card-badges"><span class="b-prio b-prio-3" title="보통">🟢 P3</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">ERP의 이해</div><div class="card-preview">옛날에 회사들은 회계팀, 인사팀, 생산팀이 각자 따로따로 다른 프로그램을 쓰고 있어서 정보…</div><div class="card-cta">레슨 시작 →</div></div><div class="card" data-prio="2" onclick="startLesson(19)"><div class="card-badges"><span class="b-prio b-prio-2" title="중요">🟡 P2</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">SCM의 이해</div><div class="card-preview">옛날에 물건을 만들어서 팔기까지 원자재 구매, 공장 생산, 창고 보관, 배송 등 수많은 단…</div><div class="card-cta">레슨 시작 →</div></div><div class="card" data-prio="2" onclick="startLesson(20)"><div class="card-badges"><span class="b-prio b-prio-2" title="중요">🟡 P2</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">PLM의 이해</div><div class="card-preview">옛날에 회사들은 제품을 만들 때 설계 팀, 생산 팀, 판매 팀이 각자 따로 정보를 관리해서…</div><div class="card-cta">레슨 시작 →</div></div><div class="card" data-prio="2" onclick="startLesson(21)"><div class="card-badges"><span class="b-prio b-prio-2" title="중요">🟡 P2</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">EDW의 이해</div><div class="card-preview">옛날에 기업들은 부서마다 각자 따로 데이터를 관리했어. 그러다 보니 영업팀 숫자랑 재무팀 …</div><div class="card-cta">레슨 시작 →</div></div><div class="card" data-prio="4" onclick="startLesson(22)"><div class="card-badges"><span class="b-prio b-prio-4" title="보조">⚪ P4</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">BI의 이해</div><div class="card-preview">옛날에 회사들은 엄청난 양의 데이터를 쌓아두고도 어디에 써야 할지 몰라서 그냥 창고에 처박…</div><div class="card-cta">레슨 시작 →</div></div><div class="card" data-prio="2" onclick="startLesson(23)"><div class="card-badges"><span class="b-prio b-prio-2" title="중요">🟡 P2</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">IT 서비스관리의 개요</div><div class="card-preview">옛날에 IT 부서가 그냥 &#x27;컴퓨터 고쳐주는 곳&#x27; 취급 받던 시절이 있었어. 그런데 회사가 …</div><div class="card-cta">레슨 시작 →</div></div><div class="card" data-prio="2" onclick="startLesson(24)"><div class="card-badges"><span class="b-prio b-prio-2" title="중요">🟡 P2</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">ITIL의 이해</div><div class="card-preview">1980년대 영국 정부는 IT 서비스가 제각각 엉망으로 운영되는 문제를 겪었어. 그래서 &#x27;…</div><div class="card-cta">레슨 시작 →</div></div><div class="card" data-prio="2" onclick="startLesson(25)"><div class="card-badges"><span class="b-prio b-prio-2" title="중요">🟡 P2</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">SLA의 이해</div><div class="card-preview">옛날에 인터넷 서비스나 클라우드를 쓸 때 &#x27;서버가 얼마나 자주 꺼져도 되는지&#x27;, &#x27;속도가 …</div><div class="card-cta">레슨 시작 →</div></div></div></div></div>
+
+<!-- ── 레슨 모드 ── -->
+<div class="lesson" id="lesson">
+  <div class="l-head">
+    <button class="l-back" onclick="exitLesson()">←</button>
+    <div class="l-title" id="l-title"></div>
+    <div class="l-page-ind" id="l-page-ind">1 / 1</div>
+  </div>
+  <div class="l-progress"><div class="l-progress-bar" id="l-progress-bar"></div></div>
+  <div class="l-body" id="l-body"></div>
+  <div class="l-foot">
+    <button class="l-nav-btn" id="l-prev" onclick="prevPage()">← 이전</button>
+    <button class="l-nav-btn primary" id="l-next" onclick="nextPage()">다음 →</button>
+  </div>
+</div>
+
+<script>
+const LESSONS = [{"title": "IT 비즈니스 발주프로세스", "keywords": [], "summary": "", "background": "옛날에 회사가 새로운 IT 시스템을 도입할 때 어디서부터 시작해야 할지 몰라서 돈만 쏟아붓고 실패하는 경우가 많았어. 그래서 '이렇게 순서대로 따라가면 성공할 수 있어!'라는 공식 절차를 만들게 된 거야.", "explanation": "마치 집을 지을 때 '설계 → 건설업체 선정 → 공사 → 완공 검사' 순서가 있는 것처럼, IT 시스템을 도입할 때도 정해진 순서가 있어. '뭘 만들지 정의 → 제안요청서 준비 → 업체 선정 및 계약 → 업체 관리 → 최종 결과물 검수'의 단계를 차례대로 밟는 거야. 이 순서를 지키면 발주자(사는 쪽)와 공급자(만드는 쪽)가 서로 헷갈리지 않고 원활하게 소통할 수 있어.", "why": "", "term_focus": [], "connections": [], "types": null, "mnemonic": "**'개요 → 제안 → 계약 → 관리 → 인수'** 를 **'개제계관인'** 으로 외워! → **'개미 제발 계속 관심 인정해줘'** 🐜", "trap": "", "table": [], "sources": [], "priority": 2}, {"title": "소프트웨어 도입 프로세스, ISO/IEC 12207", "keywords": [], "summary": "", "background": "소프트웨어를 만들거나 살 때 회사마다 방식이 제각각이라 나중에 합치거나 비교하면 완전 엉망이 되는 문제가 있었어. 그래서 '우리 다 같은 방식으로 하자!'는 약속을 국제적으로 정한 게 바로 ISO/IEC 12207이야.", "explanation": "요리 레시피 책이라고 생각해봐. 어떤 요리(소프트웨어)를 만들든 '재료 준비 → 조리 → 마무리' 같은 공통 순서를 정해놓은 거야. 근데 이 책은 '순서와 해야 할 일(What)'만 알려주고, '정확히 어떻게(How)'는 알려주지 않아. 그래서 SPICE나 CMMI 같은 다른 기준이랑 같이 써야 What + How가 완성돼!", "why": "", "term_focus": [], "connections": [], "types": null, "mnemonic": "12207 = '일이이공칠' → '일(1)하는 이(2)유와 이(2)방식, 공(0)통으로 칠(7)해라!' — 공통 프로세스를 표준으로 칠하는(정하는) 국제 규칙!", "trap": "", "table": [], "sources": [], "priority": 2}, {"title": "테일러링 프로세스", "keywords": [], "summary": "", "background": "소프트웨어 개발 방법론은 원래 모든 상황에 맞게 만들어진 '완벽한 표준 레시피'처럼 존재했는데, 막상 현실에서 쓰려니 우리 프로젝트엔 필요 없는 단계들이 너무 많아서 시간 낭비가 심했어. 그래서 '우리 상황에 맞게 필요한 것만 골라 쓰자!'는 아이디어로 테일러링 프로세스가 생겨난 거야.", "explanation": "테일러링(tailoring)은 원래 '옷을 몸에 맞게 수선한다'는 뜻이야. 기성복(표준 개발 방법론)을 사서 내 몸(우리 프로젝트 상황)에 맞게 줄이거나 늘리는 것처럼, 소프트웨어 개발할 때도 표준 절차 중에서 우리한테 불필요한 단계는 빼고, 꼭 필요한 것만 남겨서 딱 맞게 다듬는 과정이야. 예를 들어 금융 프로젝트면 보안 관련 단계는 더 추가하고, 작은 사내 프로젝트면 복잡한 문서화 단계는 줄이는 식이지.", "why": "", "term_focus": [], "connections": [], "types": null, "mnemonic": "테일러링 = '테' 일러가 옷 수선하듯, 내 몸(프로젝트)에 '딱 맞게' 방법론을 잘라내고 붙이는 것! ✂️👔 → '필요 없는 건 자르고, 부족한 건 붙인다'", "trap": "", "table": [], "sources": [], "priority": 3}, {"title": "비즈니스 아웃소싱의 개요", "keywords": [], "summary": "", "background": "옛날에 기업들은 모든 걸 혼자 다 하려고 했는데, 잘 못하는 것까지 직접 하다 보니 돈도 많이 들고 경쟁에서 뒤처지기 시작했어. 그래서 '내가 잘하는 것만 집중하고, 못하는 건 잘하는 사람한테 맡기자!'는 생각이 나온 거야.", "explanation": "예를 들어 치킨집 사장님이 치킨 튀기는 건 잘하는데 컴퓨터 관리는 영 모르잖아. 그러면 IT 전문 회사한테 '우리 컴퓨터랑 시스템 관리 맡길게요~' 하고 돈 주고 위탁하는 거야. 사장님은 치킨에만 집중하고, IT는 전문가한테 맡기니까 둘 다 잘 되는 거지!", "why": "", "term_focus": [], "connections": [], "types": null, "mnemonic": "아웃소싱 = '아, 웃기지마, 소는 네가 키워!' → 내 핵심 일(치킨)은 내가 하고, 나머지(소 키우기)는 남한테 맡긴다!", "trap": "", "table": [], "sources": [], "priority": 2}, {"title": "도입 프로세스", "keywords": [], "summary": "", "background": "옛날에 회사들이 IT 관련 일을 전부 직접 하려다 보니 돈도 너무 많이 들고 전문성도 부족한 문제가 생겼어. 그래서 '우리 잘하는 것만 하고, 나머지는 전문 업체에 맡기자!'는 아이디어에서 아웃소싱 도입 프로세스가 탄생했지.", "explanation": "예를 들어 치킨집 사장님이 튀김은 직접 하지만 배달은 배달대행 업체에 맡기는 것처럼, 회사도 자기가 제일 잘하는 핵심 업무만 남기고 나머지 IT 업무는 전문 업체에 맡기는 거야. 이때 순서가 있는데, '어떤 일을 맡길지 고르고 → 맡길 업체를 찾고 → 계약하고 → 잘 하고 있는지 관리하는' 4단계로 진행돼. 특히 계약할 때 '얼마나 잘해야 하는지' 기준을 명확하게 정해두는 게 핵심이야!", "why": "", "term_focus": [], "connections": [], "types": null, "mnemonic": "선선협관!: '선'정(업무선정) → '선'정(업체선정) → '협'상/계약 → '관'리 — 치킨집 사장이 배달대행 '선선협관'하는 거 떠올려봐!", "trap": "", "table": [], "sources": [], "priority": 3}, {"title": "아웃소싱의 형태", "keywords": [], "summary": "", "background": "옛날에 회사들이 IT 업무까지 직접 다 하려다 보니 비용도 너무 많이 들고 전문성도 떨어지는 문제가 생겼어. 그래서 'IT는 전문가한테 맡기자!'는 흐름이 생기면서 어떤 방식으로 맡길지 형태를 나눠서 정리하게 됐지.", "explanation": "예를 들어 학교 급식을 외부 업체에 맡긴다고 생각해봐. 급식 전체를 한 업체에만 맡기면 '전체 아웃소싱', 메뉴별로 여러 업체에 나눠 맡기면 '선택적 아웃소싱', 학교가 직접 급식 자회사를 만들어 맡기면 'IT 자회사 아웃소싱'인 거야. 각각 장단점이 달라서 상황에 맞게 골라 쓰는 거지!", "why": "", "term_focus": [], "connections": [], "types": {"caption": "IT 비즈니스 아웃소싱은 위탁 범위와 조직 형태에 따라 4가지로 구분된다.", "items": [{"name": "전체 아웃소싱", "en": "Total Outsourcing", "note": "IT 기능 전체를 하나의 벤더에게 전부 위탁. 책임 소재가 명확하고 업무효율성을 증대할 수 있으나, 경쟁 부재에 따른 독점적 문제가 부각될 수 있다."}, {"name": "선택적 아웃소싱", "en": "Selective Outsourcing", "note": "선택된 IT 기능 또는 업무 단위를 여러 벤더에게 위탁. 경쟁으로 인한 가격·품질 측면의 향상이 기대되나 문제 발생 시 책임 소재 문제, 고객 요구사항의 정확한 전달의 어려움이 있다."}, {"name": "IT 자회사 아웃소싱", "en": "IT Subsidiary Company Outsourcing", "note": "IT 전문법인을 별도로 설립하고 아웃소싱. 동료의식으로 인한 단결·의사소통 향상이 기대되나 관련 비용 증가, 수익성 미확보 시 모회사의 위험요소가 될 수 있다."}, {"name": "Co-Sourcing", "note": "IT 기획·전략과 IT 서비스 운영을 분리. 급변하는 환경에 대응하기 유리하며 Total Outsourcing의 문제점을 부분적으로 해결. 전략과 수행의 간격(Gap)이 발생할 경우 다양한 조율이 필요."}]}, "mnemonic": "아웃소싱 형태는 '전선자공' 으로 기억해! 전(전체) → 선(선택적) → 자(자회사) → 공(공동) — 마치 '전선 자르고 공사한다'처럼 외워봐!", "trap": "", "table": [], "sources": [{"title": "TOPCIT ESSENCE ver.3 — IT 비즈니스와 윤리", "note": "정보통신산업진흥원(NIPA) 공식 교재"}], "priority": 2}, {"title": "아웃소싱의 효과", "keywords": [], "summary": "", "background": "옛날에 회사들이 IT 시스템을 전부 혼자 관리하려다 보니 비용도 너무 많이 들고 전문 인력도 부족해서 힘들었어. 그래서 '우리가 잘 못하는 건 전문 업체한테 맡기자!'는 생각으로 아웃소싱이 생겼어.", "explanation": "아웃소싱은 마치 집에서 요리를 직접 다 하는 대신 배달 전문 식당에 맡기는 것과 같아. 내가 잘 못하거나 시간이 너무 걸리는 일을 전문가한테 맡기면 비용도 줄고 더 잘할 수 있거든. 단, 배달 음식의 맛과 양을 계속 체크해야 하듯이, 맡긴 업체가 약속대로 잘 하고 있는지 SLA(서비스 수준 합의서)로 꼭 확인해야 해.", "why": "", "term_focus": [], "connections": [], "types": null, "mnemonic": "아웃소싱 = '남한테 맡기되, 맡기고 잊으면 안 돼!' → **맡·확** (맡기고 → 확인해라!) SLA로 확인, eSCM으로 관리!", "trap": "", "table": [], "sources": [], "priority": 2}, {"title": "업무 프로세스", "keywords": [], "summary": "", "background": "옛날에 회사들이 커지면서 '누가, 언제, 어떤 순서로 일해야 하는지' 정해놓지 않으면 엄청난 혼란이 생겼어. 그래서 일하는 방식을 체계적으로 정리해서 누구나 따를 수 있게 만든 게 바로 업무 프로세스야.", "explanation": "업무 프로세스는 쉽게 말해 '회사판 레시피'야. 요리할 때 재료 준비 → 손질 → 조리 → 플레이팅 순서가 있듯이, 회사도 제품을 만들거나 서비스를 제공할 때 '누가, 무엇을, 어떤 순서로' 해야 하는지 정해진 단계가 있어. 이 단계들을 하나로 묶은 게 업무 프로세스고, 이걸 잘 만들어 놓으면 회사가 더 효율적으로 돌아가게 되는 거야.", "why": "", "term_focus": [], "connections": [], "types": null, "mnemonic": "업무 프로세스 = '누언어순무' → 누가, 언제, 어떻게, 어떤 순서로, 무엇을! 이 5가지가 정해진 회사 레시피!", "trap": "", "table": [], "sources": [], "priority": 3}, {"title": "IT 비즈니스 프로세스 관리", "keywords": [], "summary": "", "background": "옛날에 회사에서 일할 때 각 부서가 따로따로 움직이다 보니 업무가 중복되거나 중간에 막히는 일이 많았어. 그래서 '회사의 모든 일 흐름을 한눈에 보고 효율적으로 관리할 수 없을까?' 하는 고민에서 BPM이 탄생했지.", "explanation": "BPM은 쉽게 말해 회사 전체의 '업무 지도'를 만들고 관리하는 것이야. 예를 들어 피자 가게에서 주문 받기 → 재료 준비 → 굽기 → 배달하기의 과정이 있는데, 어느 단계에서 시간이 오래 걸리는지(병목) 찾아내고, 자동화할 수 있는 건 자동화해서 더 빠르고 효율적으로 만드는 거야. BPM은 이 전체 흐름을 사람, 정보, 업무 순서까지 통합해서 한 번에 관리해주는 시스템이라고 보면 돼.", "why": "", "term_focus": [], "connections": [], "types": null, "mnemonic": "BPM = '빠르게 프로세스 막힘 없애기!' — B(빠르게) P(프로세스) M(막힘 없애기) 이렇게 외워봐!", "trap": "", "table": [], "sources": [], "priority": 3}, {"title": "IT 비즈니스 프로세스 정보관리", "keywords": [], "summary": "", "background": "회사가 커지면서 매일 엄청난 양의 데이터가 쌓이는데, 오래된 데이터까지 전부 비싼 저장소에 보관하다 보니 비용이 폭발적으로 늘어나는 문제가 생겼어. 그래서 데이터도 '신선도'에 따라 다르게 관리하자는 아이디어가 나온 거야.", "explanation": "냉장고 정리랑 똑같아! 오늘 산 신선한 재료는 눈에 잘 띄는 앞칸에, 며칠 된 것은 중간 칸에, 거의 안 쓰는 냉동식품은 냉동실에 넣잖아. ILM도 마찬가지로 자주 쓰는 최신 데이터는 빠른 저장소에, 오래되고 잘 안 쓰는 데이터는 저렴한 저장소로 옮겨서 관리하는 거야. 이렇게 하면 비용은 줄이면서도 필요한 데이터는 언제든 꺼낼 수 있어.", "why": "", "term_focus": [], "connections": [], "types": null, "mnemonic": "ILM = '있을 땐 럭셔리, 묵으면 창고' — 데이터가 새것일 때는 좋은 저장소(럭셔리), 오래되면 싼 저장소(창고)로!", "trap": "", "table": [], "sources": [], "priority": 3}, {"title": "BPR의 이해", "keywords": [], "summary": "", "background": "옛날에 일본이나 한국, 대만 제품이 미국 시장에 쏟아지면서 미국 기업들이 '왜 우리가 지고 있지?' 하고 고민하게 됐어. 알고 보니 제품 자체보다 일하는 방식(프로세스)이 비효율적이어서 가격이나 품질에서 뒤처지고 있었던 거야.", "explanation": "BPR은 회사 일하는 방식을 처음부터 완전히 뜯어고치는 거야. 예를 들어, 낡고 구불구불한 길을 조금씩 보수하는 게 아니라 아예 새 고속도로를 새로 깔아버리는 것처럼, 비용·품질·서비스·속도를 확 끌어올리기 위해 업무 방식을 근본부터 다시 설계하는 기법이야. 쉽게 말해 '이 정도면 됐지~' 가 아니라 '처음부터 다시 해보자!' 하는 혁신 방법이야.", "why": "", "term_focus": [], "connections": [], "types": null, "mnemonic": "BPR = '뿌리부터 팍 리모델링!' — B(뿌리부터) P(팍) R(리모델링) 으로 기억해! 그냥 고치는 게 아니라 뿌리째 바꾸는 것!", "trap": "", "table": [], "sources": [], "priority": 2}, {"title": "BI의 이해", "keywords": [], "summary": "", "background": "옛날에 회사들은 엄청난 양의 데이터를 쌓아두고도 어디에 써야 할지 몰라서 그냥 창고에 처박아두는 경우가 많았어. 그래서 '이 데이터를 잘 분석해서 사장님이 좋은 결정을 내릴 수 있게 도와주는 시스템이 있으면 어떨까?' 하는 생각에서 BI가 탄생했어.", "explanation": "BI는 쉽게 말해 '회사판 네비게이션'이야. 네비게이션이 교통 데이터를 분석해서 '이 길로 가세요!'라고 알려주듯이, BI는 회사의 판매량·비용·고객 데이터를 분석해서 '이 방향으로 경영하세요!'라고 알려주는 거야. 예전엔 사장님(의사결정권자)만 쓰는 시스템(DSS)이었는데, BI는 회사 직원 모두가 쓸 수 있도록 확장된 버전이라고 생각하면 돼.", "why": "", "term_focus": [], "connections": [], "types": null, "mnemonic": "BI = '빅픽처 인사이트' → 회사 데이터로 큰 그림(빅픽처)을 보고 똑똑한 결정(인사이트)을 내린다! 'BI = 빅+인사이트' 이 두 단어만 기억해!", "trap": "", "table": [], "sources": [], "priority": 2}, {"title": "6시그마의 이해", "keywords": [], "summary": "", "background": "옛날에 공장에서 물건을 만들다 보면 불량품이 너무 많이 나와서 회사가 손해를 엄청 봤어. 그래서 모토로라라는 회사가 1987년에 '불량품을 거의 제로에 가깝게 줄여보자!'는 목표로 6시그마를 만들었어.", "explanation": "6시그마는 쉽게 말하면 '100만 개 만들면 딱 3.4개만 불량'이라는 엄청 높은 품질 기준이야. 예를 들어 학교 급식에서 100만 개 밥을 퍼줄 때 3~4개만 양이 틀려야 한다는 거야. 그냥 '잘 만들자'가 아니라 숫자로 목표를 딱 정해서 관리하는 게 핵심이야.", "why": "", "term_focus": [], "connections": [], "types": null, "mnemonic": "6시그마 = '백만 개 중 단 3.4개!' → '백만장자도 3.4명만 실패' 로 기억해! (백만 → 100만개, 3.4 → 불량 3.4개)", "trap": "", "table": [], "sources": [], "priority": 2}, {"title": "트리즈의 이해", "keywords": [], "summary": "", "background": "옛날에 발명가들은 새로운 아이디어를 그냥 '운'이나 '천재성'에 의존해서 만들었는데, 러시아 과학자 알츠슐러가 '발명에도 공통된 패턴이 있지 않을까?' 하고 150만 건의 특허를 분석하기 시작했어. 그 결과 발명에는 규칙이 있다는 걸 발견하고, 누구나 체계적으로 창의적 문제를 풀 수 있는 방법론을 만들었지.", "explanation": "트리즈는 쉽게 말해 '발명 문제 풀이 공식집'이야. 예를 들어 수학 문제를 풀 때 공식을 외우면 쉽게 풀리듯이, 발명할 때도 '모순을 찾아서 40가지 원리 중 하나로 해결해봐!'라는 공식이 있는 거야. 핵심은 4가지 발견(모순 있음, 발명 5단계, 40가지 원리, 진화 8법칙)으로 정리돼 있어.", "why": "", "term_focus": [], "connections": [], "types": null, "mnemonic": "트리즈 = '트'러블(모순) → '리'스트(40가지 원리) → '즈'레 해결! / 숫자 암기: 모순1 → 수준5 → 원리40 → 법칙8 (1, 5, 40, 8)", "trap": "", "table": [], "sources": [], "priority": 3}, {"title": "MBO의 이해", "keywords": [], "summary": "", "background": "옛날에 기업들이 서비스를 제공할 때 '우리는 잘하고 있다'고 생각하는데 손님들은 '별로야'라고 느끼는 일이 자꾸 생겼어. 그래서 1985년에 연구자들이 '도대체 어디서 차이가 나는 거야?'를 정확히 찾아내려고 이 방법을 만들었어.", "explanation": "예를 들어 네가 배달 음식을 시켰는데 '30분 안에 온다'고 했는데 1시간이 걸렸다면, 네 기대와 실제 서비스 사이에 gap(차이)이 생긴 거잖아. SERVQUAL은 이런 차이를 5가지 항목(눈에 보이는 것, 믿을 수 있는지, 빠른 대응, 확신감, 공감)으로 점수 매겨서 어디가 문제인지 찾아내는 도구야. 쉽게 말하면 '서비스 성적표'라고 생각하면 돼!", "why": "", "term_focus": [], "connections": [], "types": null, "mnemonic": "유신반보공 → '유'형성, '신'뢰성, '반'응성, '보'증성(확신), '공'감성 — '유신이 반(은) 보공(을 잘해)'로 외워봐!", "trap": "", "table": [], "sources": [], "priority": 4}, {"title": "엔터프라이즈 4=A(Enterprise Solution)", "keywords": [], "summary": "", "background": "옛날에 기업들은 각 부서마다 따로따로 일을 처리해서 소통이 안 되고 업무가 중복되는 문제가 많았어. 그래서 회사 전체를 하나로 연결해서 효율적으로 관리할 수 있는 통합 시스템이 필요해졌지.", "explanation": "엔터프라이즈 솔루션은 쉽게 말해 '회사 전체를 위한 올인원 관리 도구'야. 마치 학교에서 출결, 성적, 급식, 생활기록부를 따로따로 관리하지 않고 하나의 학교 시스템으로 한꺼번에 관리하는 것처럼, 기업의 생산, 영업, 회계, 인사 등 모든 업무를 하나로 묶어서 효율을 높이는 거야. 핵심은 '업무 효율성 극대화'인데, 시간도 아끼고 실수도 줄이고 회사 경쟁력을 키우는 게 목표야.", "why": "", "term_focus": [], "connections": [], "types": null, "mnemonic": "🏢 '엔터(Enter) 하면 전부 해결!' → 엔터프라이즈 솔루션은 회사 문에 들어서면(Enter) 모든 업무(프라이즈=prize=전부)가 한 방에 해결되는 시스템!", "trap": "", "table": [], "sources": [], "priority": 3}, {"title": "엔터프라이즈 솔루션의 종류", "keywords": [], "summary": "", "background": "옛날에 회사가 커지면서 영업팀, 회계팀, 창고팀이 각자 따로 엑셀 파일 쓰다 보니 정보가 뒤죽박죽 엉켜서 난리가 났어. 그래서 '이거 하나로 통합해서 관리하자!'는 생각으로 회사 전용 관리 프로그램들이 생겨난 거야.", "explanation": "엔터프라이즈 솔루션은 회사를 잘 굴러가게 해주는 전문 관리 프로그램 묶음이야. 예를 들어 ERP는 회사 전체 살림살이(돈, 사람, 물건)를 한눈에 보는 '가계부 앱', SCM은 물건이 공장에서 손님한테 오기까지 배달 경로 전체를 관리하는 '택배 추적 앱', CRM은 단골손님 정보 모아서 더 잘 챙겨주는 '단골 관리 수첩' 같은 거야. 이런 솔루션들이 모여서 회사가 똑똑하게 돌아가도록 도와주는 거지!", "why": "", "term_focus": [], "connections": [], "types": {"caption": "기업 활동에 필요한 다양한 솔루션들. 각 목적과 용도에 맞게 적절하게 이용·활용되어야 하며 유기적으로 연계되어야 한다.", "items": [{"name": "ERP", "en": "Enterprise Resource Planning", "note": "전사적 자원관리. 기업의 전체 자원을 최적화하고 분배하여 적절하게 배치·운영할 방법을 제공. 재무·생산·구매·인사 등 제반 기능의 통합 관리."}, {"name": "SCM", "en": "Supply Chain Management", "note": "공급망 관리 시스템. 원재료 구매→제품 생산→배송까지의 공급망 전체를 통합 관리. 고객 주문에서 자재 조달·생산·배송에 걸친 제품·서비스·정보 흐름을 통합."}, {"name": "CRM", "en": "Customer Relationship Management", "note": "고객 관계 관리시스템. 고객에 대한 정확한 이해를 바탕으로 고객이 원하는 제품·서비스를 적기에 제공함으로써 기업이미지·브랜드 가치 향상."}, {"name": "KMS", "en": "Knowledge Management System", "note": "지식 관리 시스템. 지식 자원을 수집하고 이를 생성/활용하는 일련의 활동 및 이를 지원·관리하는 정보체계."}, {"name": "PLM", "en": "Product Lifecycle Management", "note": "제품수명주기 관리. 기업 내·외부에서 제품의 개발 및 제품 정보의 협업적 관리를 지원하는 제품 중심의 정보체계."}, {"name": "EDW", "en": "Enterprise Data Warehouse", "note": "전사 데이터 웨어하우스. 기업의 의사결정 지원을 위해 다양한 데이터를 효과적으로 통합·분석."}, {"name": "BI", "en": "Business Intelligence", "note": "비즈니스 인텔리전스. 데이터를 효과적으로 통합·분석하여 신속한 의사결정을 지원."}]}, "mnemonic": "🎵 'ERP SCM CRM' → **'에스씨알' = 에(ERP:살림), 스(SCM:배달), 씨(CRM:단골)** — '에스씨알, 회사 살림·배달·단골!' 이렇게 외워봐!", "trap": "", "table": [], "sources": [{"title": "TOPCIT ESSENCE ver.3 — IT 비즈니스와 윤리", "note": "정보통신산업진흥원(NIPA) 공식 교재"}], "priority": 2}, {"title": "비즈니스 전략과 엔터프라이즈 솔루션", "keywords": [], "summary": "", "background": "옛날에 회사가 커지면 영업팀, 재고팀, 회계팀이 각자 따로 노는 바람에 정보가 뒤죽박죽 섞여서 큰 손해를 보는 일이 많았어. 그래서 '아, 회사 전체를 하나의 시스템으로 묶어서 관리하면 어떨까?'라는 생각에서 엔터프라이즈 솔루션이 탄생했어.", "explanation": "엔터프라이즈 솔루션은 회사를 하나의 몸으로 만들어주는 '신경계' 같은 거야. 예를 들어 편의점 본사가 있다면, 전국 수백 개 지점의 재고·매출·직원 관리를 한 화면에서 한 번에 볼 수 있게 해주는 통합 시스템이지. 회사 환경이 바뀌면 전략도 바뀌고, 그 전략에 맞게 이 시스템도 같이 유연하게 바뀌어야 회사가 살아남을 수 있어.", "why": "", "term_focus": [], "connections": [], "types": null, "mnemonic": "🏢 '한 몸 회사' = 엔터프라이즈 솔루션! → '영·재·회 따로 놀다 망한다, 하나로 묶어야 산다!' 영(영업) 재(재고) 회(회계) 세 글자만 기억해 — 이 셋을 하나로 합친 게 바로 엔터프라이즈 솔루션이야.", "trap": "", "table": [], "sources": [], "priority": 3}, {"title": "ERP의 이해", "keywords": [], "summary": "", "background": "옛날에 회사들은 회계팀, 인사팀, 생산팀이 각자 따로따로 다른 프로그램을 쓰고 있어서 정보가 서로 안 맞거나 중복되는 문제가 엄청 많았어. 그래서 '아, 이걸 하나로 묶어버리면 어떨까?' 하는 생각에서 ERP가 탄생했지!", "explanation": "ERP는 마치 학교에서 출결, 성적, 급식, 생활기록부를 하나의 앱으로 한꺼번에 관리하는 것과 같아. 선생님도, 학생도, 부모님도 같은 앱 하나로 모든 정보를 실시간으로 볼 수 있는 것처럼, 회사의 모든 부서가 하나의 시스템으로 연결되어 서로 정보를 공유하는 거야. 덕분에 '우리 창고에 재고가 얼마나 있지?' 같은 걸 일일이 전화해서 물어볼 필요가 없어지는 거지!", "why": "", "term_focus": [], "connections": [], "types": null, "mnemonic": "ERP = '어(E)? 리소스(R) 다 합쳐(P)!' → Enterprise(어), Resource(리소스), Planning(합쳐서 계획) → 회사 자원을 하나로 '다 합쳐!' 라고 외쳐봐!", "trap": "", "table": [], "sources": [], "priority": 3}, {"title": "SCM의 이해", "keywords": [], "summary": "", "background": "옛날에 물건을 만들어서 팔기까지 원자재 구매, 공장 생산, 창고 보관, 배송 등 수많은 단계가 있었는데, 각 단계가 따로따로 움직이다 보니 재고가 넘치거나 물건이 부족한 대혼란이 자주 생겼어. 이 복잡한 흐름을 한눈에 보고 똑똑하게 조율하자고 만들어진 게 바로 SCM이야.", "explanation": "SCM은 물건이 내 손에 오기까지의 모든 여정을 관리하는 시스템이야. 예를 들어 햄버거 가게를 생각해봐 — 빵 공장, 고기 농장, 야채 농부, 물류 트럭, 가게까지 연결된 전체 흐름을 한 번에 관리하는 거지. 여기서 가장 큰 문제는 '채찍 효과'인데, 손님이 햄버거를 딱 10개 더 주문했을 뿐인데 가게→물류→공장→농장으로 올라갈수록 '100개 더 준비해!'처럼 요구량이 점점 크게 부풀어 오르는 현상이야.", "why": "", "term_focus": [], "connections": [], "types": null, "mnemonic": "채찍을 살짝 흔들면 끝부분은 크게 휘청! → 소비자가 살짝 바꾸면 공장은 크게 흔들린다 🪄 'SCM = 채찍 잡는 사람 (흔들림을 막아주는 관리자)'", "trap": "", "table": [], "sources": [], "priority": 2}, {"title": "PLM의 이해", "keywords": [], "summary": "", "background": "옛날에 회사들은 제품을 만들 때 설계 팀, 생산 팀, 판매 팀이 각자 따로 정보를 관리해서 서로 뭘 하는지 몰라 실수가 많았어. 그래서 제품이 탄생하는 순간부터 없어질 때까지 모든 정보를 한 곳에서 통합 관리하자는 아이디어가 나왔어.", "explanation": "PLM은 쉽게 말해 제품의 '인생 앨범' 같은 거야. 아기가 태어나서(제품 기획) → 학교 다니고(설계/생산) → 사회생활 하다가(판매/사용) → 은퇴할 때(폐기)까지 모든 기록을 한 앨범에 모아두는 거지. 이렇게 하면 어느 팀에서든 제품에 대한 정보를 바로 찾아볼 수 있어서 실수도 줄고 돈도 절약돼.", "why": "", "term_focus": [], "connections": [], "types": null, "mnemonic": "PLM = '제품(Product)의 일생(Life)을 매니저(Manager)가 관리!' → 제품도 사람처럼 태어나고 죽는다, 그 모든 순간을 한 명의 매니저가 기록한다고 기억해!", "trap": "", "table": [], "sources": [], "priority": 2}, {"title": "EDW의 이해", "keywords": [], "summary": "", "background": "옛날에 기업들은 부서마다 각자 따로 데이터를 관리했어. 그러다 보니 영업팀 숫자랑 재무팀 숫자가 달라서 '도대체 어떤 게 맞아?' 하는 혼란이 생겼고, 이걸 한 곳에 모아서 정리하자는 필요성이 생긴 거야.", "explanation": "EDW는 쉽게 말해 회사판 '중앙 도서관'이야. 각 반(부서)마다 따로 갖고 있던 책(데이터)들을 한 도서관에 전부 모아두고, 누구든 필요한 정보를 빠르고 정확하게 찾아볼 수 있게 만든 거지. 덕분에 '우리 회사 전체가 지금 어떤 상황이야?'라는 큰 그림을 한눈에 볼 수 있어.", "why": "", "term_focus": [], "connections": [], "types": null, "mnemonic": "EDW = '전부 다 warehouse(창고)에!' 🏭 → E(전사 Enterprise) D(데이터 Data) W(창고 Warehouse) — '회사 데이터 전부 창고에 때려 넣자!'", "trap": "", "table": [], "sources": [], "priority": 2}, {"title": "BI의 이해", "keywords": [], "summary": "", "background": "옛날에 회사들은 엄청난 양의 데이터를 쌓아두고도 어디에 써야 할지 몰라서 그냥 창고에 처박아두는 경우가 많았어. 그래서 '이 데이터를 잘 분석해서 사장님이 좋은 결정을 내릴 수 있게 도와주는 시스템이 있으면 어떨까?' 하는 생각에서 BI가 탄생했어.", "explanation": "BI는 쉽게 말해 '회사판 네비게이션'이야. 네비게이션이 교통 데이터를 분석해서 '이 길로 가세요!'라고 알려주듯이, BI는 회사의 판매량·비용·고객 데이터를 분석해서 '이 방향으로 경영하세요!'라고 알려주는 거야. 예전엔 사장님(의사결정권자)만 쓰는 시스템(DSS)이었는데, BI는 회사 직원 모두가 쓸 수 있도록 확장된 버전이라고 생각하면 돼.", "why": "", "term_focus": [], "connections": [], "types": null, "mnemonic": "BI = '빅픽처 인사이트' → 회사 데이터로 큰 그림(빅픽처)을 보고 똑똑한 결정(인사이트)을 내린다! 'BI = 빅+인사이트' 이 두 단어만 기억해!", "trap": "", "table": [], "sources": [], "priority": 4}, {"title": "IT 서비스관리의 개요", "keywords": [], "summary": "", "background": "옛날에 IT 부서가 그냥 '컴퓨터 고쳐주는 곳' 취급 받던 시절이 있었어. 그런데 회사가 커지면서 IT가 비즈니스의 핵심이 되자, 체계적으로 IT를 서비스처럼 관리할 필요가 생겼어.", "explanation": "IT 서비스관리(ITSM)는 쉽게 말해 '치킨집 운영 매뉴얼' 같은 거야. 치킨을 맛있게 튀기는 법부터 손님 불만 처리까지 다 정해놓은 것처럼, IT도 서비스 품질을 일정하게 유지하려고 ITIL이라는 모범 운영 매뉴얼을 만든 거야. SLM(서비스 수준 관리)은 '치킨 30분 내 배달 보장'처럼 IT 서비스도 약속한 품질을 지키는지 관리하는 거고, CSR은 손님이 '양념 더 달라'고 요청하는 것처럼 고객이 IT에 요청하는 것을 말해.", "why": "", "term_focus": [], "connections": [], "types": null, "mnemonic": "ITSM = '아이티 식당 메뉴판' → IT를 식당처럼 운영! ITIL=레시피, SLM=배달보장, CSR=주문요청", "trap": "", "table": [], "sources": [], "priority": 2}, {"title": "ITIL의 이해", "keywords": [], "summary": "", "background": "1980년대 영국 정부는 IT 서비스가 제각각 엉망으로 운영되는 문제를 겪었어. 그래서 '우리 다 같이 이 방식으로 IT 관리하자!'는 공통 지침서가 필요해서 ITIL을 만들게 됐어.", "explanation": "ITIL은 IT 서비스를 잘 관리하기 위한 '모범 답안 모음집'이야. 예를 들어 맛집들이 레시피를 모아서 요리 교과서를 만든 것처럼, 전 세계 IT 서비스 잘하는 곳들의 노하우를 한 권에 정리해둔 거야. 이 책대로 따라 하면 IT 서비스를 체계적이고 투명하게 운영할 수 있어.", "why": "", "term_focus": [], "connections": [], "types": null, "mnemonic": "ITIL = 'IT 일잘러 교과서' — IT를 일 잘하게 만들어주는 영국산 교과서!", "trap": "", "table": [], "sources": [], "priority": 2}, {"title": "SLA의 이해", "keywords": [], "summary": "", "background": "옛날에 인터넷 서비스나 클라우드를 쓸 때 '서버가 얼마나 자주 꺼져도 되는지', '속도가 얼마나 느려지면 안 되는지' 같은 기준이 없어서 기업이랑 고객이 자주 싸웠어. 그래서 서로 계약서처럼 '우리 이 정도 수준은 지키기로 약속하자!'는 기준이 필요해졌어.", "explanation": "SLA는 쉽게 말해 '서비스 품질 약속서'야. 예를 들어 피자 가게에서 '30분 안에 배달 못 하면 무료!'라고 약속하는 것처럼, 기업이 고객한테 '우리 서비스는 하루 99.9% 켜져 있을게, 응답 속도는 1초 이내로 할게'라고 문서로 약속하는 거야. 그리고 SLM은 그 약속을 잘 지키고 있는지 계속 감시하고 관리하는 활동이야.", "why": "", "term_focus": [], "connections": [], "types": null, "mnemonic": "SLA = '서로 Level 약속', SLM = '서로 Level 매니지(관리)' → 약속(Agreement)하고, 관리(Management)한다! A → M 순서로 '약속 먼저, 관리 나중'!", "trap": "", "table": [], "sources": [], "priority": 2}];
+const PRIO_LABEL = {1:'최우선', 2:'중요', 3:'보통', 4:'보조'};
+let curTab = 'all';
+let curPrio = 'all';
+let curLessonIdx = -1;
+let curPage = 0;
+let pages = [];
+
+function filterTab(btn, ch) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  curTab = ch;
+  applyFilters();
+}
+
+function filterPrio(btn) {
+  document.querySelectorAll('.pchip').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  curPrio = btn.dataset.prio;
+  applyFilters();
+}
+
+function applyFilters() {
+  const q = document.querySelector('.search').value.toLowerCase();
+  document.querySelectorAll('.section-group').forEach(grp => {
+    const chOk = curTab === 'all' || grp.dataset.chapter === curTab;
+    grp.classList.toggle('hidden', !chOk);
+    if (chOk) {
+      let any = false;
+      grp.querySelectorAll('.card').forEach(c => {
+        const qOk = !q || c.textContent.toLowerCase().includes(q);
+        const pOk = curPrio === 'all' || c.dataset.prio === curPrio;
+        const show = qOk && pOk;
+        c.classList.toggle('hidden-card', !show);
+        if (show) any = true;
+      });
+      if (q || curPrio !== 'all') grp.classList.toggle('hidden', !any);
+    }
+  });
+}
+
+function escHtml(str) {
+  return (str || '').replace(/[&<>"]/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[ch]);
+}
+
+function splitMnemonic(text) {
+  return (text || '')
+    .replace(/\r\n/g, '\n')
+    .replace(/\s+\/\s+/g, '\n')
+    .replace(/\s+vs\.\s+/gi, '\n')
+    .replace(/\s+→\s+/g, ' → ')
+    .replace(/\s+↔\s+/g, ' ↔ ')
+    .replace(/\.\s+/g, '.\n')
+    .replace(/다\.\s+/g, '다.\n')
+    .replace(/됨\.\s+/g, '됨.\n')
+    .split(/\n+/)
+    .map(line => line.trim())
+    .filter(Boolean);
+}
+
+function mnemonicIcon(tag, text) {
+  if (tag) return '◈';
+  if (text.includes('↔') || text.includes('=')) return '⇄';
+  if (text.includes('→')) return '→';
+  return '•';
+}
+
+function renderParagraph(text) {
+  return escHtml(text || '').replace(/\n/g, '<br>');
+}
+
+function renderFactSection(label, secClass, items) {
+  if (!items || !items.length) return '';
+  const html = items.map(item => `
+    <div class="fact-item">
+      ${item.label ? `<div class="fact-link-label">${escHtml(item.label)}</div>` : ''}
+      <div class="fact-term">${escHtml(item.term || '')}</div>
+      <div class="fact-note">${renderParagraph(item.note || '')}</div>
+    </div>`).join('');
+  return `<div class="sec ${secClass}"><div class="sec-label">${label}</div><div class="fact-list">${html}</div></div>`;
+}
+
+function renderTypesSection(types) {
+  if (!types) return '';
+  const items = Array.isArray(types) ? types : (types.items || []);
+  if (!items.length) return '';
+  const caption = !Array.isArray(types) && types.caption ? types.caption : '';
+  const scale = !Array.isArray(types) ? (types.scale || '') : '';
+  const scaleLabels = {
+    'strong-to-weak': ['강함','약함','reverse'],
+    'weak-to-strong': ['약함','강함',''],
+  };
+  const tierClass = {
+    'strong': 'tier-strong',
+    'mid': 'tier-mid',
+    'weak': 'tier-weak',
+  };
+  const tierLabel = {
+    'strong': '강함',
+    'mid': '중간',
+    'weak': '약함',
+  };
+  const rows = items.map(it => {
+    const tierCls = it.tier && tierClass[it.tier] ? tierClass[it.tier] : '';
+    const tierLbl = it.tier && tierLabel[it.tier] ? tierLabel[it.tier] : (it.tier || '');
+    return `
+      <div class="type-item">
+        <div class="type-body">
+          <div class="type-head">
+            <span class="type-name">${escHtml(it.name || '')}</span>
+            ${it.en ? `<span class="type-en">${escHtml(it.en)}</span>` : ''}
+            ${tierCls ? `<span class="type-tier ${tierCls}">${escHtml(tierLbl)}</span>` : ''}
+          </div>
+          <div class="type-note">${renderParagraph(it.note || '')}</div>
+        </div>
+      </div>`;
+  }).join('');
+  let scaleHtml = '';
+  if (scale && scaleLabels[scale]) {
+    const [L, R, rev] = scaleLabels[scale];
+    scaleHtml = `<div class="types-scale ${rev}"><span>${L}</span><span class="scale-arrow"></span><span>${R}</span></div>`;
+  }
+  return `<div class="sec sec-types">
+    <div class="sec-label">🗂️ 유형</div>
+    ${caption ? `<div class="types-caption">${renderParagraph(caption)}</div>` : ''}
+    <div class="types-list">${rows}</div>
+    ${scaleHtml}
+  </div>`;
+}
+
+function renderSourceSection(sources) {
+  if (!sources || !sources.length) return '';
+  const html = sources.map(src => {
+    const hasUrl = !!src.url;
+    let host = '';
+    if (hasUrl) {
+      try { host = new URL(src.url).hostname.replace(/^www\./, ''); } catch (_err) { host = ''; }
+    }
+    const inner = `
+        <span class="src-bullet">↗</span>
+        <span class="src-text">
+          ${escHtml(src.title || src.url || '')}
+          ${src.note ? `<span class="src-host">${escHtml(src.note)}</span>` : ''}
+          ${!src.note && host ? `<span class="src-host">${escHtml(host)}</span>` : ''}
+        </span>`;
+    if (hasUrl) {
+      return `<a class="src-link" href="${escHtml(src.url)}" target="_blank" rel="noreferrer">${inner}</a>`;
+    }
+    return `<div class="src-link">${inner}</div>`;
+  }).join('');
+  return `<div class="sec sec-src"><div class="sec-label">🔗 출처</div><div class="src-list">${html}</div></div>`;
+}
+
+function renderMnemonic(text) {
+  const lines = splitMnemonic(text);
+  if (!lines.length) return '';
+  const html = lines.map(line => {
+    const m = line.match(/^【([^】]+)】\s*(.*)$/);
+    const tag = m ? m[1].trim() : '';
+    const body = (m ? m[2] : line).trim();
+    const safeBody = escHtml(body).replace(/'([^']+)'/g, '<strong>$1</strong>');
+    return `
+      <div class="mn-line">
+        <span class="mn-picto">${mnemonicIcon(tag, body)}</span>
+        <div class="mn-main">
+          ${tag ? `<span class="mn-tag">${escHtml(tag)}</span>` : ''}
+          <div class="mn-text">${safeBody}</div>
+        </div>
+      </div>`;
+  }).join('');
+  return `<div class="sec sec-mn"><div class="sec-label">🧠 5초 암기</div><div class="mn-list">${html}</div></div>`;
+}
+
+function buildPages(lesson) {
+  return [
+    { type: 'learn', data: lesson },
+    { type: 'done',  data: lesson },
+  ];
+}
+
+function renderPage() {
+  const body = document.getElementById('l-body');
+  const page = pages[curPage];
+  body.innerHTML = '';
+  body.scrollTop = 0;
+
+  const wrap = document.createElement('div');
+  wrap.className = 'l-page';
+
+  if (page.type === 'learn') {
+    const d = page.data;
+    let h = '';
+    h += `<h1 class="l-page-title">${escHtml(d.title)}</h1>`;
+    const metaBits = [];
+    if (d.priority && PRIO_LABEL[d.priority]) {
+      metaBits.push(`<span class="chip chip-prio-${d.priority}">P${d.priority} · ${PRIO_LABEL[d.priority]}</span>`);
+    }
+    if (metaBits.length) h += `<div class="l-page-meta">${metaBits.join('')}</div>`;
+    if (d.keywords && d.keywords.length) {
+      h += `<div class="l-page-kw">${d.keywords.map(k => `<span>★ ${escHtml(k)}</span>`).join('')}</div>`;
+    }
+    if (d.summary)     h += `<div class="sec sec-summary"><div class="sec-label">📌 한 줄 요약</div><p>${renderParagraph(d.summary)}</p></div>`;
+    if (d.background)  h += `<div class="sec sec-bg"><div class="sec-label">📜 배경·맥락</div><p>${renderParagraph(d.background)}</p></div>`;
+    if (d.explanation) h += `<div class="sec sec-expl"><div class="sec-label">📖 핵심 설명</div><p>${renderParagraph(d.explanation)}</p></div>`;
+    if (d.types)       h += renderTypesSection(d.types);
+    if (d.why)         h += `<div class="sec sec-why"><div class="sec-label">🔍 왜 이렇게 됐나</div><p>${renderParagraph(d.why)}</p></div>`;
+    if (d.term_focus && d.term_focus.length)   h += renderFactSection('🈶 용어·한자 풀이', 'sec-term', d.term_focus);
+    if (d.connections && d.connections.length) h += renderFactSection('🧭 앞뒤 흐름 연결', 'sec-link', d.connections);
+    if (d.mnemonic)    h += renderMnemonic(d.mnemonic);
+    if (d.trap)        h += `<div class="sec sec-trap"><div class="sec-label">⚠️ 시험 함정</div><p>${renderParagraph(d.trap)}</p></div>`;
+    if (d.table && d.table.length) {
+      const cols = Object.keys(d.table[0]);
+      const head = cols.map(c => `<th>${escHtml(c)}</th>`).join('');
+      const rows = d.table.map(r => '<tr>' + cols.map(c => `<td>${escHtml(r[c] || '')}</td>`).join('') + '</tr>').join('');
+      h += `<div class="sec sec-summary" style="padding:0;background:transparent;border:none">
+        <div class="sec-label" style="padding-left:.3rem;color:#6b7280;margin-bottom:.5rem">📊 정리표</div>
+        <table class="ctable"><thead><tr>${head}</tr></thead><tbody>${rows}</tbody></table>
+      </div>`;
+    }
+    if (d.sources && d.sources.length) h += renderSourceSection(d.sources);
+    wrap.innerHTML = h;
+  }
+  else if (page.type === 'done') {
+    const d = page.data;
+    const hasNext = curLessonIdx + 1 < LESSONS.length;
+    wrap.innerHTML = `
+      <div class="done-page">
+        <div class="done-emoji">🎉</div>
+        <div class="done-title">레슨 완료!</div>
+        <div class="done-sub">${escHtml(d.title)}</div>
+        <div class="done-actions">
+          ${hasNext ? '<button class="done-btn done-btn-primary" onclick="startLesson(' + (curLessonIdx + 1) + ')">다음 개념 →</button>' : ''}
+          <button class="done-btn done-btn-sub" onclick="exitLesson()">목록으로 돌아가기</button>
+        </div>
+      </div>`;
+  }
+
+  body.appendChild(wrap);
+
+  document.getElementById('l-page-ind').textContent = `${curPage + 1} / ${pages.length}`;
+  document.getElementById('l-progress-bar').style.width = `${((curPage + 1) / pages.length) * 100}%`;
+  document.getElementById('l-prev').disabled = curPage === 0;
+  document.getElementById('l-next').disabled = curPage === pages.length - 1;
+  document.getElementById('l-next').textContent = curPage === pages.length - 2 ? '완료 🎉' : '다음 →';
+}
+
+function startLesson(idx) {
+  if (idx < 0 || idx >= LESSONS.length) return;
+  curLessonIdx = idx;
+  curPage = 0;
+  pages = buildPages(LESSONS[idx]);
+  document.getElementById('l-title').textContent = LESSONS[idx].title;
+  document.getElementById('lesson').classList.add('show');
+  document.body.style.overflow = 'hidden';
+  renderPage();
+}
+
+function exitLesson() {
+  document.getElementById('lesson').classList.remove('show');
+  document.body.style.overflow = '';
+  curLessonIdx = -1;
+}
+
+function nextPage() { if (curPage < pages.length - 1) { curPage++; renderPage(); } }
+function prevPage() { if (curPage > 0) { curPage--; renderPage(); } }
+
+document.addEventListener('keydown', e => {
+  if (curLessonIdx < 0) return;
+  if (e.key === 'ArrowLeft')  prevPage();
+  if (e.key === 'ArrowRight') nextPage();
+  if (e.key === 'Escape')     exitLesson();
+});
+</script>
+</body>
+</html>

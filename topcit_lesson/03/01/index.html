@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>TOPCIT 03-01 컴퓨터 하드웨어</title>
+<style>
+:root{--font-sans:"Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",system-ui,sans-serif;--font-serif:"NanumMyeongjo","Nanum Myeongjo","Batang","Apple SD Gothic Neo",serif}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{overflow-x:hidden}
+body{font-family:var(--font-sans);background:#f7f8fb;color:#1f2937;min-height:100vh}
+
+.header{background:#7c3aed;color:#fff;padding:.85rem 1.25rem;display:flex;align-items:center;gap:.75rem;position:sticky;top:0;z-index:20;box-shadow:0 2px 10px rgba(0,0,0,.15)}
+.header-back{color:#fff;text-decoration:none;font-size:1.2rem;opacity:.85}
+.header h1{font-size:1rem;font-weight:800;flex:1;font-family:var(--font-serif)}
+.header-cnt{font-size:.75rem;opacity:.8;white-space:nowrap}
+
+.search-wrap{padding:.7rem 1.25rem .3rem}
+.search{width:100%;padding:.6rem 1rem;border:2px solid #e2e8f0;border-radius:2rem;font-size:.88rem;outline:none;background:#fff;transition:border .2s}
+.search:focus{border-color:#7c3aed}
+
+.tabs{display:flex;gap:.35rem;padding:.4rem 1.25rem .3rem;overflow-x:auto;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tab{flex-shrink:0;padding:.32rem .8rem;border-radius:2rem;border:1.5px solid #7c3aed;background:#fff;color:#7c3aed;font-size:.74rem;font-weight:700;cursor:pointer;white-space:nowrap;transition:all .15s;font-family:inherit}
+.tab.active,.tab:hover{background:#7c3aed;color:#fff}
+
+.prio-bar{display:flex;gap:.3rem;padding:.2rem 1.25rem .6rem;overflow-x:auto;scrollbar-width:none}
+.prio-bar::-webkit-scrollbar{display:none}
+.pchip{flex-shrink:0;padding:.28rem .7rem;border-radius:2rem;border:1.5px solid #e5e7eb;background:#fff;color:#475569;font-size:.72rem;font-weight:700;cursor:pointer;white-space:nowrap;transition:all .15s;font-family:inherit}
+.pchip:hover{border-color:var(--pc,#9ca3af);color:#111827}
+.pchip.active{background:var(--pc,#7c3aed);border-color:var(--pc,#7c3aed);color:#fff}
+.pchip[data-prio="all"].active{background:#7c3aed;border-color:#7c3aed;color:#fff}
+
+.section-group{padding:.3rem 1.25rem .8rem}
+.section-group.hidden{display:none}
+.section-label{font-size:.72rem;font-weight:800;color:#5b21b6;letter-spacing:.04em;padding:.4rem 0 .35rem;border-bottom:2px solid #7c3aed33;margin-bottom:.55rem;font-family:var(--font-serif)}
+.card-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:.55rem}
+@media(min-width:540px){.card-grid{grid-template-columns:repeat(3,1fr)}}
+@media(min-width:900px){.card-grid{grid-template-columns:repeat(4,1fr)}}
+@media(min-width:1200px){.card-grid{grid-template-columns:repeat(5,1fr)}}
+.card{background:#fff;border-radius:.7rem;padding:.85rem .8rem .65rem;cursor:pointer;border:1.5px solid #e5e7eb;transition:all .18s;box-shadow:0 1px 3px rgba(0,0,0,.04);position:relative;display:flex;flex-direction:column;gap:.35rem;min-height:9rem}
+.card:hover{border-color:#7c3aed;box-shadow:0 4px 14px #7c3aed33;transform:translateY(-2px)}
+.card-badges{position:absolute;top:.45rem;right:.5rem;display:flex;gap:.2rem;font-size:.64rem}
+.card-badges span{padding:.1rem .42rem;border-radius:.4rem;font-weight:700;line-height:1.4;white-space:nowrap}
+.b-prio-1{background:#fee2e2;color:#991b1b}
+.b-prio-2{background:#fef3c7;color:#92400e}
+.b-prio-3{background:#dcfce7;color:#166534}
+.b-prio-4{background:#f1f5f9;color:#475569}
+.b-mn{background:#ede9fe;color:#5b21b6}
+.card-title{font-size:.86rem;font-weight:700;color:#111827;line-height:1.35;padding-right:4.5rem;font-family:var(--font-serif)}
+.card-preview{font-size:.7rem;color:#6b7280;line-height:1.5;flex:1}
+.card-cta{font-size:.68rem;color:#7c3aed;font-weight:700;text-align:right;margin-top:.25rem}
+.card.hidden-card{display:none!important}
+
+/* ───────── 레슨 모드 (풀스크린) ───────── */
+.lesson{display:none;position:fixed;inset:0;background:#f7f8fb;z-index:1000;flex-direction:column}
+.lesson.show{display:flex}
+.l-head{background:#7c3aed;color:#fff;padding:.7rem 1rem;display:flex;align-items:center;gap:.7rem;flex-shrink:0}
+.l-back{background:none;border:none;color:#fff;font-size:1.3rem;cursor:pointer;padding:0;line-height:1;opacity:.9}
+.l-title{flex:1;font-size:.92rem;font-weight:800;font-family:var(--font-serif);line-height:1.3;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.l-page-ind{font-size:.78rem;font-weight:700;background:rgba(0,0,0,.18);padding:.18rem .55rem;border-radius:1rem;flex-shrink:0}
+.l-progress{height:4px;background:rgba(0,0,0,.15);flex-shrink:0}
+.l-progress-bar{height:100%;background:#fff;width:0%;transition:width .3s ease}
+.l-body{flex:1;overflow-y:auto;padding:1.2rem 1.25rem 5rem;display:flex;flex-direction:column;gap:1rem;align-items:center}
+.l-page{width:100%;max-width:680px;animation:slideIn .25s ease}
+@keyframes slideIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+.l-page-title{font-size:1.5rem;font-weight:800;color:#5b21b6;margin-bottom:.5rem;font-family:var(--font-serif);line-height:1.3}
+.l-page-meta{display:flex;flex-wrap:wrap;gap:.35rem;margin-bottom:.85rem}
+.l-page-meta .chip{padding:.18rem .55rem;border-radius:1rem;font-size:.7rem;font-weight:700}
+.chip-prio-1{background:#fee2e2;color:#991b1b}
+.chip-prio-2{background:#fef3c7;color:#92400e}
+.chip-prio-3{background:#dcfce7;color:#166534}
+.chip-prio-4{background:#f1f5f9;color:#475569}
+.l-page-kw{display:flex;flex-wrap:wrap;gap:.3rem;margin-bottom:1.2rem}
+.l-page-kw span{background:#7c3aed22;color:#5b21b6;border:1px solid #7c3aed55;border-radius:1rem;padding:.18rem .65rem;font-size:.72rem;font-weight:700}
+
+.sec{border-radius:.7rem;padding:1rem 1.1rem;line-height:1.65;margin-bottom:.85rem}
+.sec-summary{background:#7c3aed11;border-left:5px solid #7c3aed;font-size:.95rem;color:#111827;font-weight:600}
+.sec-bg{background:#fef7ec;border-left:5px solid #d97706}
+.sec-expl{background:#eef2ff;border-left:5px solid #4f46e5}
+.sec-why{background:#ecfdf5;border-left:5px solid #059669}
+.sec-term{background:#faf5ff;border-left:5px solid #7c3aed}
+.sec-link{background:#fff7ed;border-left:5px solid #c2410c}
+.sec-mn{background:linear-gradient(145deg,#fffef5 0%,#fff7d6 56%,#7c3aed20 100%);color:#1f2937;font-weight:600;border:1.5px solid #7c3aed33;border-left:5px solid #7c3aed;box-shadow:0 10px 26px #7c3aed14}
+.sec-trap{background:#fff1f2;border:1.5px solid #fda4af;border-left:5px solid #e11d48;color:#881337}
+.sec-src{background:#fff;border:1.5px solid #e5e7eb;border-left:5px solid #475569}
+.sec-types{background:#f0f9ff;border:1.5px solid #bae6fd;border-left:5px solid #0284c7}
+.sec-types .sec-label{color:#075985}
+.types-caption{font-size:.8rem;color:#334155;margin-bottom:.6rem;line-height:1.55}
+.types-list{display:flex;flex-direction:column;gap:.55rem;counter-reset:tc}
+.type-item{display:grid;grid-template-columns:2rem 1fr;gap:.55rem;align-items:start;background:#fff;border:1px solid #e0f2fe;border-radius:.7rem;padding:.7rem .78rem;counter-increment:tc;position:relative}
+.type-item::before{content:counter(tc);display:inline-flex;align-items:center;justify-content:center;width:1.7rem;height:1.7rem;border-radius:.5rem;background:#7c3aed16;color:#5b21b6;font-size:.8rem;font-weight:800;line-height:1}
+.type-body{min-width:0}
+.type-head{display:flex;flex-wrap:wrap;gap:.35rem;align-items:center;margin-bottom:.2rem}
+.type-name{font-size:.92rem;font-weight:800;color:#0f172a;font-family:var(--font-serif)}
+.type-en{font-size:.72rem;color:#64748b;font-weight:700}
+.type-tier{display:inline-flex;align-items:center;padding:.08rem .42rem;border-radius:999px;font-size:.62rem;font-weight:800;letter-spacing:.04em}
+.tier-strong{background:#fee2e2;color:#991b1b}
+.tier-mid{background:#fef3c7;color:#92400e}
+.tier-weak{background:#dcfce7;color:#166534}
+.type-note{font-size:.86rem;line-height:1.68;color:#334155;word-break:keep-all}
+.types-scale{display:flex;align-items:center;gap:.45rem;margin-top:.65rem;padding:.5rem .7rem;background:rgba(255,255,255,.7);border:1px dashed #bae6fd;border-radius:.6rem;font-size:.72rem;color:#475569;font-weight:700}
+.types-scale .scale-arrow{flex:1;height:6px;border-radius:999px;background:linear-gradient(90deg,#16a34a,#d97706,#dc2626)}
+.types-scale.reverse .scale-arrow{background:linear-gradient(90deg,#dc2626,#d97706,#16a34a)}
+.sec-label{font-size:.7rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;margin-bottom:.5rem}
+.sec-bg .sec-label{color:#92400e}
+.sec-expl .sec-label{color:#3730a3}
+.sec-why .sec-label{color:#065f46}
+.sec-term .sec-label{color:#5b21b6}
+.sec-link .sec-label{color:#9a3412}
+.sec-mn .sec-label{color:#5b21b6}
+.sec-trap .sec-label{color:#9f1239}
+.sec-summary .sec-label{color:#7c3aed}
+.sec-src .sec-label{color:#334155}
+.sec p{font-size:.92rem;line-height:1.7}
+.sec-mn p{font-size:.98rem}
+.fact-list{display:flex;flex-direction:column;gap:.65rem}
+.fact-item{background:rgba(255,255,255,.85);border:1px solid rgba(0,0,0,.06);border-radius:.85rem;padding:.78rem .85rem}
+.fact-term{font-size:.86rem;font-weight:800;color:#111827;margin-bottom:.22rem}
+.fact-note{font-size:.9rem;line-height:1.72;color:#374151;word-break:keep-all}
+.fact-link-label{display:inline-flex;align-items:center;padding:.12rem .45rem;border-radius:999px;background:#7c3aed14;color:#5b21b6;font-size:.64rem;font-weight:800;letter-spacing:.04em;margin-bottom:.38rem}
+.src-list{display:flex;flex-direction:column;gap:.5rem}
+.src-link{display:flex;align-items:flex-start;gap:.45rem;text-decoration:none;color:#111827;background:#f9fafb;border:1px solid #e5e7eb;border-radius:.8rem;padding:.72rem .82rem;transition:border-color .15s,transform .15s}
+.src-link:hover{border-color:#7c3aed;transform:translateY(-1px)}
+.src-bullet{flex-shrink:0;color:#7c3aed;font-weight:800}
+.src-text{font-size:.85rem;line-height:1.55}
+.src-host{display:block;font-size:.72rem;color:#6b7280;margin-top:.1rem}
+.mn-list{display:flex;flex-direction:column;gap:.55rem}
+.mn-line{display:flex;align-items:flex-start;gap:.72rem;background:rgba(255,255,255,.82);border:1px solid #7c3aed22;border-radius:.9rem;padding:.72rem .8rem .68rem;box-shadow:0 4px 12px rgba(0,0,0,.04)}
+.mn-picto{flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;width:1.6rem;height:1.6rem;border-radius:.45rem;background:#7c3aed16;border:1px solid #7c3aed26;font-size:.76rem;font-weight:800;line-height:1;color:#5b21b6}
+.mn-main{display:flex;flex-direction:column;gap:.28rem;min-width:0}
+.mn-tag{display:inline-flex;align-items:center;width:fit-content;padding:.12rem .45rem;border-radius:999px;background:#7c3aed18;color:#5b21b6;font-size:.64rem;font-weight:800;letter-spacing:.05em}
+.mn-text{font-size:.95rem;line-height:1.76;color:#1f2937;word-break:keep-all}
+.mn-text strong{color:#7c3aed;font-weight:800}
+
+.ctable{width:100%;border-collapse:collapse;font-size:.82rem;background:#fff;border-radius:.5rem;overflow:hidden;margin-top:.4rem}
+.ctable th{background:#7c3aed;color:#fff;padding:.55rem .65rem;text-align:left;font-weight:700;font-size:.78rem}
+.ctable td{padding:.55rem .65rem;border-top:1px solid #e5e7eb;vertical-align:top;line-height:1.55}
+.ctable tr:nth-child(even) td{background:#f9fafb}
+
+.done-page{text-align:center;padding:2.5rem 1rem}
+.done-emoji{font-size:4.5rem;margin-bottom:1rem;animation:pop .4s ease}
+@keyframes pop{from{transform:scale(0)}80%{transform:scale(1.2)}to{transform:scale(1)}}
+.done-title{font-size:1.5rem;font-weight:800;color:#5b21b6;margin-bottom:.5rem;font-family:var(--font-serif)}
+.done-sub{font-size:.95rem;color:#6b7280;margin-bottom:2rem}
+.done-actions{display:flex;flex-direction:column;gap:.6rem;max-width:300px;margin:0 auto}
+.done-btn{padding:.85rem 1.4rem;border-radius:.7rem;font-size:.95rem;font-weight:700;cursor:pointer;border:none;font-family:inherit;transition:all .15s}
+.done-btn-primary{background:#7c3aed;color:#fff}
+.done-btn-primary:hover{transform:translateY(-2px);box-shadow:0 4px 14px #7c3aed55}
+.done-btn-sub{background:#fff;color:#7c3aed;border:1.5px solid #7c3aed}
+.done-btn-sub:hover{background:#7c3aed11}
+
+.l-foot{position:fixed;bottom:0;left:0;right:0;background:#fff;padding:.7rem 1rem;display:flex;gap:.5rem;border-top:1px solid #e5e7eb;z-index:1010}
+.l-nav-btn{flex:1;padding:.7rem;border-radius:.55rem;border:1.5px solid #7c3aed;background:#fff;color:#7c3aed;font-size:.88rem;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s}
+.l-nav-btn:hover:not(:disabled){background:#7c3aed11}
+.l-nav-btn:disabled{opacity:.35;cursor:not-allowed}
+.l-nav-btn.primary{background:#7c3aed;color:#fff;border-color:#7c3aed}
+.l-nav-btn.primary:hover:not(:disabled){background:#5b21b6;border-color:#5b21b6}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <a href="../" class="header-back">←</a>
+  <span style="font-size:1.2rem">🏗️</span>
+  <h1><span style="opacity:.7;font-size:.85em">03</span> &nbsp;컴퓨터 하드웨어</h1>
+  <span class="header-cnt">30개</span>
+</div>
+
+<div class="search-wrap">
+  <input class="search" type="text" placeholder="🔍  개념 검색..." oninput="applyFilters()">
+</div>
+
+<div class="tabs" id="tab-bar"><button class="tab active" onclick="filterTab(this,'all')">전체</button><button class="tab" onclick="filterTab(this,'0')">중앙처리장치(CPU, Central </button><button class="tab" onclick="filterTab(this,'1')">입출력 장치</button><button class="tab" onclick="filterTab(this,'2')">병렬 처리 시스템(Parallel P</button><button class="tab" onclick="filterTab(this,'3')">스토리지 기술</button><button class="tab" onclick="filterTab(this,'4')">고가용성 저장장치</button><button class="tab" onclick="filterTab(this,'5')">파일 시스템</button><button class="tab" onclick="filterTab(this,'6')">파일의 개념</button></div>
+<div class="prio-bar"><button class="pchip active" data-prio="all" onclick="filterPrio(this)">전체</button><button class="pchip" data-prio="1" onclick="filterPrio(this)" style="--pc:#dc2626">🔴 P1 최우선</button><button class="pchip" data-prio="2" onclick="filterPrio(this)" style="--pc:#d97706">🟡 P2 중요</button><button class="pchip" data-prio="3" onclick="filterPrio(this)" style="--pc:#16a34a">🟢 P3 보통</button><button class="pchip" data-prio="4" onclick="filterPrio(this)" style="--pc:#9ca3af">⚪ P4 보조</button></div>
+
+<div id="card-content"><div class="section-group" data-chapter="0"><div class="section-label">중앙처리장치(CPU, Central Processing Unit)</div><div class="card-grid"><div class="card" data-prio="3" onclick="startLesson(0)"><div class="card-badges"><span class="b-prio b-prio-3" title="보통">🟢 P3</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">CPU의 정의</div><div class="card-preview">옛날에 컴퓨터는 계산 하나 하려면 사람이 직접 스위치를 조작해야 했어. 그래서 &#x27;모든 계산…</div><div class="card-cta">레슨 시작 →</div></div><div class="card" data-prio="3" onclick="startLesson(1)"><div class="card-badges"><span class="b-prio b-prio-3" title="보통">🟢 P3</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">CPU의 수행 동작</div><div class="card-preview">컴퓨터가 처음 만들어졌을 때, 두뇌 역할을 하는 CPU가 어떤 순서로 일을 처리해야 할지 …</div><div class="card-cta">레슨 시작 →</div></div><div class="card" data-prio="3" onclick="startLesson(2)"><div class="card-badges"><span class="b-prio b-prio-3" title="보통">🟢 P3</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">CPU의 구성요소</div><div class="card-preview">컴퓨터가 처음 만들어질 때, 계산도 하고 명령도 내리고 기억도 해야 하는데 이걸 하나의 부…</div><div class="card-cta">레슨 시작 →</div></div><div class="card" data-prio="3" onclick="startLesson(3)"><div class="card-badges"><span class="b-prio b-prio-3" title="보통">🟢 P3</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">컴퓨터 아키텍처의 종류</div><div class="card-preview">옛날에 컴퓨터는 명령어(레시피)랑 데이터(재료)를 같은 길로 주고받다 보니 서로 기다려야 …</div><div class="card-cta">레슨 시작 →</div></div><div class="card" data-prio="3" onclick="startLesson(4)"><div class="card-badges"><span class="b-prio b-prio-3" title="보통">🟢 P3</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">명령어 사이클 (Instruction cycle)</div><div class="card-preview">옛날에 CPU가 명령어를 어떤 순서로 처리해야 할지 규칙이 없으면 컴퓨터가 뒤죽박죽으로 일…</div><div class="card-cta">레슨 시작 →</div></div><div class="card" data-prio="3" onclick="startLesson(5)"><div class="card-badges"><span class="b-prio b-prio-3" title="보통">🟢 P3</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">컴퓨터의 기본 구조</div><div class="card-preview">옛날에 컴퓨터가 처음 만들어질 때, 사람들은 &#x27;어떻게 하면 기계가 스스로 계산하고 기억할 …</div><div class="card-cta">레슨 시작 →</div></div><div class="card" data-prio="2" onclick="startLesson(6)"><div class="card-badges"><span class="b-prio b-prio-2" title="중요">🟡 P2</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">기억장치의 계층구조</div><div class="card-preview">옛날에 컴퓨터가 처음 만들어질 때, 빠른 메모리는 너무 비싸서 전부 다 쓸 수가 없었어. …</div><div class="card-cta">레슨 시작 →</div></div><div class="card" data-prio="2" onclick="startLesson(7)"><div class="card-badges"><span class="b-prio b-prio-2" title="중요">🟡 P2</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">명령어 집합구조, CISC와 RISC</div><div class="card-preview">옛날 컴퓨터는 &#x27;복잡한 작업도 명령어 하나로 처리하자!&#x27;는 생각으로 설계됐는데, 명령어가 …</div><div class="card-cta">레슨 시작 →</div></div></div></div><div class="section-group" data-chapter="1"><div class="section-label">입출력 장치</div><div class="card-grid"><div class="card" data-prio="3" onclick="startLesson(8)"><div class="card-badges"><span class="b-prio b-prio-3" title="보통">🟢 P3</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">입출력 장치의 개념</div><div class="card-preview">컴퓨터는 혼자서는 사람과 대화를 못 해서, 사람의 명령을 받아들이고 결과를 보여줄 방법이 …</div><div class="card-cta">레슨 시작 →</div></div><div class="card" data-prio="3" onclick="startLesson(9)"><div class="card-badges"><span class="b-prio b-prio-3" title="보통">🟢 P3</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">I/O제어기의 구조와 주소지정 방식의 종류</div><div class="card-preview">컴퓨터가 키보드, 마우스, 프린터 같은 외부 장치들이랑 대화하려면 중간에 통역사 역할을 해…</div><div class="card-cta">레슨 시작 →</div></div><div class="card" data-prio="3" onclick="startLesson(10)"><div class="card-badges"><span class="b-prio b-prio-3" title="보통">🟢 P3</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">직접 메모리 접근</div><div class="card-preview">옛날에는 USB나 그래픽카드 같은 장치가 데이터를 전달할 때마다 CPU한테 일일이 부탁해야…</div><div class="card-cta">레슨 시작 →</div></div><div class="card" data-prio="3" onclick="startLesson(11)"><div class="card-badges"><span class="b-prio b-prio-3" title="보통">🟢 P3</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">기억장치의 성능 평가 요소</div><div class="card-preview">컴퓨터가 발전하면서 메모리 종류가 엄청 많아졌는데, 어떤 메모리가 더 좋은지 비교할 기준이…</div><div class="card-cta">레슨 시작 →</div></div><div class="card" data-prio="3" onclick="startLesson(12)"><div class="card-badges"><span class="b-prio b-prio-3" title="보통">🟢 P3</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">기억장치의 분류 및 특징</div><div class="card-preview">컴퓨터가 처음 만들어질 때, 모든 데이터를 한 곳에 저장하려다 보니 너무 느리거나 꺼지면 …</div><div class="card-cta">레슨 시작 →</div></div><div class="card" data-prio="3" onclick="startLesson(13)"><div class="card-badges"><span class="b-prio b-prio-3" title="보통">🟢 P3</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">주소지정 방식</div><div class="card-preview">컴퓨터가 기억장치에서 데이터를 꺼내오려면 &#x27;어디에 있는지&#x27; 주소를 알아야 하는데, 명령어 …</div><div class="card-cta">레슨 시작 →</div></div><div class="card" data-prio="4" onclick="startLesson(14)"><div class="card-badges"><span class="b-prio b-prio-4" title="보조">⚪ P4</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">뉴로모픽칩</div><div class="card-preview">기존 컴퓨터는 계산하는 곳(CPU)과 기억하는 곳(메모리)이 따로 분리되어 있어서 데이터를…</div><div class="card-cta">레슨 시작 →</div></div><div class="card" data-prio="4" onclick="startLesson(15)"><div class="card-badges"><span class="b-prio b-prio-4" title="보조">⚪ P4</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">양자컴퓨터</div><div class="card-preview">기존 컴퓨터는 0 아니면 1, 딱 두 가지로만 정보를 처리해서 엄청 복잡한 계산(예: 암호…</div><div class="card-cta">레슨 시작 →</div></div><div class="card" data-prio="3" onclick="startLesson(16)"><div class="card-badges"><span class="b-prio b-prio-3" title="보통">🟢 P3</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">메모리 구조에 의한 병렬 처리 시스템 분류</div><div class="card-preview">옛날에 컴퓨터 한 대로 복잡한 계산을 하려니 너무 느려서, 여러 개의 CPU를 동시에 돌리…</div><div class="card-cta">레슨 시작 →</div></div></div></div><div class="section-group" data-chapter="2"><div class="section-label">병렬 처리 시스템(Parallel Processing System)</div><div class="card-grid"><div class="card" data-prio="3" onclick="startLesson(17)"><div class="card-badges"><span class="b-prio b-prio-3" title="보통">🟢 P3</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">병렬 처리 시스템의 개념</div><div class="card-preview">옛날에 컴퓨터는 일꾼이 한 명뿐이라 일을 하나씩 순서대로 처리했는데, 할 일이 너무 많아지…</div><div class="card-cta">레슨 시작 →</div></div><div class="card" data-prio="2" onclick="startLesson(18)"><div class="card-badges"><span class="b-prio b-prio-2" title="중요">🟡 P2</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">병렬 처리 시스템의 플린에 의한 분류</div><div class="card-preview">옛날에 컴퓨터가 한 번에 하나씩만 일을 처리하다 보니 너무 느려서 문제가 됐어. 그래서 &#x27;…</div><div class="card-cta">레슨 시작 →</div></div><div class="card" data-prio="4" onclick="startLesson(19)"><div class="card-badges"><span class="b-prio b-prio-4" title="보조">⚪ P4</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">병렬 프로그래밍 기술</div><div class="card-preview">옛날에 컴퓨터는 일을 하나씩 순서대로만 처리했는데, 할 일이 너무 많아지면서 속도가 너무 …</div><div class="card-cta">레슨 시작 →</div></div><div class="card" data-prio="4" onclick="startLesson(20)"><div class="card-badges"><span class="b-prio b-prio-4" title="보조">⚪ P4</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">그래픽 처리 프로세싱 기술</div><div class="card-preview">옛날엔 컴퓨터로 게임이나 영상을 처리할 때 CPU 혼자 다 하려니까 너무 느리고 버벅거리는…</div><div class="card-cta">레슨 시작 →</div></div><div class="card" data-prio="4" onclick="startLesson(21)"><div class="card-badges"><span class="b-prio b-prio-4" title="보조">⚪ P4</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">스토리지 용량 관리 기술</div><div class="card-preview">옛날에는 창고를 빌릴 때 &#x27;나중에 짐이 많아질 수도 있으니까&#x27; 하고 무조건 큰 창고를 통째…</div><div class="card-cta">레슨 시작 →</div></div></div></div><div class="section-group" data-chapter="3"><div class="section-label">스토리지 기술</div><div class="card-grid"><div class="card" data-prio="3" onclick="startLesson(22)"><div class="card-badges"><span class="b-prio b-prio-3" title="보통">🟢 P3</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">저장장치의 개념</div><div class="card-preview">옛날에 컴퓨터를 끄면 작업하던 내용이 다 날아가는 문제가 있었어. 그래서 전원이 꺼져도 데…</div><div class="card-cta">레슨 시작 →</div></div><div class="card" data-prio="2" onclick="startLesson(23)"><div class="card-badges"><span class="b-prio b-prio-2" title="중요">🟡 P2</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">저장장치와 서버의 연결</div><div class="card-preview">옛날에는 컴퓨터 한 대에 하드디스크 하나씩 꽂아서 쓰면 충분했는데, 영상이나 사진 같은 무…</div><div class="card-cta">레슨 시작 →</div></div><div class="card" data-prio="3" onclick="startLesson(24)"><div class="card-badges"><span class="b-prio b-prio-3" title="보통">🟢 P3</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">저장장치 디스크 스케줄링</div><div class="card-preview">옛날에 컴퓨터 디스크는 실제로 빙글빙글 돌아가는 원판이었는데, 여러 사람이 동시에 &#x27;내 파…</div><div class="card-cta">레슨 시작 →</div></div></div></div><div class="section-group" data-chapter="4"><div class="section-label">고가용성 저장장치</div><div class="card-grid"><div class="card" data-prio="1" onclick="startLesson(25)"><div class="card-badges"><span class="b-prio b-prio-1" title="최우선">🔴 P1</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">RAID(Redundant Array of Independent Disks) 기술</div><div class="card-preview">옛날에는 하드디스크 하나가 고장나면 그 안에 저장된 데이터가 전부 날아가버리는 끔찍한 일이…</div><div class="card-cta">레슨 시작 →</div></div><div class="card" data-prio="4" onclick="startLesson(26)"><div class="card-badges"><span class="b-prio b-prio-4" title="보조">⚪ P4</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">백업 스토리지: LTO, VIL</div><div class="card-preview">옛날에 회사들이 엄청난 양의 데이터를 저장해야 했는데, 하드디스크는 너무 비싸고 용량도 부…</div><div class="card-cta">레슨 시작 →</div></div></div></div><div class="section-group" data-chapter="5"><div class="section-label">파일 시스템</div><div class="card-grid"><div class="card" data-prio="3" onclick="startLesson(27)"><div class="card-badges"><span class="b-prio b-prio-3" title="보통">🟢 P3</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">파일시스템의 이해</div><div class="card-preview">옛날에 컴퓨터에 파일이 엄청 많아지면서 &#x27;내가 저장한 파일이 어디 있지?&#x27; 하고 찾기가 너…</div><div class="card-cta">레슨 시작 →</div></div></div></div><div class="section-group" data-chapter="6"><div class="section-label">파일의 개념</div><div class="card-grid"><div class="card" data-prio="3" onclick="startLesson(28)"><div class="card-badges"><span class="b-prio b-prio-3" title="보통">🟢 P3</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">운영체쩌별 파일시스템의 종류</div><div class="card-preview">옛날에 컴퓨터마다 파일을 저장하는 방식이 달라서 윈도우에서 만든 파일을 맥이나 리눅스에서 …</div><div class="card-cta">레슨 시작 →</div></div><div class="card" data-prio="4" onclick="startLesson(29)"><div class="card-badges"><span class="b-prio b-prio-4" title="보조">⚪ P4</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">UNIX의 i-node</div><div class="card-preview">옛날에 컴퓨터에 파일이 엄청 많아지면서 &#x27;이 파일이 어디 있지? 누가 만든 거지?&#x27; 를 빠…</div><div class="card-cta">레슨 시작 →</div></div></div></div></div>
+
+<!-- ── 레슨 모드 ── -->
+<div class="lesson" id="lesson">
+  <div class="l-head">
+    <button class="l-back" onclick="exitLesson()">←</button>
+    <div class="l-title" id="l-title"></div>
+    <div class="l-page-ind" id="l-page-ind">1 / 1</div>
+  </div>
+  <div class="l-progress"><div class="l-progress-bar" id="l-progress-bar"></div></div>
+  <div class="l-body" id="l-body"></div>
+  <div class="l-foot">
+    <button class="l-nav-btn" id="l-prev" onclick="prevPage()">← 이전</button>
+    <button class="l-nav-btn primary" id="l-next" onclick="nextPage()">다음 →</button>
+  </div>
+</div>
+
+<script>
+const LESSONS = [{"title": "CPU의 정의", "keywords": ["순차적", "데이터버스:", "공간적", "주소버스:", "명령어"], "summary": "", "background": "옛날에 컴퓨터는 계산 하나 하려면 사람이 직접 스위치를 조작해야 했어. 그래서 '모든 계산과 명령을 한 곳에서 자동으로 처리해주는 두뇌' 같은 장치가 필요해졌고, 그게 바로 CPU야.", "explanation": "CPU는 컴퓨터의 두뇌야. 우리가 카카오톡 메시지를 보내면 '이 버튼 눌렸네 → 글자 읽어 → 전송해' 이런 모든 판단과 계산을 CPU가 처리하는 거야. 쉽게 말해 컴퓨터가 하는 모든 일의 총감독이라고 보면 돼.", "why": "", "term_focus": [], "connections": [], "types": null, "mnemonic": "CPU = 컴퓨터의 P(핵심) U(유일한) 두뇌! → '컴퓨터 머리 = CPU' 딱 이것만 기억해!", "trap": "", "table": [], "sources": [], "priority": 3}, {"title": "CPU의 수행 동작", "keywords": ["순차적", "데이터버스:", "공간적", "주소버스:", "명령어"], "summary": "", "background": "컴퓨터가 처음 만들어졌을 때, 두뇌 역할을 하는 CPU가 어떤 순서로 일을 처리해야 할지 체계가 필요했어. 그래서 모든 명령을 처리할 때 공통으로 거치는 단계와 필요할 때만 거치는 단계를 나눠서 정리하게 됐어.", "explanation": "CPU가 일하는 방식은 요리사가 레시피를 보고 요리하는 것과 똑같아. 먼저 레시피를 집어 들고(명령어 인출), 레시피를 읽어서 뭘 해야 할지 파악하고(명령어 해석), 필요한 재료를 꺼내오고(데이터 인출), 실제로 요리하고(데이터 처리), 마지막으로 완성된 요리를 그릇에 담아(데이터 쓰기) 끝내는 거야.", "why": "", "term_focus": [], "connections": [], "types": null, "mnemonic": "\"인해인처쓰\" → 인출 → 해석 → 인출(데이터) → 처리 → 쓰기! '인해인처쓰' 다섯 글자만 기억해!", "trap": "", "table": [], "sources": [], "priority": 3}, {"title": "CPU의 구성요소", "keywords": ["순차적", "데이터버스:", "공간적", "주소버스:", "명령어"], "summary": "", "background": "컴퓨터가 처음 만들어질 때, 계산도 하고 명령도 내리고 기억도 해야 하는데 이걸 하나의 부품이 다 하려니 너무 복잡해졌어. 그래서 역할별로 나눠서 각자 잘하는 일만 맡기자고 해서 CPU 안에 여러 구성요소가 생기게 됐어.", "explanation": "CPU는 회사로 비유하면 딱 맞아. 사장(제어장치)이 '이 일 저 사람한테 시켜!'라고 명령을 내리고, 계산 전문 직원(연산장치)이 실제로 더하고 빼는 계산을 하고, 메모장(레지스터)에 중간 결과를 잠깐 적어두는 거야. 그리고 사내 메신저(버스)가 이 사람들 사이에서 정보를 전달해주는 역할을 해.", "why": "", "term_focus": [], "connections": [], "types": {"caption": "중앙처리장치는 제어장치·연산장치·레지스터 및 이들을 연결하여 데이터를 전달하는 버스로 구성된다.", "items": [{"name": "제어유닛", "en": "Control Unit (CU)", "note": "프로그램 코드(명령어)를 해석하고, 그것을 실행하기 위한 제어신호들(Control Signal)을 순차적으로 발생하는 하드웨어 모듈."}, {"name": "연산장치", "en": "ALU (Arithmetic Logic Unit)", "note": "중앙처리장치의 핵심 요소로, 산술 연산(Arithmetic Operation)과 논리 연산(Logic Operation)을 수행."}, {"name": "레지스터", "en": "Register", "note": "중앙처리장치 내부에서 처리할 명령어나 연산의 중간 결과값 등을 일시적으로 기억하는 임시 기억 장소. 종류: PC(프로그램 카운터), IR(명령어 레지스터), ACC(누산기), MAR(기억장치 주소 레지스터), MBR(기억장치 버퍼 레지스터), SP(스택포인터)."}, {"name": "버스", "en": "Bus", "note": "CPU, 메모리, I/O 장치 등과 상호 필요한 정보를 교환하기 위한 공동의 전송선. 주소버스(주소 정보 전송), 데이터버스(데이터 전송), 제어버스(제어 신호 전송)로 구분된다."}]}, "mnemonic": "CPU = '제(제어장치)발 연(연산장치)락 레(레지스터)버(버스)!' — 제발 연락 레버! 4글자만 기억해!", "trap": "", "table": [], "sources": [{"title": "TOPCIT ESSENCE ver.3 — 시스템 아키텍처 이해와 활용", "note": "정보통신산업진흥원(NIPA) 공식 교재"}], "priority": 3}, {"title": "컴퓨터 아키텍처의 종류", "keywords": ["순차적", "데이터버스:", "공간적", "주소버스:", "명령어"], "summary": "", "background": "옛날에 컴퓨터는 명령어(레시피)랑 데이터(재료)를 같은 길로 주고받다 보니 서로 기다려야 해서 느렸어. 이 병목 문제를 해결하려고 '길을 따로 만들자!'는 아이디어가 나온 거야.", "explanation": "폰노이만은 명령어랑 데이터가 같은 도로 하나를 공유하는 구조야 — 마치 1차선 도로에서 버스랑 트럭이 번갈아 다니는 것처럼 동시에 못 지나가. 하버드 아키텍처는 명령어 전용 도로, 데이터 전용 도로를 따로 만든 거야 — 2차선으로 나눠서 동시에 달릴 수 있으니 훨씬 빠르지. 대신 도로를 두 개 설계해야 하니까 구조가 복잡해지는 단점이 있어.", "why": "", "term_focus": [], "connections": [], "types": {"caption": "1945년 폰노이만의 프로그램 내장 설계 원리를 적용한 폰노이만 아키텍처와, 명령 메모리와 데이터 메모리를 분리한 하버드 아키텍처가 있다. 최근 고성능 CPU는 두 방식을 함께 사용한다.", "items": [{"name": "폰노이만 아키텍처", "en": "Von Neumann Architecture", "note": "하나의 메모리로부터 명령을 읽고, 같은 메모리로부터 데이터를 읽고 쓴다. 명령과 데이터가 같은 신호 버스·메모리를 사용하기 때문에 동시에 발생할 수 없어 병목이 생긴다."}, {"name": "하버드 아키텍처", "en": "Harvard Architecture", "note": "서로 다른 메모리에 명령어와 데이터를 저장하여 병목 현상을 해결. 명령어 읽기/쓰기 병행이 가능하므로 성능이 향상되나 버스 시스템의 설계가 복잡하다."}]}, "mnemonic": "🧠 '폰노이만=폰(1개 도로) / 하버드=하(Ha! 2개!)'\n→ '폰은 폰(1), 하버드는 둘(2)!' 로 외워봐!\n폰노이만: 도로 1개 → 순서대로 기다림\n하버드: 도로 2개 → 동시에 씽씽!", "trap": "", "table": [], "sources": [{"title": "TOPCIT ESSENCE ver.3 — 시스템 아키텍처 이해와 활용", "note": "정보통신산업진흥원(NIPA) 공식 교재"}], "priority": 3}, {"title": "명령어 사이클 (Instruction cycle)", "keywords": ["순차적", "데이터버스:", "공간적", "주소버스:", "명령어"], "summary": "", "background": "옛날에 CPU가 명령어를 어떤 순서로 처리해야 할지 규칙이 없으면 컴퓨터가 뒤죽박죽으로 일을 해버리는 문제가 있었어. 그래서 '명령어 하나를 처리할 때 항상 이 순서대로 해!'라는 일정한 처리 흐름을 만들게 된 거야.", "explanation": "명령어 사이클은 CPU가 할 일을 처리하는 반복 루틴인데, 마치 편의점 알바생이 손님 주문을 처리하는 것과 같아. ① 주문서 가져오기(인출) → ② 주문서에 다른 메뉴판 참고가 필요하면 찾아보기(간접) → ③ 실제로 음식 만들기(실행) → ④ 급한 손님 끼어들면 잠깐 대응하기(인터럽트). 이 4단계를 컴퓨터가 꺼질 때까지 계속 반복하는 거야!", "why": "", "term_focus": [], "connections": [], "types": null, "mnemonic": "🔁 '인간실인' 반복! → 인출 → 간접 → 실행 → 인터럽트, 줄여서 '인·간·실·인'! '인간 실인(실제 인간)처럼 CPU도 쉬지 않고 반복한다'고 기억해봐!", "trap": "", "table": [], "sources": [], "priority": 3}, {"title": "컴퓨터의 기본 구조", "keywords": ["순차적", "데이터버스:", "공간적", "주소버스:", "명령어"], "summary": "", "background": "옛날에 컴퓨터가 처음 만들어질 때, 사람들은 '어떻게 하면 기계가 스스로 계산하고 기억할 수 있을까?'를 고민했어. 그래서 역할을 나눠서 '생각하는 부분', '잠깐 기억하는 부분', '오래 저장하는 부분'으로 구조를 설계하게 됐지.", "explanation": "컴퓨터 구조는 사람의 몸이랑 똑같아! CPU는 '뇌'로 모든 계산과 판단을 하고, 주기억장치(RAM)는 '책상 위'처럼 지금 당장 쓸 것만 꺼내놓는 임시 공간이야. 보조기억장치(하드디스크/SSD)는 '책장'처럼 전원이 꺼져도 내용이 사라지지 않고 오래 보관되는 창고 역할을 해.", "why": "", "term_focus": [], "connections": [], "types": null, "mnemonic": "CPU-RAM-하드 = 뇌-책상-책장! '뇌가 책상에서 꺼내 쓰고, 책장에 저장한다' 로 기억해!", "trap": "", "table": [], "sources": [], "priority": 3}, {"title": "기억장치의 계층구조", "keywords": ["순차적", "데이터버스:", "공간적", "주소버스:", "명령어"], "summary": "", "background": "옛날에 컴퓨터가 처음 만들어질 때, 빠른 메모리는 너무 비싸서 전부 다 쓸 수가 없었어. 그래서 빠르고 비싼 건 조금만, 느리고 싼 건 많이 쓰는 방식으로 메모리를 층층이 나눠 쓰게 된 거야.", "explanation": "피자 가게 비유로 생각해봐. 요리사(CPU) 바로 옆 작은 선반(레지스터/캐시)엔 지금 당장 쓸 재료만 올려두고, 좀 떨어진 큰 냉장고(RAM)엔 오늘 쓸 재료를, 멀리 있는 창고(하드디스크)엔 나머지를 쌓아두는 거야. 선반은 꺼내기 빠르지만 작고 비싸고, 창고는 크고 싸지만 가지러 멀리 가야 해서 느린 것처럼, 메모리도 CPU에 가까울수록 빠르고 비싸고 용량이 작아져.", "why": "", "term_focus": [], "connections": [], "types": {"caption": "기억장치는 계층을 이루며, 상위층으로 갈수록 비트당 가격이 높아지고 용량은 감소하며 액세스 시간은 짧아지고 CPU에 의한 액세스 빈도는 높아진다.", "scale": "strong-to-weak", "items": [{"name": "레지스터", "en": "Register", "tier": "strong", "note": "최상위 계층. CPU 내부의 임시 저장소로 액세스 시간이 가장 짧고 비트당 가격이 가장 비싸다."}, {"name": "캐시", "en": "Cache", "tier": "strong", "note": "CPU와 주기억장치 사이에 위치한 고속 메모리. L1/L2/L3 캐시로 세분화되며 CPU의 반복 참조 데이터를 저장해 성능을 높인다."}, {"name": "주기억장치", "en": "Main Memory", "tier": "mid", "note": "CPU가 처리할 프로그램이나 데이터를 일시적으로 저장하는 기억장치. RAM, ROM 등."}, {"name": "보조기억장치", "en": "Auxiliary Memory", "tier": "weak", "note": "주기억장치의 저장용량 부족을 보완하며, 비휘발성 특징을 이용해 데이터를 반영구적으로 저장. 자기디스크, 광학디스크 등."}]}, "mnemonic": "🏔️ '위로 올라갈수록 비싸고 작고 빠르다' → 산 정상(CPU)에 가까울수록 땅값(가격)↑, 공간(용량)↓, 배달속도(속도)↑ — 줄여서 '위에선 비·작·빠!'", "trap": "", "table": [], "sources": [{"title": "TOPCIT ESSENCE ver.3 — 시스템 아키텍처 이해와 활용", "note": "정보통신산업진흥원(NIPA) 공식 교재"}], "priority": 2}, {"title": "명령어 집합구조, CISC와 RISC", "keywords": ["순차적", "데이터버스:", "공간적", "주소버스:", "명령어"], "summary": "", "background": "옛날 컴퓨터는 '복잡한 작업도 명령어 하나로 처리하자!'는 생각으로 설계됐는데, 명령어가 너무 많고 복잡해지다 보니 오히려 처리 속도가 느려지는 문제가 생겼어. 그래서 '명령어를 최대한 단순하게 줄이면 더 빠르지 않을까?'라는 반성에서 RISC가 탄생하게 됐지.", "explanation": "CISC는 '만능 요리사'야. 김치찌개 재료 손질부터 끓이기까지 혼자 다 해주는 대신 시간이 오래 걸려. 반면 RISC는 '분업 요리사'야. 각자 칼질, 불 조절 같은 단순한 일 하나씩만 맡지만, 여러 명이 동시에 빠르게 처리할 수 있어. 쉽게 말해 CISC는 '복잡하지만 명령어 수 적게', RISC는 '단순하지만 빠르게'가 핵심이야!", "why": "", "term_focus": [], "connections": [], "types": {"caption": "명령어 집합 구조(ISA)는 마이크로프로세서가 인식해서 실행할 수 있는 기계어 명령어다. 대표적인 두 구조가 CISC와 RISC.", "items": [{"name": "CISC", "en": "Complex Instruction Set Computer", "note": "복잡한 명령 처리를 하나의 명령어로 실행할 수 있도록 다수의 복잡한 명령어를 탑재한 복합 명령형 컴퓨터. 가변 길이 명령어(필요한 정보만 저장)로 코드 크기를 줄이나, 파이프라인 적용이 어렵다. 제어장치는 Micro-Program 방식, 컴파일러 구조 단순, 레지스터 수 적음. 활용: Intel x86 계열."}, {"name": "RISC", "en": "Reduced Instruction Set Computer", "note": "복잡한 명령을 단순한 명령어들의 조합으로 처리할 수 있도록 소수의 단순한 명령어를 탑재한 축소 명령형 컴퓨터. 32비트로 고정된 명령어 길이로 파이프라인 적용이 용이. 제어장치는 Hard-Wired 방식, 컴파일러 구조 복잡, 레지스터 수 많음. 활용: ARM, MIPS."}]}, "mnemonic": "C(CISC) = Complex = '씨, 복잡해!' / R(RISC) = Reduced = '리(알)아, 줄여!' → 씨(C)는 복잡, 리(R)는 줄임!", "trap": "", "table": [], "sources": [{"title": "TOPCIT ESSENCE ver.3 — 시스템 아키텍처 이해와 활용", "note": "정보통신산업진흥원(NIPA) 공식 교재"}], "priority": 2}, {"title": "입출력 장치의 개념", "keywords": ["인공", "저장", "계산", "반도체", "보존", "저장장치의", "오류검출", "셀(저장", "각각의"], "summary": "", "background": "컴퓨터는 혼자서는 사람과 대화를 못 해서, 사람의 명령을 받아들이고 결과를 보여줄 방법이 필요했어. 그래서 컴퓨터와 사람 사이를 연결해주는 '다리' 역할을 하는 장치가 등장했지.", "explanation": "입출력 장치는 컴퓨터와 사람 사이의 소통 창구야. 키보드나 마우스처럼 내가 컴퓨터한테 뭔가를 '넣어주는' 게 입력 장치고, 모니터나 프린터처럼 컴퓨터가 나한테 결과를 '보여주는' 게 출력 장치야. 쉽게 말해 입력은 '말 걸기', 출력은 '대답 듣기'라고 생각하면 돼!", "why": "", "term_focus": [], "connections": [], "types": null, "mnemonic": "🎤입력 = 마이크(내가 말함) / 🔊출력 = 스피커(상대가 대답함) → '입마출스' 로 기억!", "trap": "", "table": [], "sources": [], "priority": 3}, {"title": "I/O제어기의 구조와 주소지정 방식의 종류", "keywords": ["인공", "저장", "계산", "반도체", "보존", "저장장치의", "오류검출", "셀(저장", "각각의"], "summary": "", "background": "컴퓨터가 키보드, 마우스, 프린터 같은 외부 장치들이랑 대화하려면 중간에 통역사 역할을 해주는 뭔가가 필요했어. 그래서 CPU가 직접 장치랑 씨름하지 않아도 되도록 I/O 제어기라는 중간 관리자를 만들게 됐지.", "explanation": "I/O 제어기는 CPU와 외부 장치 사이에 있는 '통역 직원' 같은 거야. 직원한테 말 걸 때 '현재 상태 물어보는 창구 번호'랑 '실제 데이터 주는 창구 번호' 두 개가 따로 있는 거고, 이 번호를 일반 메모리 주소랑 같이 쓰면 Memory Mapped I/O, 따로 분리해서 쓰면 I/O Mapped I/O야.", "why": "", "term_focus": [], "connections": [], "types": {"caption": "I/O 장치마다 상태/제어 레지스터 주소와 데이터 레지스터 주소 2개가 필요하며, 주소 할당 방식에 따라 2가지로 구분된다.", "items": [{"name": "Memory Mapped I/O", "note": "기억장치 주소 영역의 일부분을 I/O 제어기 내 레지스터들의 주소로 할당하는 방식. 프로그래밍이 용이한 장점이 있으나 기억장치 공간이 감소하는 단점이 있다."}, {"name": "I/O Mapped I/O", "note": "I/O 장치 주소 공간을 기억장치 주소 공간과 분리하여 할당하는 방식. 기억장치 주소 공간이 줄어들지 않는 장점이 있으나 프로그래밍이 어렵다."}]}, "mnemonic": "【M따 I따】 Memory Mapped = 메모리랑 '따'로 안 씀(같이 씀), I/O Mapped = 메모리랑 '따'로 씀! 'M따 I따'로 반대로 기억해!", "trap": "", "table": [], "sources": [{"title": "TOPCIT ESSENCE ver.3 — 시스템 아키텍처 이해와 활용", "note": "정보통신산업진흥원(NIPA) 공식 교재"}], "priority": 3}, {"title": "직접 메모리 접근", "keywords": ["인공", "저장", "계산", "반도체", "보존", "저장장치의", "오류검출", "셀(저장", "각각의"], "summary": "", "background": "옛날에는 USB나 그래픽카드 같은 장치가 데이터를 전달할 때마다 CPU한테 일일이 부탁해야 했는데, 이러면 CPU가 그 심부름만 하느라 정작 중요한 일을 못 했어. 그래서 'CPU 없이도 장치가 메모리에 직접 데이터를 넣을 수 없을까?' 하는 고민에서 DMA가 탄생했지.", "explanation": "DMA는 택배 직배송 같은 거야. 원래는 물건(데이터)을 보낼 때 항상 사장님(CPU)이 직접 받아서 창고(메모리)에 갖다 놓아야 했는데, DMA는 택배기사(DMA 컨트롤러)가 사장님 거치지 않고 창고에 바로 갖다 놓는 거야. 덕분에 사장님은 다른 중요한 일에 집중할 수 있어서 전체 작업이 훨씬 빨라지는 거지.", "why": "", "term_focus": [], "connections": [], "types": null, "mnemonic": "DMA = '도마' 위에서 CPU 빼고 직접 썰기! → 'D(직접) M(메모리) A(접근)', CPU 없이 도마 위에서 바로 처리한다고 기억해!", "trap": "", "table": [], "sources": [], "priority": 3}, {"title": "기억장치의 성능 평가 요소", "keywords": ["인공", "저장", "계산", "반도체", "보존", "저장장치의", "오류검출", "셀(저장", "각각의"], "summary": "", "background": "컴퓨터가 발전하면서 메모리 종류가 엄청 많아졌는데, 어떤 메모리가 더 좋은지 비교할 기준이 필요했어. 그래서 속도, 효율, 비용을 객관적으로 측정하는 4가지 기준을 만들게 됐어.", "explanation": "편의점에서 물건 사는 걸 상상해봐. '물건 찾는 시간(접근 시간)', '다음 손님 받을 준비 되는 시간(사이클 시간)', '1초에 물건 몇 개 계산하나(데이터 전송률)', '얼마짜리 편의점이냐(가격)' — 이 4가지로 편의점 성능을 평가하는 거야. 메모리도 똑같이 이 4가지로 얼마나 빠르고 효율적이고 저렴한지 평가해.", "why": "", "term_focus": [], "connections": [], "types": null, "mnemonic": "🎵 '접사데가' — 접근! 사이클! 데이터전송률! 가격! 순서대로 외워, '접사데가' 한 단어로 끝!", "trap": "", "table": [], "sources": [], "priority": 3}, {"title": "기억장치의 분류 및 특징", "keywords": ["인공", "저장", "계산", "반도체", "보존", "저장장치의", "오류검출", "셀(저장", "각각의"], "summary": "", "background": "컴퓨터가 처음 만들어질 때, 모든 데이터를 한 곳에 저장하려다 보니 너무 느리거나 꺼지면 다 날아가는 문제가 생겼어. 그래서 '빠르게 쓰는 곳', '오래 보관하는 곳'처럼 역할을 나눠서 기억장치를 여러 종류로 구분하게 됐어.", "explanation": "기억장치는 책상 위 메모지(RAM, 주기억장치)랑 서랍 속 파일 박스(하드디스크, 보조기억장치)로 나눌 수 있어. 메모지는 빠르게 쓰고 지울 수 있지만 자리를 비우면(전원 꺼지면) 내용이 사라지고, 파일 박스는 느리지만 꺼져도 내용이 남아있지. 이렇게 '속도 vs 용량', '휘발성 vs 비휘발성'이 기억장치를 나누는 핵심 기준이야.", "why": "", "term_focus": [], "connections": [], "types": {"caption": "기억장치는 용도·물리적 저장방식·데이터 유지·접근방식·내용 보존 여부 5가지 기준으로 분류된다.", "items": [{"name": "용도 (주/보조)", "note": "주기억장치(Main Memory): CPU가 처리할 프로그램·데이터를 일시 저장 — RAM, ROM. 보조기억장치(Auxiliary): 저장용량 부족 보완과 반영구 저장 — 자기디스크, 광학디스크."}, {"name": "물리적 저장 방식", "note": "자기(Magnetic): 자속 방향으로 2가지 정보 기억 — 자기테이프. 광학(Optical): 레이저 광선으로 정보 기록 — CD, DVD, Blu-Ray. 반도체(Semiconductor): 집적회로 기술 — RAM, ROM, 플래시 메모리."}, {"name": "전원 단절 시 데이터 유지", "note": "휘발성(Volatile): 전원이 단절되면 모든 정보가 삭제 — RAM 기반 SSD. 비휘발성(Non-Volatile): 전원이 단절되어도 보존 — ROM, 자기코어, 보조기억장치."}, {"name": "접근 방식", "note": "순차적 접근(Sequential): 저장된 순서대로만 접근 — 자기테이프. 직접 접근(Direct): 원하는 위치를 직접 접근 — 디스크, 플래시 메모리."}, {"name": "내용 보존 여부", "note": "파괴성(Destructive): 판독 후 저장 내용이 파괴 — 자기코어. 비파괴성(Non-Destructive): 판독 후에도 내용 유지 — 자기코어를 제외한 기억장치."}]}, "mnemonic": "📝 '메(모지)빠날 - 파(일박스)느남' → 메모지(주기억장치)는 빠르지만 날아가고, 파일박스(보조기억장치)는 느리지만 남는다!", "trap": "", "table": [], "sources": [{"title": "TOPCIT ESSENCE ver.3 — 시스템 아키텍처 이해와 활용", "note": "정보통신산업진흥원(NIPA) 공식 교재"}], "priority": 3}, {"title": "주소지정 방식", "keywords": ["인공", "저장", "계산", "반도체", "보존", "저장장치의", "오류검출", "셀(저장", "각각의"], "summary": "", "background": "컴퓨터가 기억장치에서 데이터를 꺼내오려면 '어디에 있는지' 주소를 알아야 하는데, 명령어 안에 주소를 담을 공간이 너무 부족했어. 그래서 제한된 공간을 최대한 효율적으로 쓰면서도 원하는 위치를 정확히 찾을 수 있는 다양한 주소 지정 방법들이 개발된 거야.", "explanation": "주소지정 방식은 쉽게 말해 '택배 찾는 방법'이야. 직접 주소지정은 '서울시 강남구 123번지'처럼 정확한 주소를 바로 알려주는 것, 간접 주소지정은 '내 책상 서랍 안에 진짜 주소가 적혀 있어'처럼 주소의 주소를 알려주는 것, 묵시적 주소지정은 '늘 쓰는 그 자리'처럼 주소를 따로 말 안 해도 정해진 위치를 쓰는 거야.", "why": "", "term_focus": [], "connections": [], "types": {"caption": "주기억장치 자료의 주소(Address)를 제한된 명령어 비트로 효율적으로 지정하는 방식들.", "items": [{"name": "즉시 주소지정", "en": "Immediate Addressing Mode", "note": "명령어 내에 피연산자(데이터 값) 자체가 포함되어 있는 방식. 별도의 메모리 접근 없이 즉시 사용 가능."}, {"name": "직접 주소지정", "en": "Direct Addressing Mode", "note": "명령어 내 주소 필드의 값이 피연산자의 실제 메모리 주소."}, {"name": "간접 주소지정", "en": "Indirect Addressing Mode", "note": "명령어 내 주소 필드가 피연산자의 실제 주소를 가지고 있는 메모리 위치를 가리키는 방식."}, {"name": "묵시 주소지정", "en": "Implied Addressing Mode", "note": "피연산자의 위치가 명령어 자체에 암묵적으로 지정된 방식(예: 스택 연산)."}, {"name": "변위 주소지정", "en": "Displacement Addressing Mode", "note": "베이스 주소 + 변위(offset)로 실제 주소를 계산하는 방식. 세부 유형: 상대(Relative) — PC 기준 변위 더함 / 인덱스(Indexed) — 인덱스 레지스터 값 더함 / 베이스 레지스터(Base Register) — 베이스 레지스터 값 더함."}]}, "mnemonic": "직·간·묵 → '직접 가거나, 간판 보고 찾거나, 묵묵히 원래 자리' — 직접/간접/묵시적 세 가지를 순서대로 떠올려봐!", "trap": "", "table": [], "sources": [{"title": "TOPCIT ESSENCE ver.3 — 시스템 아키텍처 이해와 활용", "note": "정보통신산업진흥원(NIPA) 공식 교재"}], "priority": 3}, {"title": "뉴로모픽칩", "keywords": ["인공", "저장", "계산", "반도체", "보존", "저장장치의", "오류검출", "셀(저장", "각각의"], "summary": "", "background": "기존 컴퓨터는 계산하는 곳(CPU)과 기억하는 곳(메모리)이 따로 분리되어 있어서 데이터를 주고받느라 느려지는 '병목 현상' 문제가 있었어. 그래서 사람의 뇌처럼 기억과 계산을 한 곳에서 동시에 처리할 수 있는 칩이 필요해졌어.", "explanation": "우리 뇌는 눈으로 본 것을 기억하면서 동시에 '저게 고양이네!'라고 판단하잖아? 뉴로모픽칩은 바로 그 뇌의 방식을 흉내 낸 반도체야. 기존 컴퓨터가 줄 서서 하나씩 처리하는 '편의점 계산대 1개'라면, 뉴로모픽칩은 여러 계산대가 동시에 돌아가는 '대형마트 계산대'처럼 이미지, 소리 같은 복잡한 정보를 한꺼번에 빠르게 처리해.", "why": "", "term_focus": [], "connections": [], "types": null, "mnemonic": "🧠 '뇌(뉴로) + 모양(모픽) = 뇌를 모방한 칩!' — '뉴로모픽 = 뇌모방칩'으로 기억해! 뇌처럼 기억이랑 계산을 동시에 하는 반도체!", "trap": "", "table": [], "sources": [], "priority": 4}, {"title": "양자컴퓨터", "keywords": ["인공", "저장", "계산", "반도체", "보존", "저장장치의", "오류검출", "셀(저장", "각각의"], "summary": "", "background": "기존 컴퓨터는 0 아니면 1, 딱 두 가지로만 정보를 처리해서 엄청 복잡한 계산(예: 암호 해독)엔 수천 년이 걸릴 수도 있었어. 그래서 과학자들이 '자연의 물리 법칙을 그대로 이용하면 동시에 여러 계산을 할 수 있지 않을까?' 하고 만든 게 양자컴퓨터야.", "explanation": "일반 컴퓨터는 전등 스위치처럼 ON(1) 아니면 OFF(0)만 가능한데, 양자컴퓨터는 '팽이'처럼 돌아가는 동안엔 ON도 OFF도 아닌 두 상태를 동시에 가질 수 있어. 덕분에 미로 찾기를 할 때 일반 컴퓨터는 길을 하나씩 차례로 시도하지만, 양자컴퓨터는 모든 길을 한꺼번에 시도하는 것처럼 계산 속도가 폭발적으로 빨라져. 이 엄청난 속도 때문에 지금 우리가 쓰는 암호들도 순식간에 풀릴 수 있어서 정보보안에서 아주 중요한 위협으로 다뤄지는 거야.", "why": "", "term_focus": [], "connections": [], "types": null, "mnemonic": "✨ '0도 1도 동시에!' → 큐비트(Q) = Q(동시에 둘 다!)로 기억해. '큐~빗(Qubit)' 하면 '큐(Q) 하나가 0이랑 1을 동시에 품고 있다'고 떠올리면 끝!", "trap": "", "table": [], "sources": [], "priority": 4}, {"title": "메모리 구조에 의한 병렬 처리 시스템 분류", "keywords": ["인공", "저장", "계산", "반도체", "보존", "저장장치의", "오류검출", "셀(저장", "각각의"], "summary": "", "background": "옛날에 컴퓨터 한 대로 복잡한 계산을 하려니 너무 느려서, 여러 개의 CPU를 동시에 돌리는 방법을 고민하게 됐어. 근데 CPU가 여럿이면 메모리를 어떻게 나눠 쓸지가 문제가 됐고, 그 방식에 따라 시스템 구조가 달라지게 됐어.", "explanation": "SMP는 여러 명의 요리사가 하나의 냉장고를 같이 쓰는 것처럼, 모든 CPU가 메모리 하나를 공유해서 쓰는 방식이야. 편하긴 한데 냉장고 문 앞에 사람이 몰리면 막히듯이(병목현상) CPU가 많아질수록 느려질 수 있어. MPP는 반대로 요리사마다 자기 냉장고를 따로 갖는 거야. 서로 독립적이라 확장이 쉽고 막힐 일이 없지만, 재료를 나눠 쓰려면 서로 연락(네트워크 통신)을 해야 해서 번거롭지.", "why": "", "term_focus": [], "connections": [], "types": {"caption": "병렬 처리 시스템을 메모리 공유 방식에 따라 분류. SMP는 강결합, MPP는 약결합, NUMA는 SMP와 MPP의 절충.", "items": [{"name": "SMP", "en": "Symmetric Multiprocessor (대칭 다중 프로세서)", "note": "모든 프로세서가 메인메모리를 공유메모리로 사용하는 강결합 시스템 구조. 데이터 전달은 공유메모리를 이용할 수 있어 프로그래밍이 용이하나, 확장의 어려움이 있고 내부버스에 병목현상이 발생할 수 있다."}, {"name": "MPP", "en": "Massive Parallel Processor (거대 병렬 프로세서)", "note": "프로세서별로 독립된 메인 메모리를 가지는 분산 메모리 방식. 내부버스나 이더넷 같은 네트워크를 이용해 프로세서 간 데이터를 교환하는 약결합 시스템. 확장성이 좋으나 프로그래밍이 어렵다."}, {"name": "NUMA", "en": "Non Uniform Memory Access", "note": "프로그램 개발이 용이한 SMP의 장점과 확장성이 좋은 MPP의 장점을 결합. 각 프로세서는 로컬 메모리를 가지며 모든 프로세서가 접근할 수 있는 공유 메모리도 함께 가지는 구조."}]}, "mnemonic": "S(SMP) = Share(공유), 하나의 메모리를 같이 씀 → '같이 써서 Simple하지만 Stuck(막힘) 위험!' / M(MPP) = Mine(내 것), 각자 메모리를 따로 가짐 → '내 것은 내 것, 빠르지만 메시지 보내야 함!'", "trap": "", "table": [], "sources": [{"title": "TOPCIT ESSENCE ver.3 — 시스템 아키텍처 이해와 활용", "note": "정보통신산업진흥원(NIPA) 공식 교재"}], "priority": 3}, {"title": "병렬 처리 시스템의 개념", "keywords": ["지시문"], "summary": "", "background": "옛날에 컴퓨터는 일꾼이 한 명뿐이라 일을 하나씩 순서대로 처리했는데, 할 일이 너무 많아지면서 속도가 너무 느려지는 문제가 생겼어. 그래서 일꾼을 여러 명 고용해서 동시에 일을 나눠 처리하자는 아이디어가 나온 거야.", "explanation": "예를 들어 김밥 100줄을 혼자 만들면 엄청 오래 걸리지만, 친구 10명이 함께 나눠서 만들면 훨씬 빠르게 끝나잖아. 병렬 처리도 똑같이 여러 개의 CPU(일꾼)가 큰 작업을 쪼개서 동시에 처리하는 방식이야. 덕분에 속도도 빠르고, 한 명이 쓰러져도 나머지가 계속 일하니까 전체가 멈추지 않아.", "why": "", "term_focus": [], "connections": [], "types": null, "mnemonic": "병렬 = '병사 여럿이 나란히 달린다' → 여러 CPU가 나란히 동시에 일함!", "trap": "", "table": [], "sources": [], "priority": 3}, {"title": "병렬 처리 시스템의 플린에 의한 분류", "keywords": ["지시문"], "summary": "", "background": "옛날에 컴퓨터가 한 번에 하나씩만 일을 처리하다 보니 너무 느려서 문제가 됐어. 그래서 '여러 개를 동시에 처리하면 어떨까?' 하는 아이디어가 나왔고, 플린이라는 사람이 그 방식들을 4가지로 깔끔하게 정리해줬어.", "explanation": "명령어(시키는 일)와 데이터(재료)가 각각 하나냐 여러 개냐로 나누는 거야. 예를 들어 SISD는 요리사 한 명이 레시피 하나로 재료 하나만 요리하는 것, SIMD는 요리사 한 명이 레시피 하나로 재료 여러 개를 동시에 요리하는 것, MIMD는 요리사 여러 명이 각자 다른 레시피로 다른 재료를 동시에 요리하는 거야. 현대 멀티코어 CPU나 분산 서버가 바로 MIMD 방식이야!", "why": "", "term_focus": [], "connections": [], "types": {"caption": "플린(Flynn)이 제안한 병렬 컴퓨터 분류 기준. 명령어 스트림(단일/다중)과 데이터 스트림(단일/다중)의 조합으로 4가지 유형으로 나뉜다.", "items": [{"name": "SISD", "en": "Single Instruction Single Data", "note": "단일 명령어 스트림, 단일 데이터 스트림. 단일 프로세서가 하나의 명령어로 하나의 데이터를 처리하는 전통적인 폰노이만 구조."}, {"name": "SIMD", "en": "Single Instruction Multiple Data", "note": "단일 명령어 스트림, 다중 데이터 스트림. 하나의 명령어로 여러 데이터를 동시 처리. 배열 프로세서 형태."}, {"name": "MISD", "en": "Multiple Instruction Single Data", "note": "다중 명령어 스트림, 단일 데이터 스트림. 여러 명령어가 하나의 데이터를 처리. 파이프라인 프로세서 형태이나 실제 구현은 드물다."}, {"name": "MIMD", "en": "Multiple Instruction Multiple Data", "note": "다중 명령어 스트림, 다중 데이터 스트림. 여러 프로세서가 각자 다른 명령어로 다른 데이터를 처리. 공유기억장치(SMP/NUMA) 또는 분산기억장치(클러스터) 구조로 구현."}]}, "mnemonic": "🎵 SM / SM / MM 노래로 외워! → '싱글싱글(SISD), 싱글멀티(SIMD), 멀티싱글(MISD), 멀티멀티(MIMD)' — 앞글자가 명령어 수, 뒷글자가 데이터 수! S=Single(하나), M=Multiple(여러개)", "trap": "", "table": [], "sources": [{"title": "TOPCIT ESSENCE ver.3 — 시스템 아키텍처 이해와 활용", "note": "정보통신산업진흥원(NIPA) 공식 교재"}], "priority": 2}, {"title": "병렬 프로그래밍 기술", "keywords": ["지시문"], "summary": "", "background": "옛날에 컴퓨터는 일을 하나씩 순서대로만 처리했는데, 할 일이 너무 많아지면서 속도가 너무 느려지는 문제가 생겼어. 그래서 여러 명이 동시에 일을 나눠서 처리하는 '병렬 프로그래밍' 방식이 필요해졌지.", "explanation": "병렬 프로그래밍은 마치 김밥 가게에서 혼자 다 만들던 걸, 여러 직원이 밥 펴기·재료 얹기·마는 걸 동시에 나눠서 하는 것과 같아. OpenMP는 기존 레시피(코드)에 '이 부분은 같이 해!'라는 메모(디렉티브)만 붙이면 알아서 여러 명이 나눠 일하고, 끝나면 다시 한 명이 마무리하는 방식이야. MPI는 각자 다른 주방(컴퓨터)에서 일하면서 메모지(메시지)를 주고받으며 협력하는 방식이고.", "why": "", "term_focus": [], "connections": [], "types": null, "mnemonic": "🍴 OpenMP = '오픈(열어서) 내 팀이 같이(MP=My People)' → 한 주방에서 메모 붙여 팀 나눔 / MPI = '편지(Message) 보내는 독립 주방들' → fork(나눠) join(합쳐)!", "trap": "", "table": [], "sources": [], "priority": 4}, {"title": "그래픽 처리 프로세싱 기술", "keywords": ["지시문"], "summary": "", "background": "옛날엔 컴퓨터로 게임이나 영상을 처리할 때 CPU 혼자 다 하려니까 너무 느리고 버벅거리는 문제가 있었어. 그래서 '그래픽 전담 처리 장치'를 따로 만들자! 해서 GPU가 탄생했어.", "explanation": "CPU가 '만능 요리사 1명'이라면, GPU는 '간단한 작업만 하는 알바생 수천 명'이야. 예를 들어 김밥 1000줄을 만들 때 요리사 1명이 순서대로 만드는 것보다, 알바생 1000명이 동시에 1줄씩 만드는 게 훨씬 빠르잖아. GPU가 바로 그 방식으로 그래픽이나 대용량 데이터를 엄청 빠르게 처리해줘.", "why": "", "term_focus": [], "connections": [], "types": null, "mnemonic": "GPU = '게임 병렬 유닛' → G(게임처럼 화려한 작업), P(병렬로 동시에), U(유닛 수천 개가 처리)! '게병유' 세 글자만 기억해!", "trap": "", "table": [], "sources": [], "priority": 4}, {"title": "스토리지 용량 관리 기술", "keywords": ["지시문"], "summary": "", "background": "옛날에는 창고를 빌릴 때 '나중에 짐이 많아질 수도 있으니까' 하고 무조건 큰 창고를 통째로 예약해뒀어. 근데 실제로는 창고의 절반도 안 쓰는 경우가 많아서 공간이 엄청 낭비됐거든!", "explanation": "씬 프로비저닝은 마치 '뷔페 식당'이랑 같아. 기존 방식(Thick)은 손님이 오기도 전에 접시에 음식을 가득 담아놓는 거고, 씬 프로비저닝은 손님이 실제로 먹을 만큼만 그때그때 가져다 주는 거야. 덕분에 음식(저장 공간) 낭비가 없고, 필요할 때마다 유연하게 늘릴 수 있어!", "why": "", "term_focus": [], "connections": [], "types": null, "mnemonic": "씬(Thin) = 날씬하게! 🪄 '필요한 만큼만 날씬하게 쓴다' — Thick(뚱뚱하게 미리 다 차지)의 반대로, 씬은 '쏙쏙 필요할 때만' 꺼내 쓰는 다이어트 저장소!", "trap": "", "table": [], "sources": [], "priority": 4}, {"title": "저장장치의 개념", "keywords": [], "summary": "", "background": "옛날에 컴퓨터를 끄면 작업하던 내용이 다 날아가는 문제가 있었어. 그래서 전원이 꺼져도 데이터를 안전하게 보관할 수 있는 '영구 저장 공간'이 필요해졌지.", "explanation": "저장장치는 쉽게 말해 컴퓨터의 '서랍장'이야. 메모리(주기억장치)가 지금 당장 손에 들고 있는 책이라면, 저장장치(보조기억장치)는 책꽂이에 꽂아두는 것처럼 전원이 꺼져도 데이터가 사라지지 않고 남아 있어. 웹서버, 앱, 데이터베이스 모두 이 서랍장 덕분에 정보를 잃어버리지 않고 계속 쓸 수 있는 거야.", "why": "", "term_focus": [], "connections": [], "types": null, "mnemonic": "📚 '메모리는 손에 든 책, 저장장치는 책꽂이!' — 손에서 놓으면(전원 OFF) 책은 떨어지지만, 책꽂이(저장장치)에 꽂힌 건 절대 안 사라져!", "trap": "", "table": [], "sources": [], "priority": 3}, {"title": "저장장치와 서버의 연결", "keywords": [], "summary": "", "background": "옛날에는 컴퓨터 한 대에 하드디스크 하나씩 꽂아서 쓰면 충분했는데, 영상이나 사진 같은 무거운 파일들이 많아지면서 하드디스크 하나로는 도저히 감당이 안 되기 시작했어. 그래서 여러 디스크를 묶어서 쓰거나, 아예 저장 전용 장치를 따로 만들어서 연결하는 방법들이 생겨난 거야.", "explanation": "컴퓨터와 저장장치를 연결하는 방식이 3가지 있어. DAS는 USB처럼 내 컴퓨터에 직접 꽂아 쓰는 방식이고, NAS는 공유기에 연결된 공용 USB처럼 여러 컴퓨터가 네트워크로 함께 쓰는 방식이야. SAN은 회사처럼 큰 곳에서 저장장치 전용 고속도로를 따로 깔아서 엄청 빠르게 연결하는 방식이라고 보면 돼.", "why": "", "term_focus": [], "connections": [], "types": null, "mnemonic": "D(직접 Direct) - N(네트워크 Network) - S(전용도로 Special망) → '직·넷·전' 순서로 점점 규모가 커진다고 기억해!", "trap": "", "table": [], "sources": [], "priority": 2}, {"title": "저장장치 디스크 스케줄링", "keywords": [], "summary": "", "background": "옛날에 컴퓨터 디스크는 실제로 빙글빙글 돌아가는 원판이었는데, 여러 사람이 동시에 '내 파일 읽어줘!'라고 요청하면 어떤 순서로 처리할지 몰라서 디스크 바늘이 왔다갔다 엄청 비효율적으로 움직였어. 그래서 '어떤 순서로 요청을 처리하면 바늘이 가장 적게 움직일까?'를 고민하다가 디스크 스케줄링이 탄생했지!", "explanation": "마트 계산대 직원이 손님들 카트를 처리하는 걸 상상해봐. 1번 줄, 5번 줄, 2번 줄 손님이 동시에 왔을 때, 무작정 부른 순서대로 처리하는 것보다 가까운 줄부터 차례대로 처리하면 직원이 덜 움직이고 더 빨리 끝나잖아. 디스크 스케줄링도 똑같이, 디스크 바늘이 최대한 적게 움직이면서 최대한 많은 요청을 빠르게 처리하는 순서를 정하는 방법이야.", "why": "", "term_focus": [], "connections": [], "types": {"caption": "디스크 드라이브에 입출력을 요청할 때 요청을 효율적으로 처리하기 위한 기법. 탐색 시간·회전 대기 시간을 최소화하여 접근 시간을 줄인다.", "items": [{"name": "FCFS", "en": "First Come First Service", "note": "요청된 순서대로 서비스. 디스크의 대기 큐에 들어온 요청 트랙 순서대로 헤드를 움직인다. 프로그램이 간단하고 모든 요청에 공평하지만, 헤드 움직임이 비효율적일 수 있어 응답시간이 길어질 수 있다."}, {"name": "SSTF", "en": "Shortest Seek Time First", "note": "현재 헤드 위치에서 탐색 거리가 가장 짧은 요청부터 서비스. FCFS보다 처리율이 높고 평균 응답시간도 짧지만, 멀리 있는 요청이 계속 미뤄져 기아 현상(Starvation)이 발생할 수 있다."}, {"name": "SCAN", "note": "현재 헤드가 진행 중인 방향에서 가장 짧은 탐색 거리에 있는 요청을 먼저 서비스. 응답시간 편차를 줄이고 단위 시간당 처리량·평균 응답시간이 우수. 한 방향 요청을 모두 서비스한 후 가장 바깥쪽/안쪽 실린더에 도달하면 방향을 변경한다. SSTF의 기아 현상을 해결."}, {"name": "LOOK", "note": "SCAN과 동일하지만 헤드가 실린더의 가장 안쪽/바깥쪽까지 이동하지 않고, 진행 방향의 요청이 더 이상 없으면 바로 방향을 변경한다."}, {"name": "C-SCAN", "en": "Circular SCAN", "note": "안쪽과 바깥쪽 트랙을 환형(Circular) 모형으로 연결하여 헤드가 한 방향으로만 이동하면서 요청을 처리. SCAN보다 입출력 요청에 균등하게 응답."}, {"name": "C-LOOK", "en": "Circular LOOK", "note": "C-SCAN과 유사하게 안쪽/바깥쪽 트랙을 환형으로 연결하지만, LOOK처럼 필요한 만큼만 이동하는 스케줄링 기법."}]}, "mnemonic": "🎯 '최소 최대 최소 최소' - 디스크 스케줄링 목표는 딱 4개! '이동(최소) / 처리량(최대) / 응답시간(최소) / 편차(최소)' → '적게 움직여서, 많이 처리하고, 빨리 답하되, 들쭉날쭉하지 말자!'", "trap": "", "table": [], "sources": [{"title": "TOPCIT ESSENCE ver.3 — 시스템 아키텍처 이해와 활용", "note": "정보통신산업진흥원(NIPA) 공식 교재"}], "priority": 3}, {"title": "RAID(Redundant Array of Independent Disks) 기술", "keywords": ["기능", "기술", "솔루션"], "summary": "", "background": "옛날에는 하드디스크 하나가 고장나면 그 안에 저장된 데이터가 전부 날아가버리는 끔찍한 일이 자주 있었어. 그래서 '여러 개의 디스크를 묶어서 하나처럼 쓰면 하나가 고장나도 괜찮지 않을까?' 하는 아이디어에서 RAID가 탄생했어.", "explanation": "RAID는 여러 개의 하드디스크를 하나의 팀으로 묶어서 쓰는 기술이야. 예를 들어 중요한 숙제 파일을 USB 하나에만 저장하면 잃어버릴 수 있지만, 3개의 USB에 똑같이 나눠 저장해두면 하나가 망가져도 안전한 것처럼, RAID도 디스크 여러 개에 데이터를 나누거나 복사해서 더 빠르고 안전하게 보관해줘. 덕분에 속도도 빨라지고, 용량도 커지고, 하나가 고장나도 시스템이 멈추지 않는 세 가지 장점을 동시에 누릴 수 있어.", "why": "", "term_focus": [], "connections": [], "types": {"caption": "다수의 디스크를 배열하고 상호 결합을 통해 별도의 디스크 유닛을 만들어 장애 발생 요인을 최소화하고 접근 성능을 향상시키는 저장장치 기술. 주요 특징은 가용성 향상·용량 확장·속도 향상. 주로 쓰이는 것은 0/1/5/6/10이며 2/3/4는 거의 사용되지 않는다.", "items": [{"name": "RAID 0", "en": "Striped Disk Array without Fault Tolerance", "note": "최소 2개 이상의 드라이브로 구성. 여러 디스크에 일정 크기로 나누어 저장하는 디스크 스트라이핑으로 입출력 속도를 높임. 중복성이 없어 데이터 복구 불가 — 한 드라이브에 오류 발생 시 데이터 손실."}, {"name": "RAID 1", "en": "Mirroring", "note": "두 개 이상의 디스크에 동일한 데이터를 기록하는 미러링 방식. 한 드라이브에 장애가 나도 다른 드라이브로 복구 가능하여 안정성이 매우 높음. 단, 저장 용량 효율은 50%로 떨어진다."}, {"name": "RAID 5", "en": "Striped with Distributed Parity", "note": "스트라이핑 + 분산 패리티. 패리티 정보를 모든 드라이브에 분산 저장해 한 드라이브 장애 시 복구 가능. 최소 3개 드라이브 필요."}, {"name": "RAID 6", "en": "Striped with Dual Distributed Parity", "note": "RAID 5와 유사하지만 2개의 드라이브에 패리티를 중복 저장. RAID 5보다 내구성(Durability)이 높아 데이터를 안전하게 저장 가능. 두 드라이브 동시 장애까지 복구 가능."}, {"name": "RAID 10", "en": "Striping & Mirroring (1+0)", "note": "최소 4개 드라이브가 필요. RAID 0과 RAID 1 기술의 복합체로 입출력 속도 향상과 데이터 안정성을 동시에 제공. RAID 0의 안정성 단점과 RAID 1의 성능 단점을 모두 해결하지만 비용이 많이 소요된다."}]}, "mnemonic": "RAID = '빠르고(속도↑) 안전하고(가용성↑) 크다(용량↑)' → 줄여서 '빠·안·크' 디스크 여러 개가 뭉치면 빠·안·크게 된다!", "trap": "", "table": [], "sources": [{"title": "TOPCIT ESSENCE ver.3 — 시스템 아키텍처 이해와 활용", "note": "정보통신산업진흥원(NIPA) 공식 교재"}], "priority": 1}, {"title": "백업 스토리지: LTO, VIL", "keywords": ["기능", "기술", "솔루션"], "summary": "", "background": "옛날에 회사들이 엄청난 양의 데이터를 저장해야 했는데, 하드디스크는 너무 비싸고 용량도 부족했어. 그래서 오래되고 저렴하면서도 대용량을 저장할 수 있는 '테이프' 방식을 발전시킨 게 LTO야. 그런데 실제 테이프는 느리고 불편하니까, 테이프처럼 동작하는 가상 장치(VTL)도 만들게 된 거지.", "explanation": "LTO는 카세트 테이프처럼 생긴 저장장치인데, 엄청나게 많은 데이터를 싸게 보관할 수 있어서 회사들이 백업용으로 많이 써. VTL은 실제 테이프는 없는데 컴퓨터가 '나 테이프야~'라고 흉내 내는 가상 테이프야. 마치 실제 CD 없이 컴퓨터에서 가상 CD를 돌리는 것처럼, 테이프 없이 테이프인 척 하면서 속도는 훨씬 빠르게 동작하는 거지.", "why": "", "term_focus": [], "connections": [], "types": null, "mnemonic": "LTO = '롱 테이프 오리지널(진짜 테이프)', VTL = '가상(Virtual) 테이프 라이브러리(가짜 테이프)' → 진짜 vs 가짜! LTO는 손에 잡히는 테이프, VTL은 눈에 안 보이는 유령 테이프!", "trap": "", "table": [], "sources": [], "priority": 4}, {"title": "파일시스템의 이해", "keywords": [], "summary": "", "background": "옛날에 컴퓨터에 파일이 엄청 많아지면서 '내가 저장한 파일이 어디 있지?' 하고 찾기가 너무 힘들어졌어. 그래서 파일들을 체계적으로 정리하고 빠르게 찾을 수 있는 규칙이 필요해졌지.", "explanation": "파일시스템은 도서관이랑 똑같아! 도서관에 책이 엄청 많아도 '소설 → 한국소설 → ㄱ작가' 이런 식으로 분류해두면 바로 찾잖아. 컴퓨터도 똑같이 파일들을 폴더(디렉토리)로 분류해서 보관하고, 어느 파일이 어디 있는지 목록을 따로 관리해줘. 덕분에 우리가 '내 문서 → 사진 → 2024년' 이렇게 쭉 들어가면 원하는 파일을 바로 찾을 수 있는 거야.", "why": "", "term_focus": [], "connections": [], "types": null, "mnemonic": "파일시스템 = '파일 도서관 사서' 📚 → 파일(책)을 디렉토리(책장)에 정리하고, 어디 있는지 목록(카탈로그)으로 관리해주는 사서!", "trap": "", "table": [], "sources": [], "priority": 3}, {"title": "운영체쩌별 파일시스템의 종류", "keywords": ["위차:", "디렉토리", "이름:", "시간,", "파일", "보호", "크가:"], "summary": "", "background": "옛날에 컴퓨터마다 파일을 저장하는 방식이 달라서 윈도우에서 만든 파일을 맥이나 리눅스에서 못 읽는 문제가 생겼어. 그래서 각 운영체제 회사들이 자기 시스템에 맞는 최적의 파일 저장 규칙(파일시스템)을 따로따로 만들게 됐어.", "explanation": "파일시스템은 쉽게 말해 '서랍 정리 방식'이야. 윈도우는 FAT/NTFS라는 방식으로 정리하고, 맥은 HFS+, 리눅스는 ext4, 솔라리스는 ZFS로 정리하는 거야. 각 운영체제가 자기만의 서랍 정리법을 쓰니까, 다른 OS의 서랍은 바로 못 여는 거야.", "why": "", "term_focus": [], "connections": [], "types": {"caption": "운영체제별로 사용하는 파일시스템이 다르다.", "items": [{"name": "유닉스", "note": "Boot Block, Super Block, Bitmap Block, i-node, Data Block 구조. i-node를 통해 파일/디렉토리의 메타데이터를 관리하며 할당·적용·생성·링크·삭제 역할을 수행."}, {"name": "리눅스", "note": "확장파일시스템(ext, ext2, ext3, ext4), ZFS, ReiserFS, XFS 등을 지원."}, {"name": "솔라리스", "note": "ZFS, UFS."}, {"name": "mac OS", "note": "HFS, HFS+."}, {"name": "윈도우", "note": "FAT, NTFS."}]}, "mnemonic": "🗂️ '윈파맥에리확솔제' → 윈도우=FAT·NTFS / 맥=HFS+ / 리눅스=ext(확장) / 솔라리스=ZFS·UFS — '윈파 맥에 리확 솔제!'로 외워봐!", "trap": "", "table": [], "sources": [{"title": "TOPCIT ESSENCE ver.3 — 시스템 아키텍처 이해와 활용", "note": "정보통신산업진흥원(NIPA) 공식 교재"}], "priority": 3}, {"title": "UNIX의 i-node", "keywords": ["위차:", "디렉토리", "이름:", "시간,", "파일", "보호", "크가:"], "summary": "", "background": "옛날에 컴퓨터에 파일이 엄청 많아지면서 '이 파일이 어디 있지? 누가 만든 거지?' 를 빠르게 찾을 방법이 필요했어. 그래서 유닉스 개발자들이 파일마다 '신분증' 같은 걸 만들어서 정보를 한 곳에 몰아 저장하는 방식을 고안했어.", "explanation": "i-node는 파일의 주민등록증이라고 생각하면 돼. 파일 이름은 그냥 별명이고, 진짜 중요한 정보(주인이 누구인지, 언제 만들었는지, 실제 데이터가 하드디스크 어디에 저장됐는지)는 전부 i-node 안에 들어있어. 그리고 모든 파일의 주민등록증을 모아놓은 서랍장이 'i-node table'이고, 각 주민등록증의 번호가 'i-number'야.", "why": "", "term_focus": [], "connections": [], "types": null, "mnemonic": "i-node = '아이(I)의 노트' → 파일의 모든 개인정보(주인, 날짜, 위치)를 적어둔 비밀 노트! 노트엔 직접 주소 10개(Direct), 한 번 건너서 1개(Single), 두 번 건너서 1개(Double), 세 번 건너서 1개(Triple) = '직한두세(10,1,1,1)'", "trap": "", "table": [], "sources": [], "priority": 4}];
+const PRIO_LABEL = {1:'최우선', 2:'중요', 3:'보통', 4:'보조'};
+let curTab = 'all';
+let curPrio = 'all';
+let curLessonIdx = -1;
+let curPage = 0;
+let pages = [];
+
+function filterTab(btn, ch) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  curTab = ch;
+  applyFilters();
+}
+
+function filterPrio(btn) {
+  document.querySelectorAll('.pchip').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  curPrio = btn.dataset.prio;
+  applyFilters();
+}
+
+function applyFilters() {
+  const q = document.querySelector('.search').value.toLowerCase();
+  document.querySelectorAll('.section-group').forEach(grp => {
+    const chOk = curTab === 'all' || grp.dataset.chapter === curTab;
+    grp.classList.toggle('hidden', !chOk);
+    if (chOk) {
+      let any = false;
+      grp.querySelectorAll('.card').forEach(c => {
+        const qOk = !q || c.textContent.toLowerCase().includes(q);
+        const pOk = curPrio === 'all' || c.dataset.prio === curPrio;
+        const show = qOk && pOk;
+        c.classList.toggle('hidden-card', !show);
+        if (show) any = true;
+      });
+      if (q || curPrio !== 'all') grp.classList.toggle('hidden', !any);
+    }
+  });
+}
+
+function escHtml(str) {
+  return (str || '').replace(/[&<>"]/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[ch]);
+}
+
+function splitMnemonic(text) {
+  return (text || '')
+    .replace(/\r\n/g, '\n')
+    .replace(/\s+\/\s+/g, '\n')
+    .replace(/\s+vs\.\s+/gi, '\n')
+    .replace(/\s+→\s+/g, ' → ')
+    .replace(/\s+↔\s+/g, ' ↔ ')
+    .replace(/\.\s+/g, '.\n')
+    .replace(/다\.\s+/g, '다.\n')
+    .replace(/됨\.\s+/g, '됨.\n')
+    .split(/\n+/)
+    .map(line => line.trim())
+    .filter(Boolean);
+}
+
+function mnemonicIcon(tag, text) {
+  if (tag) return '◈';
+  if (text.includes('↔') || text.includes('=')) return '⇄';
+  if (text.includes('→')) return '→';
+  return '•';
+}
+
+function renderParagraph(text) {
+  return escHtml(text || '').replace(/\n/g, '<br>');
+}
+
+function renderFactSection(label, secClass, items) {
+  if (!items || !items.length) return '';
+  const html = items.map(item => `
+    <div class="fact-item">
+      ${item.label ? `<div class="fact-link-label">${escHtml(item.label)}</div>` : ''}
+      <div class="fact-term">${escHtml(item.term || '')}</div>
+      <div class="fact-note">${renderParagraph(item.note || '')}</div>
+    </div>`).join('');
+  return `<div class="sec ${secClass}"><div class="sec-label">${label}</div><div class="fact-list">${html}</div></div>`;
+}
+
+function renderTypesSection(types) {
+  if (!types) return '';
+  const items = Array.isArray(types) ? types : (types.items || []);
+  if (!items.length) return '';
+  const caption = !Array.isArray(types) && types.caption ? types.caption : '';
+  const scale = !Array.isArray(types) ? (types.scale || '') : '';
+  const scaleLabels = {
+    'strong-to-weak': ['강함','약함','reverse'],
+    'weak-to-strong': ['약함','강함',''],
+  };
+  const tierClass = {
+    'strong': 'tier-strong',
+    'mid': 'tier-mid',
+    'weak': 'tier-weak',
+  };
+  const tierLabel = {
+    'strong': '강함',
+    'mid': '중간',
+    'weak': '약함',
+  };
+  const rows = items.map(it => {
+    const tierCls = it.tier && tierClass[it.tier] ? tierClass[it.tier] : '';
+    const tierLbl = it.tier && tierLabel[it.tier] ? tierLabel[it.tier] : (it.tier || '');
+    return `
+      <div class="type-item">
+        <div class="type-body">
+          <div class="type-head">
+            <span class="type-name">${escHtml(it.name || '')}</span>
+            ${it.en ? `<span class="type-en">${escHtml(it.en)}</span>` : ''}
+            ${tierCls ? `<span class="type-tier ${tierCls}">${escHtml(tierLbl)}</span>` : ''}
+          </div>
+          <div class="type-note">${renderParagraph(it.note || '')}</div>
+        </div>
+      </div>`;
+  }).join('');
+  let scaleHtml = '';
+  if (scale && scaleLabels[scale]) {
+    const [L, R, rev] = scaleLabels[scale];
+    scaleHtml = `<div class="types-scale ${rev}"><span>${L}</span><span class="scale-arrow"></span><span>${R}</span></div>`;
+  }
+  return `<div class="sec sec-types">
+    <div class="sec-label">🗂️ 유형</div>
+    ${caption ? `<div class="types-caption">${renderParagraph(caption)}</div>` : ''}
+    <div class="types-list">${rows}</div>
+    ${scaleHtml}
+  </div>`;
+}
+
+function renderSourceSection(sources) {
+  if (!sources || !sources.length) return '';
+  const html = sources.map(src => {
+    const hasUrl = !!src.url;
+    let host = '';
+    if (hasUrl) {
+      try { host = new URL(src.url).hostname.replace(/^www\./, ''); } catch (_err) { host = ''; }
+    }
+    const inner = `
+        <span class="src-bullet">↗</span>
+        <span class="src-text">
+          ${escHtml(src.title || src.url || '')}
+          ${src.note ? `<span class="src-host">${escHtml(src.note)}</span>` : ''}
+          ${!src.note && host ? `<span class="src-host">${escHtml(host)}</span>` : ''}
+        </span>`;
+    if (hasUrl) {
+      return `<a class="src-link" href="${escHtml(src.url)}" target="_blank" rel="noreferrer">${inner}</a>`;
+    }
+    return `<div class="src-link">${inner}</div>`;
+  }).join('');
+  return `<div class="sec sec-src"><div class="sec-label">🔗 출처</div><div class="src-list">${html}</div></div>`;
+}
+
+function renderMnemonic(text) {
+  const lines = splitMnemonic(text);
+  if (!lines.length) return '';
+  const html = lines.map(line => {
+    const m = line.match(/^【([^】]+)】\s*(.*)$/);
+    const tag = m ? m[1].trim() : '';
+    const body = (m ? m[2] : line).trim();
+    const safeBody = escHtml(body).replace(/'([^']+)'/g, '<strong>$1</strong>');
+    return `
+      <div class="mn-line">
+        <span class="mn-picto">${mnemonicIcon(tag, body)}</span>
+        <div class="mn-main">
+          ${tag ? `<span class="mn-tag">${escHtml(tag)}</span>` : ''}
+          <div class="mn-text">${safeBody}</div>
+        </div>
+      </div>`;
+  }).join('');
+  return `<div class="sec sec-mn"><div class="sec-label">🧠 5초 암기</div><div class="mn-list">${html}</div></div>`;
+}
+
+function buildPages(lesson) {
+  return [
+    { type: 'learn', data: lesson },
+    { type: 'done',  data: lesson },
+  ];
+}
+
+function renderPage() {
+  const body = document.getElementById('l-body');
+  const page = pages[curPage];
+  body.innerHTML = '';
+  body.scrollTop = 0;
+
+  const wrap = document.createElement('div');
+  wrap.className = 'l-page';
+
+  if (page.type === 'learn') {
+    const d = page.data;
+    let h = '';
+    h += `<h1 class="l-page-title">${escHtml(d.title)}</h1>`;
+    const metaBits = [];
+    if (d.priority && PRIO_LABEL[d.priority]) {
+      metaBits.push(`<span class="chip chip-prio-${d.priority}">P${d.priority} · ${PRIO_LABEL[d.priority]}</span>`);
+    }
+    if (metaBits.length) h += `<div class="l-page-meta">${metaBits.join('')}</div>`;
+    if (d.keywords && d.keywords.length) {
+      h += `<div class="l-page-kw">${d.keywords.map(k => `<span>★ ${escHtml(k)}</span>`).join('')}</div>`;
+    }
+    if (d.summary)     h += `<div class="sec sec-summary"><div class="sec-label">📌 한 줄 요약</div><p>${renderParagraph(d.summary)}</p></div>`;
+    if (d.background)  h += `<div class="sec sec-bg"><div class="sec-label">📜 배경·맥락</div><p>${renderParagraph(d.background)}</p></div>`;
+    if (d.explanation) h += `<div class="sec sec-expl"><div class="sec-label">📖 핵심 설명</div><p>${renderParagraph(d.explanation)}</p></div>`;
+    if (d.types)       h += renderTypesSection(d.types);
+    if (d.why)         h += `<div class="sec sec-why"><div class="sec-label">🔍 왜 이렇게 됐나</div><p>${renderParagraph(d.why)}</p></div>`;
+    if (d.term_focus && d.term_focus.length)   h += renderFactSection('🈶 용어·한자 풀이', 'sec-term', d.term_focus);
+    if (d.connections && d.connections.length) h += renderFactSection('🧭 앞뒤 흐름 연결', 'sec-link', d.connections);
+    if (d.mnemonic)    h += renderMnemonic(d.mnemonic);
+    if (d.trap)        h += `<div class="sec sec-trap"><div class="sec-label">⚠️ 시험 함정</div><p>${renderParagraph(d.trap)}</p></div>`;
+    if (d.table && d.table.length) {
+      const cols = Object.keys(d.table[0]);
+      const head = cols.map(c => `<th>${escHtml(c)}</th>`).join('');
+      const rows = d.table.map(r => '<tr>' + cols.map(c => `<td>${escHtml(r[c] || '')}</td>`).join('') + '</tr>').join('');
+      h += `<div class="sec sec-summary" style="padding:0;background:transparent;border:none">
+        <div class="sec-label" style="padding-left:.3rem;color:#6b7280;margin-bottom:.5rem">📊 정리표</div>
+        <table class="ctable"><thead><tr>${head}</tr></thead><tbody>${rows}</tbody></table>
+      </div>`;
+    }
+    if (d.sources && d.sources.length) h += renderSourceSection(d.sources);
+    wrap.innerHTML = h;
+  }
+  else if (page.type === 'done') {
+    const d = page.data;
+    const hasNext = curLessonIdx + 1 < LESSONS.length;
+    wrap.innerHTML = `
+      <div class="done-page">
+        <div class="done-emoji">🎉</div>
+        <div class="done-title">레슨 완료!</div>
+        <div class="done-sub">${escHtml(d.title)}</div>
+        <div class="done-actions">
+          ${hasNext ? '<button class="done-btn done-btn-primary" onclick="startLesson(' + (curLessonIdx + 1) + ')">다음 개념 →</button>' : ''}
+          <button class="done-btn done-btn-sub" onclick="exitLesson()">목록으로 돌아가기</button>
+        </div>
+      </div>`;
+  }
+
+  body.appendChild(wrap);
+
+  document.getElementById('l-page-ind').textContent = `${curPage + 1} / ${pages.length}`;
+  document.getElementById('l-progress-bar').style.width = `${((curPage + 1) / pages.length) * 100}%`;
+  document.getElementById('l-prev').disabled = curPage === 0;
+  document.getElementById('l-next').disabled = curPage === pages.length - 1;
+  document.getElementById('l-next').textContent = curPage === pages.length - 2 ? '완료 🎉' : '다음 →';
+}
+
+function startLesson(idx) {
+  if (idx < 0 || idx >= LESSONS.length) return;
+  curLessonIdx = idx;
+  curPage = 0;
+  pages = buildPages(LESSONS[idx]);
+  document.getElementById('l-title').textContent = LESSONS[idx].title;
+  document.getElementById('lesson').classList.add('show');
+  document.body.style.overflow = 'hidden';
+  renderPage();
+}
+
+function exitLesson() {
+  document.getElementById('lesson').classList.remove('show');
+  document.body.style.overflow = '';
+  curLessonIdx = -1;
+}
+
+function nextPage() { if (curPage < pages.length - 1) { curPage++; renderPage(); } }
+function prevPage() { if (curPage > 0) { curPage--; renderPage(); } }
+
+document.addEventListener('keydown', e => {
+  if (curLessonIdx < 0) return;
+  if (e.key === 'ArrowLeft')  prevPage();
+  if (e.key === 'ArrowRight') nextPage();
+  if (e.key === 'Escape')     exitLesson();
+});
+</script>
+</body>
+</html>

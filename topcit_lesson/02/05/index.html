@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>TOPCIT 02-05 트랜잭션 & 복구</title>
+<style>
+:root{--font-sans:"Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",system-ui,sans-serif;--font-serif:"NanumMyeongjo","Nanum Myeongjo","Batang","Apple SD Gothic Neo",serif}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{overflow-x:hidden}
+body{font-family:var(--font-sans);background:#f7f8fb;color:#1f2937;min-height:100vh}
+
+.header{background:#0e9488;color:#fff;padding:.85rem 1.25rem;display:flex;align-items:center;gap:.75rem;position:sticky;top:0;z-index:20;box-shadow:0 2px 10px rgba(0,0,0,.15)}
+.header-back{color:#fff;text-decoration:none;font-size:1.2rem;opacity:.85}
+.header h1{font-size:1rem;font-weight:800;flex:1;font-family:var(--font-serif)}
+.header-cnt{font-size:.75rem;opacity:.8;white-space:nowrap}
+
+.search-wrap{padding:.7rem 1.25rem .3rem}
+.search{width:100%;padding:.6rem 1rem;border:2px solid #e2e8f0;border-radius:2rem;font-size:.88rem;outline:none;background:#fff;transition:border .2s}
+.search:focus{border-color:#0e9488}
+
+.tabs{display:flex;gap:.35rem;padding:.4rem 1.25rem .3rem;overflow-x:auto;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tab{flex-shrink:0;padding:.32rem .8rem;border-radius:2rem;border:1.5px solid #0e9488;background:#fff;color:#0e9488;font-size:.74rem;font-weight:700;cursor:pointer;white-space:nowrap;transition:all .15s;font-family:inherit}
+.tab.active,.tab:hover{background:#0e9488;color:#fff}
+
+.prio-bar{display:flex;gap:.3rem;padding:.2rem 1.25rem .6rem;overflow-x:auto;scrollbar-width:none}
+.prio-bar::-webkit-scrollbar{display:none}
+.pchip{flex-shrink:0;padding:.28rem .7rem;border-radius:2rem;border:1.5px solid #e5e7eb;background:#fff;color:#475569;font-size:.72rem;font-weight:700;cursor:pointer;white-space:nowrap;transition:all .15s;font-family:inherit}
+.pchip:hover{border-color:var(--pc,#9ca3af);color:#111827}
+.pchip.active{background:var(--pc,#0e9488);border-color:var(--pc,#0e9488);color:#fff}
+.pchip[data-prio="all"].active{background:#0e9488;border-color:#0e9488;color:#fff}
+
+.section-group{padding:.3rem 1.25rem .8rem}
+.section-group.hidden{display:none}
+.section-label{font-size:.72rem;font-weight:800;color:#115e59;letter-spacing:.04em;padding:.4rem 0 .35rem;border-bottom:2px solid #0e948833;margin-bottom:.55rem;font-family:var(--font-serif)}
+.card-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:.55rem}
+@media(min-width:540px){.card-grid{grid-template-columns:repeat(3,1fr)}}
+@media(min-width:900px){.card-grid{grid-template-columns:repeat(4,1fr)}}
+@media(min-width:1200px){.card-grid{grid-template-columns:repeat(5,1fr)}}
+.card{background:#fff;border-radius:.7rem;padding:.85rem .8rem .65rem;cursor:pointer;border:1.5px solid #e5e7eb;transition:all .18s;box-shadow:0 1px 3px rgba(0,0,0,.04);position:relative;display:flex;flex-direction:column;gap:.35rem;min-height:9rem}
+.card:hover{border-color:#0e9488;box-shadow:0 4px 14px #0e948833;transform:translateY(-2px)}
+.card-badges{position:absolute;top:.45rem;right:.5rem;display:flex;gap:.2rem;font-size:.64rem}
+.card-badges span{padding:.1rem .42rem;border-radius:.4rem;font-weight:700;line-height:1.4;white-space:nowrap}
+.b-prio-1{background:#fee2e2;color:#991b1b}
+.b-prio-2{background:#fef3c7;color:#92400e}
+.b-prio-3{background:#dcfce7;color:#166534}
+.b-prio-4{background:#f1f5f9;color:#475569}
+.b-mn{background:#ede9fe;color:#5b21b6}
+.card-title{font-size:.86rem;font-weight:700;color:#111827;line-height:1.35;padding-right:4.5rem;font-family:var(--font-serif)}
+.card-preview{font-size:.7rem;color:#6b7280;line-height:1.5;flex:1}
+.card-cta{font-size:.68rem;color:#0e9488;font-weight:700;text-align:right;margin-top:.25rem}
+.card.hidden-card{display:none!important}
+
+/* ───────── 레슨 모드 (풀스크린) ───────── */
+.lesson{display:none;position:fixed;inset:0;background:#f7f8fb;z-index:1000;flex-direction:column}
+.lesson.show{display:flex}
+.l-head{background:#0e9488;color:#fff;padding:.7rem 1rem;display:flex;align-items:center;gap:.7rem;flex-shrink:0}
+.l-back{background:none;border:none;color:#fff;font-size:1.3rem;cursor:pointer;padding:0;line-height:1;opacity:.9}
+.l-title{flex:1;font-size:.92rem;font-weight:800;font-family:var(--font-serif);line-height:1.3;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.l-page-ind{font-size:.78rem;font-weight:700;background:rgba(0,0,0,.18);padding:.18rem .55rem;border-radius:1rem;flex-shrink:0}
+.l-progress{height:4px;background:rgba(0,0,0,.15);flex-shrink:0}
+.l-progress-bar{height:100%;background:#fff;width:0%;transition:width .3s ease}
+.l-body{flex:1;overflow-y:auto;padding:1.2rem 1.25rem 5rem;display:flex;flex-direction:column;gap:1rem;align-items:center}
+.l-page{width:100%;max-width:680px;animation:slideIn .25s ease}
+@keyframes slideIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+.l-page-title{font-size:1.5rem;font-weight:800;color:#115e59;margin-bottom:.5rem;font-family:var(--font-serif);line-height:1.3}
+.l-page-meta{display:flex;flex-wrap:wrap;gap:.35rem;margin-bottom:.85rem}
+.l-page-meta .chip{padding:.18rem .55rem;border-radius:1rem;font-size:.7rem;font-weight:700}
+.chip-prio-1{background:#fee2e2;color:#991b1b}
+.chip-prio-2{background:#fef3c7;color:#92400e}
+.chip-prio-3{background:#dcfce7;color:#166534}
+.chip-prio-4{background:#f1f5f9;color:#475569}
+.l-page-kw{display:flex;flex-wrap:wrap;gap:.3rem;margin-bottom:1.2rem}
+.l-page-kw span{background:#0e948822;color:#115e59;border:1px solid #0e948855;border-radius:1rem;padding:.18rem .65rem;font-size:.72rem;font-weight:700}
+
+.sec{border-radius:.7rem;padding:1rem 1.1rem;line-height:1.65;margin-bottom:.85rem}
+.sec-summary{background:#0e948811;border-left:5px solid #0e9488;font-size:.95rem;color:#111827;font-weight:600}
+.sec-bg{background:#fef7ec;border-left:5px solid #d97706}
+.sec-expl{background:#eef2ff;border-left:5px solid #4f46e5}
+.sec-why{background:#ecfdf5;border-left:5px solid #059669}
+.sec-term{background:#faf5ff;border-left:5px solid #7c3aed}
+.sec-link{background:#fff7ed;border-left:5px solid #c2410c}
+.sec-mn{background:linear-gradient(145deg,#fffef5 0%,#fff7d6 56%,#0e948820 100%);color:#1f2937;font-weight:600;border:1.5px solid #0e948833;border-left:5px solid #0e9488;box-shadow:0 10px 26px #0e948814}
+.sec-trap{background:#fff1f2;border:1.5px solid #fda4af;border-left:5px solid #e11d48;color:#881337}
+.sec-src{background:#fff;border:1.5px solid #e5e7eb;border-left:5px solid #475569}
+.sec-types{background:#f0f9ff;border:1.5px solid #bae6fd;border-left:5px solid #0284c7}
+.sec-types .sec-label{color:#075985}
+.types-caption{font-size:.8rem;color:#334155;margin-bottom:.6rem;line-height:1.55}
+.types-list{display:flex;flex-direction:column;gap:.55rem;counter-reset:tc}
+.type-item{display:grid;grid-template-columns:2rem 1fr;gap:.55rem;align-items:start;background:#fff;border:1px solid #e0f2fe;border-radius:.7rem;padding:.7rem .78rem;counter-increment:tc;position:relative}
+.type-item::before{content:counter(tc);display:inline-flex;align-items:center;justify-content:center;width:1.7rem;height:1.7rem;border-radius:.5rem;background:#0e948816;color:#115e59;font-size:.8rem;font-weight:800;line-height:1}
+.type-body{min-width:0}
+.type-head{display:flex;flex-wrap:wrap;gap:.35rem;align-items:center;margin-bottom:.2rem}
+.type-name{font-size:.92rem;font-weight:800;color:#0f172a;font-family:var(--font-serif)}
+.type-en{font-size:.72rem;color:#64748b;font-weight:700}
+.type-tier{display:inline-flex;align-items:center;padding:.08rem .42rem;border-radius:999px;font-size:.62rem;font-weight:800;letter-spacing:.04em}
+.tier-strong{background:#fee2e2;color:#991b1b}
+.tier-mid{background:#fef3c7;color:#92400e}
+.tier-weak{background:#dcfce7;color:#166534}
+.type-note{font-size:.86rem;line-height:1.68;color:#334155;word-break:keep-all}
+.types-scale{display:flex;align-items:center;gap:.45rem;margin-top:.65rem;padding:.5rem .7rem;background:rgba(255,255,255,.7);border:1px dashed #bae6fd;border-radius:.6rem;font-size:.72rem;color:#475569;font-weight:700}
+.types-scale .scale-arrow{flex:1;height:6px;border-radius:999px;background:linear-gradient(90deg,#16a34a,#d97706,#dc2626)}
+.types-scale.reverse .scale-arrow{background:linear-gradient(90deg,#dc2626,#d97706,#16a34a)}
+.sec-label{font-size:.7rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;margin-bottom:.5rem}
+.sec-bg .sec-label{color:#92400e}
+.sec-expl .sec-label{color:#3730a3}
+.sec-why .sec-label{color:#065f46}
+.sec-term .sec-label{color:#5b21b6}
+.sec-link .sec-label{color:#9a3412}
+.sec-mn .sec-label{color:#115e59}
+.sec-trap .sec-label{color:#9f1239}
+.sec-summary .sec-label{color:#0e9488}
+.sec-src .sec-label{color:#334155}
+.sec p{font-size:.92rem;line-height:1.7}
+.sec-mn p{font-size:.98rem}
+.fact-list{display:flex;flex-direction:column;gap:.65rem}
+.fact-item{background:rgba(255,255,255,.85);border:1px solid rgba(0,0,0,.06);border-radius:.85rem;padding:.78rem .85rem}
+.fact-term{font-size:.86rem;font-weight:800;color:#111827;margin-bottom:.22rem}
+.fact-note{font-size:.9rem;line-height:1.72;color:#374151;word-break:keep-all}
+.fact-link-label{display:inline-flex;align-items:center;padding:.12rem .45rem;border-radius:999px;background:#0e948814;color:#115e59;font-size:.64rem;font-weight:800;letter-spacing:.04em;margin-bottom:.38rem}
+.src-list{display:flex;flex-direction:column;gap:.5rem}
+.src-link{display:flex;align-items:flex-start;gap:.45rem;text-decoration:none;color:#111827;background:#f9fafb;border:1px solid #e5e7eb;border-radius:.8rem;padding:.72rem .82rem;transition:border-color .15s,transform .15s}
+.src-link:hover{border-color:#0e9488;transform:translateY(-1px)}
+.src-bullet{flex-shrink:0;color:#0e9488;font-weight:800}
+.src-text{font-size:.85rem;line-height:1.55}
+.src-host{display:block;font-size:.72rem;color:#6b7280;margin-top:.1rem}
+.mn-list{display:flex;flex-direction:column;gap:.55rem}
+.mn-line{display:flex;align-items:flex-start;gap:.72rem;background:rgba(255,255,255,.82);border:1px solid #0e948822;border-radius:.9rem;padding:.72rem .8rem .68rem;box-shadow:0 4px 12px rgba(0,0,0,.04)}
+.mn-picto{flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;width:1.6rem;height:1.6rem;border-radius:.45rem;background:#0e948816;border:1px solid #0e948826;font-size:.76rem;font-weight:800;line-height:1;color:#115e59}
+.mn-main{display:flex;flex-direction:column;gap:.28rem;min-width:0}
+.mn-tag{display:inline-flex;align-items:center;width:fit-content;padding:.12rem .45rem;border-radius:999px;background:#0e948818;color:#115e59;font-size:.64rem;font-weight:800;letter-spacing:.05em}
+.mn-text{font-size:.95rem;line-height:1.76;color:#1f2937;word-break:keep-all}
+.mn-text strong{color:#0e9488;font-weight:800}
+
+.ctable{width:100%;border-collapse:collapse;font-size:.82rem;background:#fff;border-radius:.5rem;overflow:hidden;margin-top:.4rem}
+.ctable th{background:#0e9488;color:#fff;padding:.55rem .65rem;text-align:left;font-weight:700;font-size:.78rem}
+.ctable td{padding:.55rem .65rem;border-top:1px solid #e5e7eb;vertical-align:top;line-height:1.55}
+.ctable tr:nth-child(even) td{background:#f9fafb}
+
+.done-page{text-align:center;padding:2.5rem 1rem}
+.done-emoji{font-size:4.5rem;margin-bottom:1rem;animation:pop .4s ease}
+@keyframes pop{from{transform:scale(0)}80%{transform:scale(1.2)}to{transform:scale(1)}}
+.done-title{font-size:1.5rem;font-weight:800;color:#115e59;margin-bottom:.5rem;font-family:var(--font-serif)}
+.done-sub{font-size:.95rem;color:#6b7280;margin-bottom:2rem}
+.done-actions{display:flex;flex-direction:column;gap:.6rem;max-width:300px;margin:0 auto}
+.done-btn{padding:.85rem 1.4rem;border-radius:.7rem;font-size:.95rem;font-weight:700;cursor:pointer;border:none;font-family:inherit;transition:all .15s}
+.done-btn-primary{background:#0e9488;color:#fff}
+.done-btn-primary:hover{transform:translateY(-2px);box-shadow:0 4px 14px #0e948855}
+.done-btn-sub{background:#fff;color:#0e9488;border:1.5px solid #0e9488}
+.done-btn-sub:hover{background:#0e948811}
+
+.l-foot{position:fixed;bottom:0;left:0;right:0;background:#fff;padding:.7rem 1rem;display:flex;gap:.5rem;border-top:1px solid #e5e7eb;z-index:1010}
+.l-nav-btn{flex:1;padding:.7rem;border-radius:.55rem;border:1.5px solid #0e9488;background:#fff;color:#0e9488;font-size:.88rem;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s}
+.l-nav-btn:hover:not(:disabled){background:#0e948811}
+.l-nav-btn:disabled{opacity:.35;cursor:not-allowed}
+.l-nav-btn.primary{background:#0e9488;color:#fff;border-color:#0e9488}
+.l-nav-btn.primary:hover:not(:disabled){background:#115e59;border-color:#115e59}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <a href="../" class="header-back">←</a>
+  <span style="font-size:1.2rem">📊</span>
+  <h1><span style="opacity:.7;font-size:.85em">02</span> &nbsp;트랜잭션 &amp; 복구</h1>
+  <span class="header-cnt">22개</span>
+</div>
+
+<div class="search-wrap">
+  <input class="search" type="text" placeholder="🔍  개념 검색..." oninput="applyFilters()">
+</div>
+
+<div class="tabs" id="tab-bar"><button class="tab active" onclick="filterTab(this,'all')">전체</button><button class="tab" onclick="filterTab(this,'0')">트랜잭션이란</button><button class="tab" onclick="filterTab(this,'1')">트랜잭션 격리수준(Isolation </button><button class="tab" onclick="filterTab(this,'2')">데이터베이스 장애와 복구 개념</button><button class="tab" onclick="filterTab(this,'3')">데이터베이스 장애 복구 방법</button><button class="tab" onclick="filterTab(this,'4')">데이터베이스 백업</button></div>
+<div class="prio-bar"><button class="pchip active" data-prio="all" onclick="filterPrio(this)">전체</button><button class="pchip" data-prio="1" onclick="filterPrio(this)" style="--pc:#dc2626">🔴 P1 최우선</button><button class="pchip" data-prio="2" onclick="filterPrio(this)" style="--pc:#d97706">🟡 P2 중요</button><button class="pchip" data-prio="3" onclick="filterPrio(this)" style="--pc:#16a34a">🟢 P3 보통</button><button class="pchip" data-prio="4" onclick="filterPrio(this)" style="--pc:#9ca3af">⚪ P4 보조</button></div>
+
+<div id="card-content"><div class="section-group" data-chapter="0"><div class="section-label">트랜잭션이란</div><div class="card-grid"><div class="card" data-prio="1" onclick="startLesson(0)"><div class="card-badges"><span class="b-prio b-prio-1" title="최우선">🔴 P1</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">트랜잭션의 ACID 특징</div><div class="card-preview">옛날에 은행 시스템에서 돈을 이체할 때 중간에 오류가 나면 돈이 빠져나가기만 하고 상대방한…</div><div class="card-cta">레슨 시작 →</div></div><div class="card" data-prio="2" onclick="startLesson(1)"><div class="card-badges"><span class="b-prio b-prio-2" title="중요">🟡 P2</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">트랜잭션 처리 시 고려사항</div><div class="card-preview">여러 사람이 동시에 은행 ATM을 쓰다 보면 같은 계좌에 동시에 접근해서 돈이 이중으로 빠…</div><div class="card-cta">레슨 시작 →</div></div><div class="card" data-prio="2" onclick="startLesson(2)"><div class="card-badges"><span class="b-prio b-prio-2" title="중요">🟡 P2</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">트랜잭션의 직렬가능 스케줄의 정의</div><div class="card-preview">옛날에 여러 사람이 동시에 은행 계좌를 건드리면 돈이 이상하게 계산되는 문제가 생겼어. 그…</div><div class="card-cta">레슨 시작 →</div></div><div class="card" data-prio="2" onclick="startLesson(3)"><div class="card-badges"><span class="b-prio b-prio-2" title="중요">🟡 P2</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">동시성(병행) 제어의 정의</div><div class="card-preview">옛날에 데이터베이스를 한 명씩만 쓸 때는 문제가 없었는데, 여러 명이 동시에 같은 데이터를…</div><div class="card-cta">레슨 시작 →</div></div><div class="card" data-prio="2" onclick="startLesson(4)"><div class="card-badges"><span class="b-prio b-prio-2" title="중요">🟡 P2</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">동시성(병행) 제어의 목적</div><div class="card-preview">옛날에 여러 사람이 동시에 같은 데이터를 수정하다가 데이터가 엉망이 되는 문제가 생겼어. …</div><div class="card-cta">레슨 시작 →</div></div><div class="card" data-prio="2" onclick="startLesson(5)"><div class="card-badges"><span class="b-prio b-prio-2" title="중요">🟡 P2</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">동시성(병행) 제어를 하지 않았을 경우 발생하는 문제점</div><div class="card-preview">옛날에 은행 시스템에서 여러 사람이 동시에 같은 계좌에 입출금하다가 잔액이 뒤죽박죽 되는 …</div><div class="card-cta">레슨 시작 →</div></div><div class="card" data-prio="2" onclick="startLesson(6)"><div class="card-badges"><span class="b-prio b-prio-2" title="중요">🟡 P2</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">2PL(2--Phase Locking) 기법이란</div><div class="card-preview">여러 사람이 동시에 같은 데이터를 수정하면 데이터가 엉망이 되는 문제가 생겼어. 그래서 &#x27;…</div><div class="card-cta">레슨 시작 →</div></div></div></div><div class="section-group" data-chapter="1"><div class="section-label">트랜잭션 격리수준(Isolation Level)</div><div class="card-grid"><div class="card" data-prio="1" onclick="startLesson(7)"><div class="card-badges"><span class="b-prio b-prio-1" title="최우선">🔴 P1</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">완료되지 않은 읽기(Read Uncommitted)</div><div class="card-preview">옛날에 여러 사람이 동시에 데이터베이스를 쓰다 보니 &#x27;내가 수정 중인 데이터를 다른 사람이…</div><div class="card-cta">레슨 시작 →</div></div><div class="card" data-prio="1" onclick="startLesson(8)"><div class="card-badges"><span class="b-prio b-prio-1" title="최우선">🔴 P1</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">완료된 읽기</div><div class="card-preview">옛날에 여러 사람이 동시에 데이터를 수정하다 보니, 아직 저장도 안 된 엉터리 데이터를 다…</div><div class="card-cta">레슨 시작 →</div></div><div class="card" data-prio="1" onclick="startLesson(9)"><div class="card-badges"><span class="b-prio b-prio-1" title="최우선">🔴 P1</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">반복 읽기(Repeatable Read) )</div><div class="card-preview">여러 사람이 동시에 데이터베이스를 사용하다 보니, 내가 같은 데이터를 두 번 읽었는데 그 …</div><div class="card-cta">레슨 시작 →</div></div><div class="card" data-prio="1" onclick="startLesson(10)"><div class="card-badges"><span class="b-prio b-prio-1" title="최우선">🔴 P1</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">교착상태(Deadlock) 정의</div><div class="card-preview">옛날에 컴퓨터가 여러 작업을 동시에 처리하게 되면서, 두 작업이 서로 상대방이 쓰는 자원을…</div><div class="card-cta">레슨 시작 →</div></div><div class="card" data-prio="1" onclick="startLesson(11)"><div class="card-badges"><span class="b-prio b-prio-1" title="최우선">🔴 P1</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">교착상태 발생원인</div><div class="card-preview">옛날에 컴퓨터가 여러 작업을 동시에 처리하게 되면서, 여러 프로그램이 같은 자원을 쓰려고 …</div><div class="card-cta">레슨 시작 →</div></div><div class="card" data-prio="1" onclick="startLesson(12)"><div class="card-badges"><span class="b-prio b-prio-1" title="최우선">🔴 P1</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">교착상태의 해결 방안</div><div class="card-preview">여러 프로그램이 동시에 실행되다 보면 서로 상대방이 가진 자원을 기다리느라 아무도 진행을 …</div><div class="card-cta">레슨 시작 →</div></div></div></div><div class="section-group" data-chapter="2"><div class="section-label">데이터베이스 장애와 복구 개념</div><div class="card-grid"><div class="card" data-prio="2" onclick="startLesson(13)"><div class="card-badges"><span class="b-prio b-prio-2" title="중요">🟡 P2</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">데이터 복구의 정의</div><div class="card-preview">옛날에 컴퓨터가 갑자기 꺼지거나 오류가 나면 저장하던 데이터가 다 날아가버리는 문제가 생겼…</div><div class="card-cta">레슨 시작 →</div></div><div class="card" data-prio="2" onclick="startLesson(14)"><div class="card-badges"><span class="b-prio b-prio-2" title="중요">🟡 P2</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">데이터베이스 장애(실패)의 유형</div><div class="card-preview">데이터베이스는 수많은 사람들이 동시에 중요한 데이터를 다루다 보니, 컴퓨터가 꺼지거나 사람…</div><div class="card-cta">레슨 시작 →</div></div><div class="card" data-prio="2" onclick="startLesson(15)"><div class="card-badges"><span class="b-prio b-prio-2" title="중요">🟡 P2</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">데이터베이스 복구의 기본원리: 정보 중복성의 원리</div><div class="card-preview">옛날에 컴퓨터가 갑자기 꺼지거나 데이터가 날아가는 사고가 자주 생겼어. 그래서 중요한 데이…</div><div class="card-cta">레슨 시작 →</div></div><div class="card" data-prio="2" onclick="startLesson(16)"><div class="card-badges"><span class="b-prio b-prio-2" title="중요">🟡 P2</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">데이터베이스 복구 조치 유형</div><div class="card-preview">옛날에 컴퓨터가 갑자기 꺼지거나 오류가 나면 저장하던 데이터가 날아가거나 엉망이 되는 문제…</div><div class="card-cta">레슨 시작 →</div></div></div></div><div class="section-group" data-chapter="3"><div class="section-label">데이터베이스 장애 복구 방법</div><div class="card-grid"><div class="card" data-prio="2" onclick="startLesson(17)"><div class="card-badges"><span class="b-prio b-prio-2" title="중요">🟡 P2</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">데이터베이스 복구 기법</div><div class="card-preview">옛날에 컴퓨터가 작업 도중 갑자기 꺼지거나 오류가 나면 저장하던 데이터가 다 날아가는 문제…</div><div class="card-cta">레슨 시작 →</div></div><div class="card" data-prio="3" onclick="startLesson(18)"><div class="card-badges"><span class="b-prio b-prio-3" title="보통">🟢 P3</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">분산 데이터베이스에서의 복구(회복)와 2단계 완료 프로토콜</div><div class="card-preview">여러 컴퓨터에 데이터를 나눠서 저장하다 보니, 한 작업이 여러 컴퓨터에 동시에 영향을 줄 …</div><div class="card-cta">레슨 시작 →</div></div></div></div><div class="section-group" data-chapter="4"><div class="section-label">데이터베이스 백업</div><div class="card-grid"><div class="card" data-prio="3" onclick="startLesson(19)"><div class="card-badges"><span class="b-prio b-prio-3" title="보통">🟢 P3</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">데이터베이스 백업 개요</div><div class="card-preview">옛날에 컴퓨터가 갑자기 고장나거나 바이러스에 걸리면 그동안 쌓아온 데이터가 한 순간에 다 …</div><div class="card-cta">레슨 시작 →</div></div><div class="card" data-prio="3" onclick="startLesson(20)"><div class="card-badges"><span class="b-prio b-prio-3" title="보통">🟢 P3</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">데이터베이스 백업의 요구사항 및 주요 작업사항</div><div class="card-preview">옛날에 회사 서버가 갑자기 고장나거나 화재가 나서 몇 년치 데이터가 한순간에 날아가버리는 …</div><div class="card-cta">레슨 시작 →</div></div><div class="card" data-prio="3" onclick="startLesson(21)"><div class="card-badges"><span class="b-prio b-prio-3" title="보통">🟢 P3</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">데이터베이스 백업 방식의 종류와 특징</div><div class="card-preview">데이터가 많아질수록 컴퓨터가 고장나거나 실수로 데이터를 날렸을 때 피해가 엄청나게 커졌어.…</div><div class="card-cta">레슨 시작 →</div></div></div></div></div>
+
+<!-- ── 레슨 모드 ── -->
+<div class="lesson" id="lesson">
+  <div class="l-head">
+    <button class="l-back" onclick="exitLesson()">←</button>
+    <div class="l-title" id="l-title"></div>
+    <div class="l-page-ind" id="l-page-ind">1 / 1</div>
+  </div>
+  <div class="l-progress"><div class="l-progress-bar" id="l-progress-bar"></div></div>
+  <div class="l-body" id="l-body"></div>
+  <div class="l-foot">
+    <button class="l-nav-btn" id="l-prev" onclick="prevPage()">← 이전</button>
+    <button class="l-nav-btn primary" id="l-next" onclick="nextPage()">다음 →</button>
+  </div>
+</div>
+
+<script>
+const LESSONS = [{"title": "트랜잭션의 ACID 특징", "keywords": ["외부합집합", "조인"], "summary": "", "background": "옛날에 은행 시스템에서 돈을 이체할 때 중간에 오류가 나면 돈이 빠져나가기만 하고 상대방한테 안 들어오는 사고가 생겼어. 그래서 데이터베이스 작업을 안전하게 처리하기 위한 4가지 규칙, ACID가 만들어졌지.", "explanation": "ACID는 데이터베이스 작업(트랜잭션)이 반드시 지켜야 할 4가지 약속이야. 원자성(Atomicity)은 '전부 성공하거나 전부 실패하거나' — 치킨 10마리 주문하면 10마리 다 오거나 아예 안 오거나 둘 중 하나여야 해. 일관성(Consistency)은 항상 예측 가능한 결과가 나와야 하고, 고립성(Isolation)은 내가 작업하는 동안 다른 사람이 끼어들지 못하게 막는 거고, 지속성(Durability)은 작업이 성공하면 시스템이 꺼져도 그 결과가 반드시 저장되어 있어야 한다는 뜻이야.", "why": "", "term_focus": [], "connections": [], "types": {"caption": "트랜잭션이 안전하게 수행되기 위한 4가지 특징. 이 4가지 성질로 데이터 무결성이 보장된다.", "items": [{"name": "원자성", "en": "Atomicity", "note": "트랜잭션 내 모든 연산은 함께 성공하거나 함께 실패해야 한다. 부분 반영이 있어서는 안 된다. 예: 10건 입력 중 9건만 성공하고 1건 실패하는 상황은 원자성 위반."}, {"name": "일관성", "en": "Consistency", "note": "트랜잭션의 실행은 항상 기대되는 값을 정확하게 보여줘야 하며, 중간에 다른 트랜잭션이 끼어들지 못하도록 Lock, Timestamp, Validation 등을 사용해 제어한다."}, {"name": "격리성", "en": "Isolation", "note": "트랜잭션의 Commit 또는 Rollback이 발생하기 전에 다른 트랜잭션이 끼어들어 처리하면 안 된다. 동시 수행 중인 트랜잭션들이 서로 간섭하지 않아야 한다."}, {"name": "지속성", "en": "Durability", "note": "한 번 성공한 트랜잭션의 결과는 지속성을 보장해야 한다. 시스템 장애가 발생해도 데이터는 유지되어야 하며, 필요 시 순방향 복구 알고리즘으로 복구한다."}]}, "mnemonic": "🎵 'A-C-I-D, 아 씨 아이디!' — All or nothing(원자성), Correct always(일관성), Isolated(고립성), Durable forever(지속성)! 산(acid)처럼 강력하게 데이터를 지킨다고 기억해!", "trap": "", "table": [], "sources": [{"title": "TOPCIT ESSENCE ver.3 — 데이터 이해와 활용", "note": "정보통신산업진흥원(NIPA) 공식 교재"}], "priority": 1}, {"title": "트랜잭션 처리 시 고려사항", "keywords": ["외부합집합", "조인"], "summary": "", "background": "여러 사람이 동시에 은행 ATM을 쓰다 보면 같은 계좌에 동시에 접근해서 돈이 이중으로 빠지거나 꼬이는 문제가 생겼어. 그래서 '어떻게 하면 여러 작업을 동시에 안전하게 처리할 수 있을까?'를 고민하다가 트랜잭션 처리 규칙이 만들어졌어.", "explanation": "트랜잭션은 화장실 칸 같은 거야. 한 명이 들어가면 문을 잠그고(잠금), 볼일 끝나면 빨리 나와야(짧은 수행시간) 다음 사람도 쓸 수 있거든. 근데 어떤 사람이 너무 오래 칸을 차지하고 있으면 밖에 줄 선 사람들이 다 기다리다 지쳐버리잖아(교착상태·충돌). 그래서 핵심은 '잠금은 필요한 만큼만, 시간은 최대한 짧게!'야.", "why": "", "term_focus": [], "connections": [], "types": null, "mnemonic": "🚽 '화장실 법칙' — 들어가면 잠그고(잠금 유지), 볼일 끝나면 바로 나와!(짧게 끝내기) 오래 있으면 밖에서 난리난다!", "trap": "", "table": [], "sources": [], "priority": 2}, {"title": "트랜잭션의 직렬가능 스케줄의 정의", "keywords": ["외부합집합", "조인"], "summary": "", "background": "옛날에 여러 사람이 동시에 은행 계좌를 건드리면 돈이 이상하게 계산되는 문제가 생겼어. 그래서 '동시에 작업해도 한 명씩 차례대로 한 것과 결과가 똑같으면 안전하다!'는 기준을 만들게 됐어.", "explanation": "급식 줄을 생각해봐. 10명이 동시에 막 뒤엉켜서 받아도, 결과적으로 한 명씩 차례대로 받은 것과 음식 양이 똑같다면 '문제없는 상태'인 거야. 트랜잭션 직렬가능 스케줄도 마찬가지로, 여러 작업이 동시에 뒤섞여 실행됐어도 어떤 순서대로 하나씩 실행한 결과랑 같으면 '안전한 스케줄'이라고 부르는 거야.", "why": "", "term_focus": [], "connections": [], "types": null, "mnemonic": "🎯 '동시 = 차례 결과' → 동(동시에 해도) 차(차례대로 한 것과) 결(결과가 같으면) OK! '동차결 OK'로 외워!", "trap": "", "table": [], "sources": [], "priority": 2}, {"title": "동시성(병행) 제어의 정의", "keywords": ["외부합집합", "조인"], "summary": "", "background": "옛날에 데이터베이스를 한 명씩만 쓸 때는 문제가 없었는데, 여러 명이 동시에 같은 데이터를 건드리다 보니 서로 충돌하거나 데이터가 엉망이 되는 문제가 생겼어. 그래서 여러 사람이 동시에 써도 데이터가 안전하게 유지되도록 관리해주는 방법이 필요해진 거야.", "explanation": "마트 계산대를 생각해봐. 여러 손님이 동시에 같은 물건을 사려고 할 때, 재고 숫자가 꼬이지 않게 순서를 조율해주는 직원이 있잖아. 동시성 제어가 바로 그 직원 역할이야. 여러 사람이 동시에 데이터베이스를 사용해도 데이터가 뒤죽박죽 안 되도록 교통정리를 해주는 기능이야.", "why": "", "term_focus": [], "connections": [], "types": null, "mnemonic": "🚦 '동시에 써도 동시에 망하지 않게' → 동시성 제어 = 데이터 교통경찰!", "trap": "", "table": [], "sources": [], "priority": 2}, {"title": "동시성(병행) 제어의 목적", "keywords": ["외부합집합", "조인"], "summary": "", "background": "옛날에 여러 사람이 동시에 같은 데이터를 수정하다가 데이터가 엉망이 되는 문제가 생겼어. 예를 들어 두 명이 동시에 같은 은행 잔고를 건드리면 돈이 사라지거나 두 배가 되는 사고가 났던 거지!", "explanation": "동시성 제어는 여러 사람이 같은 문서를 동시에 편집할 때 서로 충돌 안 하게 교통정리 해주는 역할이야. 목적은 크게 세 가지인데, 첫째 작업 결과가 순서대로 한 명씩 한 것과 같도록 보장하고, 둘째 빠른 응답과 시스템을 최대한 바쁘게 돌리고, 셋째 데이터가 절대 이상하게 망가지지 않게 지키는 거야.", "why": "", "term_focus": [], "connections": [], "types": null, "mnemonic": "🎯 '직빠무' 로 외워! → 직렬가능성 보장 / 빠른 응답·최대 활용 / 무결성·일관성 보장. '직빠무, 데이터 지켜!'라고 주문처럼 외워봐!", "trap": "", "table": [], "sources": [], "priority": 2}, {"title": "동시성(병행) 제어를 하지 않았을 경우 발생하는 문제점", "keywords": ["외부합집합", "조인"], "summary": "", "background": "옛날에 은행 시스템에서 여러 사람이 동시에 같은 계좌에 입출금하다가 잔액이 뒤죽박죽 되는 사고가 생겼어. 그래서 여러 작업이 동시에 돌아갈 때 생기는 문제들을 정리하게 됐어.", "explanation": "예를 들어 ATM 두 대에서 같은 통장 잔액 1만원을 동시에 출금하면, 한 쪽이 먼저 뺀 결과를 다른 쪽이 덮어써서 돈이 두 번 나갔는데 잔액은 1번만 줄어드는 일이 생겨 — 이게 '갱신 손실'이야. 또 중간에 잘못된 값을 다른 작업이 읽어가는 '오손 읽기', 같은 데이터가 작업마다 달라 보이는 '모순성', 한 작업이 취소될 때 다른 작업도 같이 날아가는 '연쇄 복귀'까지 총 4가지 문제가 생겨.", "why": "", "term_focus": [], "connections": [], "types": {"caption": "여러 트랜잭션이 동시에 실행될 때 병행 제어가 없으면 발생하는 4가지 대표적인 문제.", "items": [{"name": "갱신 손실", "en": "Lost Update", "note": "두 트랜잭션이 동일 데이터를 동시에 갱신할 때 발생. 이전 트랜잭션이 데이터를 갱신한 후 종료하기 전에 다른 트랜잭션이 갱신값을 덮어쓰는 경우."}, {"name": "오손 읽기", "en": "Dirty Read", "note": "트랜잭션의 중간 수행 결과를 다른 트랜잭션이 참조함으로써 발생하는 오류. 아직 Commit되지 않은 변경을 읽는 경우."}, {"name": "모순성", "en": "Inconsistency", "note": "두 트랜잭션이 동시에 실행할 때 DB가 일관성이 없는 상태로 남는 문제."}, {"name": "연쇄 복귀", "en": "Cascading Rollback", "note": "복수의 트랜잭션이 데이터 공유 시 특정 트랜잭션이 처리를 취소한 경우, 다른 트랜잭션이 처리한 부분에 대해 취소 불가능."}, {"name": "반복할 수 없는 읽기", "en": "Unrepeatable Read", "note": "한 트랜잭션 내에서 같은 질의를 두 번 수행했는데, 그 사이에 다른 트랜잭션이 값을 수정/삭제하여 두 질의의 결과가 다르게 나타나는 현상."}]}, "mnemonic": "🔑 '갱오모연' — 갱신 손실, 오손 읽기, 모순성, 연쇄 복귀! '갱(UPDATE) 오(ERROR) 모(순) 연(쇄)' — 동시 제어 안 하면 갱오모연 터진다!", "trap": "", "table": [], "sources": [{"title": "TOPCIT ESSENCE ver.3 — 데이터 이해와 활용", "note": "정보통신산업진흥원(NIPA) 공식 교재"}], "priority": 2}, {"title": "2PL(2--Phase Locking) 기법이란", "keywords": ["외부합집합", "조인"], "summary": "", "background": "여러 사람이 동시에 같은 데이터를 수정하면 데이터가 엉망이 되는 문제가 생겼어. 그래서 '내가 쓰는 동안 다른 사람은 손대지 마!'라는 규칙을 체계적으로 정리한 게 바로 2PL이야.", "explanation": "도서관에서 책을 빌리는 걸 생각해봐. 책을 빌리는 단계(확장단계)에서는 책을 마구마구 빌리기만 하고, 반납하는 단계(수축단계)에서는 빌렸던 책을 하나씩 돌려주기만 해. 핵심은 '첫 번째 반납이 시작되면 절대로 새 책을 빌릴 수 없다'는 거야. 이 규칙만 지키면 여러 사람이 동시에 도서관을 이용해도 데이터가 꼬이지 않아!", "why": "", "term_focus": [], "connections": [], "types": null, "mnemonic": "📖 '빌리고 다 빌렸으면 반납만!' → 빌리기(Lock) 먼저 다 끝내고, 반납(Unlock) 시작하면 다시는 빌리기 없음! 마치 쇼핑카트에 물건 다 담은 후 계산대 가면 다시 물건 담으러 못 가는 것처럼!", "trap": "", "table": [], "sources": [], "priority": 2}, {"title": "완료되지 않은 읽기(Read Uncommitted)", "keywords": [], "summary": "", "background": "옛날에 여러 사람이 동시에 데이터베이스를 쓰다 보니 '내가 수정 중인 데이터를 다른 사람이 보면 어떡하지?' 라는 문제가 생겼어. 그래서 데이터를 읽을 때 얼마나 엄격하게 통제할지 단계를 나눠서 정하게 됐어.", "explanation": "친구가 시험 답안지를 아직 수정하는 중인데, 네가 그 지우다 만 답안을 슬쩍 보는 것과 같아. 친구가 최종 제출도 안 했는데 중간에 보는 거니까 나중에 바뀔 수도 있는 엉터리 정보를 보게 되는 거지. Read Uncommitted는 이렇게 '완료도 안 된 데이터'를 그냥 읽어버리는 가장 느슨한 단계야.", "why": "", "term_focus": [], "connections": [], "types": null, "mnemonic": "🚨 '미완성 답안지 훔쳐보기' — Read(읽기) + Uncommitted(제출 안 함) = 아직 제출 안 한 답 몰래 보기!", "trap": "", "table": [], "sources": [], "priority": 1}, {"title": "완료된 읽기", "keywords": [], "summary": "", "background": "옛날에 여러 사람이 동시에 데이터를 수정하다 보니, 아직 저장도 안 된 엉터리 데이터를 다른 사람이 읽어버리는 사고가 생겼어. 그래서 '완전히 저장이 끝난 데이터만 읽을 수 있게 하자!'는 규칙이 필요해졌지.", "explanation": "친구가 시험 답안지를 아직 고치는 중인데, 네가 그 중간 상태를 보고 '이게 정답이구나!' 하고 착각하는 상황을 생각해봐. '완료된 읽기'는 친구가 답안지를 완전히 다 쓰고 제출한 다음에만 네가 볼 수 있게 하는 규칙이야. 즉, 완전히 확정된 데이터만 읽을 수 있어서 중간에 잘못된 정보를 볼 일이 없어.", "why": "", "term_focus": [], "connections": [], "types": null, "mnemonic": "🍳 '다 익어야 먹는다!' — 음식이 완전히 익어야(=트랜잭션 완료) 먹을 수 있다(=읽기 허용)고 기억해!", "trap": "", "table": [], "sources": [], "priority": 1}, {"title": "반복 읽기(Repeatable Read) )", "keywords": [], "summary": "", "background": "여러 사람이 동시에 데이터베이스를 사용하다 보니, 내가 같은 데이터를 두 번 읽었는데 그 사이에 다른 사람이 값을 바꿔버려서 결과가 달라지는 문제가 생겼어. 이걸 막으려고 '한 번 읽은 데이터는 내 작업이 끝날 때까지 절대 안 변해!' 를 보장하는 Repeatable Read 개념이 만들어진 거야.", "explanation": "도서관에서 책을 빌려서 읽는 중이라고 생각해봐. Repeatable Read는 내가 그 책을 읽는 동안 다른 사람이 내용을 몰래 바꾸거나 책을 없애버리지 못하도록 막아주는 거야. 단, 내가 읽고 있는 책 말고 새 책이 갑자기 꽂히는 건 못 막아 — 그게 바로 Phantom Read(유령 레코드)야.", "why": "", "term_focus": [], "connections": [], "types": null, "mnemonic": "격리 레벨을 0~3으로 외워! '더러운(Dirty) 놈이 반복(Repeatable)해서 유령(Phantom)처럼 나타난다' → 레벨 올라갈수록 하나씩 차단! 0=다 허용, 1=Dirty 차단, 2=반복 차단, 3=유령까지 차단 ✅", "trap": "", "table": [], "sources": [], "priority": 1}, {"title": "교착상태(Deadlock) 정의", "keywords": [], "summary": "", "background": "옛날에 컴퓨터가 여러 작업을 동시에 처리하게 되면서, 두 작업이 서로 상대방이 쓰는 자원을 기다리다가 둘 다 영원히 멈춰버리는 문제가 생겼어. 이 상황을 해결 안 하면 컴퓨터 전체가 멈춰버리니까 반드시 다뤄야 하는 개념이 된 거야.", "explanation": "친구 A는 가위를 갖고 있고 풀을 기다리고 있어. 친구 B는 풀을 갖고 있고 가위를 기다리고 있어. 둘 다 상대방 것을 기다리느라 아무도 먼저 양보 안 하면 영원히 아무 작업도 못 하게 되는데, 이게 바로 교착상태야. 이럴 땐 선생님(시스템)이 강제로 한 명한테 '너 포기해!'라고 해서 상황을 풀어줘야 해.", "why": "", "term_focus": [], "connections": [], "types": null, "mnemonic": "🔒 '니 거 내 거, 내 거 니 거 — 둘 다 꼼짝 마!' → 서로 상대 자원 잠가놓고 기다리다 둘 다 STOP! = 교착(잠길 교, 붙을 착)", "trap": "", "table": [], "sources": [], "priority": 1}, {"title": "교착상태 발생원인", "keywords": [], "summary": "", "background": "옛날에 컴퓨터가 여러 작업을 동시에 처리하게 되면서, 여러 프로그램이 같은 자원을 쓰려고 서로 기다리다가 아무것도 못 하는 상황이 생겼어. 이 '서로 눈치만 보며 멈춰버리는' 현상을 교착상태라고 부르는데, 왜 이게 생기는지 조건을 정리할 필요가 생겼지.", "explanation": "교착상태가 생기려면 4가지 조건이 동시에 성립해야 해. 첫째, 화장실 칸이 1개뿐이라 한 명만 쓸 수 있고(상호배제), 둘째, 화장실 안에 있는 사람이 세면대도 쓰고 싶다고 버티고(점유와 대기), 셋째, 안에서 잠근 문을 밖에서 강제로 못 열고(비선점), 넷째, A는 B 자리를 기다리고 B는 A 자리를 기다리며 빙글빙글 도는 상황(환형 대기)이야. 이 4가지가 한꺼번에 일어나면 아무도 못 빠져나오는 교착상태가 돼!", "why": "", "term_focus": [], "connections": [], "types": {"caption": "하나의 시스템에서 교착상태(Deadlock)가 발생하기 위한 4가지 조건. 4가지가 동시에 성립할 때 발생한다.", "items": [{"name": "상호배제", "en": "Mutual Exclusion", "note": "프로세스들이 자원을 배타적으로 점유하여 다른 프로세스가 그 자원을 사용하지 못함."}, {"name": "점유와 대기", "en": "Hold & Wait", "note": "프로세스가 어떤 자원을 할당받아 점유하고 있으면서 다른 자원을 요구."}, {"name": "비선점", "en": "Non-Preemption", "note": "프로세스에 할당된 자원은 사용이 끝날 때까지 강제로 빼앗을 수 없으며, 점유하고 있는 프로세스 자신만이 해제 가능."}, {"name": "환형 대기", "en": "Circular Wait", "note": "프로세스 간 자원 요구가 하나의 환(순환)을 구성."}]}, "mnemonic": "🔒 '상점비환' - 상(상호배제)점(점유와대기)비(비선점)환(환형대기) → '상점에서 비환불!' 로 외워봐! 상점에서 한번 사면(상호배제·점유) 환불도 안 되고(비선점) 계속 맴돈다(환형대기)는 뜻이야~", "trap": "", "table": [], "sources": [{"title": "TOPCIT ESSENCE ver.3 — 데이터 이해와 활용", "note": "정보통신산업진흥원(NIPA) 공식 교재"}], "priority": 1}, {"title": "교착상태의 해결 방안", "keywords": [], "summary": "", "background": "여러 프로그램이 동시에 실행되다 보면 서로 상대방이 가진 자원을 기다리느라 아무도 진행을 못하는 '꼼짝달싹 못하는' 상황이 생겼어. 이 문제를 해결하기 위해 '애초에 막자', '피해가자', '걸리면 고치자' 세 가지 접근법이 탄생했어.", "explanation": "교착상태 해결법은 크게 세 가지야. 첫째, '예방'은 식당에서 아예 포크를 한 번에 두 개 다 집어야만 밥을 먹을 수 있게 규칙을 만들어서 서로 하나씩 들고 기다리는 상황 자체를 없애는 거야. 둘째, '회피'는 Wait-Die/Wound-Wait처럼 나이(타임스탬프) 순서로 누가 기다리고 누가 포기할지 미리 정해두는 방법이야. 셋째, '탐지 후 복구'는 일단 막히게 내버려 두다가 막혔다 싶으면 범인을 찾아서 작업을 강제로 취소시켜 풀어주는 방식이야.", "why": "", "term_focus": [], "connections": [], "types": null, "mnemonic": "교착상태 해결은 '예-회-탐복' → '예방하고, 회피하고, 탐지해서 복구!' 순서로 외워! 마치 사고 대응처럼 '사고 안 나게 막고 → 위험 지역 피하고 → 사고 났으면 119 불러 수습'!", "trap": "", "table": [], "sources": [], "priority": 1}, {"title": "데이터 복구의 정의", "keywords": ["인덱스"], "summary": "", "background": "옛날에 컴퓨터가 갑자기 꺼지거나 오류가 나면 저장하던 데이터가 다 날아가버리는 문제가 생겼어. 그래서 '어떻게 하면 망가진 데이터를 사고 나기 전 상태로 되돌릴 수 있을까?' 하는 고민에서 데이터 복구 개념이 탄생했지.", "explanation": "데이터 복구는 마치 게임하다가 갑자기 정전됐을 때 마지막 저장 포인트로 돌아가는 것과 같아. 데이터베이스에 갑작스러운 사고(정전, 오류 등)가 생기면, 사고 나기 직전의 깨끗하고 정확한 상태로 되돌려놓는 거야. 쉽게 말해 '데이터 타임머신'이라고 생각하면 돼!", "why": "", "term_focus": [], "connections": [], "types": null, "mnemonic": "🎮 '세이브 포인트로 귀환!' — 게임 세이브 = 데이터 복구! 사고 나면 마지막 세이브 포인트(장애 이전)로 되돌아간다!", "trap": "", "table": [], "sources": [], "priority": 2}, {"title": "데이터베이스 장애(실패)의 유형", "keywords": ["인덱스"], "summary": "", "background": "데이터베이스는 수많은 사람들이 동시에 중요한 데이터를 다루다 보니, 컴퓨터가 꺼지거나 사람이 실수하는 등 다양한 이유로 데이터가 망가지는 사고가 자꾸 발생했어. 그래서 '어떤 종류의 사고가 있는지' 미리 분류해두고 각각에 맞는 대처법을 만들 필요가 생긴 거야.", "explanation": "데이터베이스 장애는 크게 4가지야. 첫째 '트랜잭션 장애'는 은행 송금 도중 잔액 부족처럼 작업 자체가 논리적으로 실패하는 것, 둘째 '시스템 장애'는 컴퓨터가 갑자기 꺼지는 것처럼 하드웨어나 소프트웨어가 뻗어버리는 것, 셋째 '디스크 장애'는 저장 창고(하드디스크)가 물리적으로 부서지는 것, 넷째 '사용자 장애'는 관리자나 사용자가 실수로 데이터를 잘못 건드리는 거야.", "why": "", "term_focus": [], "connections": [], "types": {"caption": "데이터베이스 운영 중 발생할 수 있는 장애(Failure) 유형. 각 유형별로 복구 방법이 다르다.", "items": [{"name": "트랜잭션 장애", "note": "논리적 오류: 내부 오류로 트랜잭션을 완료할 수 없음. 시스템 오류: Deadlock 등의 오류 조건으로 활성 트랜잭션을 강제로 종료."}, {"name": "시스템 장애", "note": "전원·하드웨어·소프트웨어 등의 고장. 시스템 장애로 인해 저장 내용이 영향받지 않도록 무결성 체크 필요."}, {"name": "디스크(매체) 장애", "note": "디스크 스토리지의 일부 또는 전체가 붕괴되는 경우. 가장 최근의 덤프와 로그를 이용하여 덤프 이후에 완결된 트랜잭션을 재실행(REDO)하여 복구."}, {"name": "사용자 장애", "note": "사용자들의 데이터베이스에 대한 이해 부족으로 발생하거나, DBA가 DB 관리를 하다가 발생시키는 실수."}]}, "mnemonic": "🧠 '트시디사' 로 외워! → **트**랜잭션, **시**스템, **디**스크, **사**용자 — '트시디사, 네 가지 사고 조심해~' 순서대로 외워두면 끝!", "trap": "", "table": [], "sources": [{"title": "TOPCIT ESSENCE ver.3 — 데이터 이해와 활용", "note": "정보통신산업진흥원(NIPA) 공식 교재"}], "priority": 2}, {"title": "데이터베이스 복구의 기본원리: 정보 중복성의 원리", "keywords": ["인덱스"], "summary": "", "background": "옛날에 컴퓨터가 갑자기 꺼지거나 데이터가 날아가는 사고가 자주 생겼어. 그래서 중요한 데이터를 어떻게 하면 잃지 않고 되살릴 수 있을까 고민하다가 이 개념이 생겼어.", "explanation": "쉽게 말해서 '백업'이야. 중요한 시험 답안지를 원본 하나만 갖고 있으면 잃어버렸을 때 끝이잖아? 그래서 복사본을 따로 보관해두는 거야. 데이터베이스도 똑같이 데이터 전체를 다른 곳에 복사(아카이브/덤프)해두거나, 무슨 작업을 했는지 일기처럼 기록(로그/저널)해두면 문제가 생겼을 때 그걸 보고 되돌릴 수 있어.", "why": "", "term_focus": [], "connections": [], "types": null, "mnemonic": "📋 '복사 + 일기' → 아카이브는 '사진 찍어두기', 로그는 '일기 써두기' — 사고 나면 사진 보고 복원, 일기 보고 되감기!", "trap": "", "table": [], "sources": [], "priority": 2}, {"title": "데이터베이스 복구 조치 유형", "keywords": ["인덱스"], "summary": "", "background": "옛날에 컴퓨터가 갑자기 꺼지거나 오류가 나면 저장하던 데이터가 날아가거나 엉망이 되는 문제가 있었어. 그래서 '어떤 상황이냐에 따라 다르게 복구하자!'는 방법을 만들게 됐어.", "explanation": "REDO는 '다시 해!'라는 뜻인데, 예를 들어 저장 완료된 문서가 하드 고장으로 통째로 날아갔을 때, 백업본을 꺼내서 그 이후에 했던 작업들을 일지(로그)보고 다시 따라하는 거야. UNDO는 '없던 일로 해!'라는 뜻인데, 파일은 멀쩡한데 저장 도중 전기가 나가서 반쯤 저장된 이상한 상태일 때, 일지를 거꾸로 뒤져서 그 작업 자체를 없던 일로 되돌리는 거야. 쉽게 말해 REDO는 '완료된 것 다시 실행', UNDO는 '진행 중이던 것 취소'야.", "why": "", "term_focus": [], "connections": [], "types": {"caption": "데이터베이스 장애 발생 시 취하는 2가지 기본 복구 조치. REDO는 완료된 트랜잭션에 대해 재실행, UNDO는 미완료 트랜잭션에 대해 취소.", "items": [{"name": "REDO (재실행)", "en": "Forward Recovery", "note": "아카이브 사본 + 로그(Log)를 이용하여 완료 후 상태로 복원. 데이터베이스 내용 자체가 손상된 경우 가장 최근 사본을 적재한 후 그 이후에 일어난 변경 내역을 재실행. 장애 발생 시점 기준 이미 완료된 트랜잭션에 적용. 쓰기(Write) 연산을 재실행하여 변경된 값을 디스크에 저장."}, {"name": "UNDO (취소)", "en": "Backward Recovery", "note": "로그(Log) + 역방향(Backward) 취소 연산을 이용하여 시작 상태로 복원. 데이터베이스 내용 자체에 손상은 없으나 변경 중이거나 변경된 내용의 신뢰성을 잃어버린 경우, 로그를 이용해 모든 변경을 취소하여 원래 상태로 복원. 진행 중이던(미완료) 트랜잭션에 적용. 쓰기(Write) 연산을 취소하여 이전 값으로 돌아감."}]}, "mnemonic": "RE(다시)DO(해) vs UN(안했던 일로)DO(해) — '완료됐으면 다시DO, 미완료면 안했던 일로DO!' 🔁❌", "trap": "", "table": [], "sources": [{"title": "TOPCIT ESSENCE ver.3 — 데이터 이해와 활용", "note": "정보통신산업진흥원(NIPA) 공식 교재"}], "priority": 2}, {"title": "데이터베이스 복구 기법", "keywords": ["제어"], "summary": "", "background": "옛날에 컴퓨터가 작업 도중 갑자기 꺼지거나 오류가 나면 저장하던 데이터가 다 날아가는 문제가 있었어. 그래서 '어떻게 하면 망가진 데이터를 원래대로 되돌릴 수 있을까?' 고민하다가 여러 복구 기법들이 생겨났어.", "explanation": "데이터베이스 복구 기법은 컴퓨터가 갑자기 꺼졌을 때 데이터를 되살리는 방법이야. 예를 들어 '로그 기반'은 일기장에 매일 한 일을 다 적어두고 나중에 처음부터 다시 읽어서 복구하는 것이고, '체크포인트'는 중간중간 세이브포인트를 찍어두는 게임처럼 마지막 저장 지점부터만 복구하는 거야. '그림자 페이징'은 원본은 건드리지 않고 복사본에서 작업하다가 성공하면 교체하고 실패하면 그냥 버리는 방식이야.", "why": "", "term_focus": [], "connections": [], "types": {"caption": "데이터베이스 복구 기법은 회복 방식에 따라 3가지로 분류된다.", "items": [{"name": "로그 기반 회복 기법", "en": "Log-based Recovery", "note": "로그를 이용한 복구. REDO/UNDO를 결정하기 위해 로그 전체를 조사. 체크포인트 필요 없는 트랜잭션까지 또다시 REDO 발생하므로 속도가 느림. 즉시 갱신 기법과 지연 갱신 기법으로 세분화된다."}, {"name": "검사점(Check Point) 회복 기법", "en": "Check Point Recovery", "note": "로그 파일과 검사점을 이용한 복구. UNDO 사용. 로그 기반보다 상대적으로 빠름."}, {"name": "그림자 페이징 기법", "en": "Shadow Paging", "note": "그림자 페이지 테이블을 이용한 복구. UNDO가 간단하고 REDO가 불필요하며 수행 속도가 빠르고 간편. 여러 트랜잭션이 병행 수행되는 환경에서는 단독 사용이 어려워 로그 기반이나 검사점 기법과 함께 사용된다. 그림자 페이지 테이블 복사·기록에 따른 오버헤드 발생."}]}, "mnemonic": "복구 기법은 '로체그' 로 외워! → **로**그기반(일기장 처음부터 읽기) → **체**크포인트(게임 세이브 지점) → **그**림자페이징(복사본에서 작업) / 속도는 로<체<그 순으로 빨라진다고 기억해!", "trap": "", "table": [], "sources": [{"title": "TOPCIT ESSENCE ver.3 — 데이터 이해와 활용", "note": "정보통신산업진흥원(NIPA) 공식 교재"}], "priority": 2}, {"title": "분산 데이터베이스에서의 복구(회복)와 2단계 완료 프로토콜", "keywords": ["제어"], "summary": "", "background": "여러 컴퓨터에 데이터를 나눠서 저장하다 보니, 한 작업이 여러 컴퓨터에 동시에 영향을 줄 때 한 곳은 저장 성공, 다른 곳은 실패하는 최악의 상황이 생겼어. 이걸 막으려고 '모두 같이 성공하거나, 모두 같이 실패하자'는 규칙이 필요해졌지.", "explanation": "식당에서 단체 주문할 때 반장이 '다 먹을 수 있어?' 물어보고, 모두 '응!'이라고 해야만 주문하는 것처럼, 1단계에서 조정자(반장)가 모든 컴퓨터에 '저장 가능해?'라고 물어보고, 2단계에서 전원 OK면 '저장해!'를 외치는 방식이야. 한 명이라도 '못 해!'라고 하면 전체가 취소되어서 데이터가 어느 한 곳만 저장되는 불일치 상태를 막을 수 있어.", "why": "", "term_focus": [], "connections": [], "types": null, "mnemonic": "2단계 완료 = '물어보고(?) → 질러라(!)' — 1단계는 물음표(Commit?), 2단계는 느낌표(Commit!) 🙋‍♂️→✅", "trap": "", "table": [], "sources": [], "priority": 3}, {"title": "데이터베이스 백업 개요", "keywords": ["테이블"], "summary": "", "background": "옛날에 컴퓨터가 갑자기 고장나거나 바이러스에 걸리면 그동안 쌓아온 데이터가 한 순간에 다 날아가는 끔찍한 일이 생겼어. 그래서 '혹시 모르니까 데이터를 딴 곳에도 미리 복사해두자!'는 생각에서 백업이 탄생했지.", "explanation": "백업은 마치 중요한 숙제 파일을 USB에도 따로 저장해두는 것과 같아. 백업에는 3가지 방식이 있는데, 전체 백업은 모든 파일을 통째로 복사하는 거고, 증분 백업은 '지난번 이후로 새로 바뀐 것만' 저장하는 거고, 차등 백업은 '처음 전체 백업 이후로 바뀐 것 전부'를 저장하는 거야. 보통 매일, 매주, 매달 주기적으로 백업을 해서 혹시 모를 사고에 대비해.", "why": "", "term_focus": [], "connections": [], "types": null, "mnemonic": "백업 3형제 = '전증차' → 전(전체-모두), 증(증분-조금씩 새것만), 차(차등-처음부터 달라진 것) / 외우는 법: '전교 증학생 차이' (전체→증분→차등 순서로 저장 범위가 작아진다고 기억!)", "trap": "", "table": [], "sources": [], "priority": 3}, {"title": "데이터베이스 백업의 요구사항 및 주요 작업사항", "keywords": ["테이블"], "summary": "", "background": "옛날에 회사 서버가 갑자기 고장나거나 화재가 나서 몇 년치 데이터가 한순간에 날아가버리는 사고가 종종 있었어. 그래서 '데이터를 어떻게 안전하게 보관하고, 사고 나면 얼마나 빨리 되살릴 수 있을까?'를 체계적으로 정리할 필요가 생긴 거야.", "explanation": "데이터베이스 백업은 마치 중요한 시험 노트를 사진 찍어 클라우드에 올려두는 것과 같아. 노트를 잃어버렸을 때 얼마나 빨리 복구할 수 있는지(MTTR), 얼마나 자주 고장 없이 버티는지(MTBF)를 따지고, 지진·화재 같은 최악의 상황까지 대비해서 복사본을 따로 보관해두는 게 핵심이야. 쉽게 말해 '언제 백업할지, 어디에 저장할지, 사고 나면 얼마나 빨리 되돌릴 수 있는지' 이 세 가지를 미리 계획해두는 거야.", "why": "", "term_focus": [], "connections": [], "types": null, "mnemonic": "백업의 핵심 3박자 → '빨리·자주·멀리' 🎵 (빨리 복구하고 / 자주 백업하고 / 멀리 재난 대비) — MTTR=빨리, 트랜잭션 빈도=자주, 재난복구=멀리!", "trap": "", "table": [], "sources": [], "priority": 3}, {"title": "데이터베이스 백업 방식의 종류와 특징", "keywords": ["테이블"], "summary": "", "background": "데이터가 많아질수록 컴퓨터가 고장나거나 실수로 데이터를 날렸을 때 피해가 엄청나게 커졌어. 그래서 '어떻게 하면 데이터를 안전하게, 근데 효율적으로 저장해둘까?'라는 고민에서 여러 백업 방식이 탄생했어.", "explanation": "백업은 쉽게 말해 '데이터 복사본 만들기'인데, 방식이 세 가지야. 첫째, 가게 문 닫고 재고 정리하는 것처럼 서비스를 완전히 멈추고 백업하는 '콜드 백업', 둘째, 가게 영업하면서 몰래 재고 정리하는 '핫 백업'이 있어. 백업 범위로는 창고 전체를 통째로 사진 찍는 '전체 백업', 마지막 전체 백업 이후 새로 바뀐 것만 찍는 '증분 백업', 그리고 처음 전체 백업 이후 달라진 것 전부 다시 찍는 '차등 백업'이 있어.", "why": "", "term_focus": [], "connections": [], "types": {"caption": "백업은 서비스 중단 여부에 따라 오프라인/온라인, 백업 범위에 따라 전체/차등/증분/아카이브 로그로 분류된다.", "items": [{"name": "오프라인(콜드) 백업", "en": "Cold Backup", "note": "서비스 중단 기준. DB를 정지하고 백업 받는 방식. 백업을 수행하는 동안 DB 사용 불가(서비스 중단)."}, {"name": "온라인(핫) 백업", "en": "Hot Backup", "note": "서비스 중단 기준. DB를 운영하면서 백업 받는 방식. 서비스 중단 시간은 없으나 CPU/I/O 등의 사용량이 증가한다."}, {"name": "전체 백업", "en": "Full Backup", "note": "백업 범위 기준. 데이터베이스 전체를 백업. 수행 시간이 오래 걸리고 데이터 중복으로 비용이 많이 든다."}, {"name": "차등 백업", "en": "Differential Backup", "note": "백업 범위 기준. 마지막으로 수행한 전체 백업 이후에 변경된 데이터에 대해서만 백업. Full 백업에 비해 용량을 줄일 수 있으나 Incremental보다는 중복 백업이 많다. 복구 시 최근 Full + 마지막 차등 백업본만 적용하면 되므로 복구시간이 단축된다."}, {"name": "증분 백업", "en": "Incremental Backup", "note": "백업 범위 기준. 마지막으로 수행한 증분 백업 이후에 변경된 데이터에 대해서만 백업. Differential보다 중복 백업이 적지만, 복구 시 최근 Full + 이후 수행된 모든 증분 백업을 모두 적용해야 해서 복구시간이 증가한다. 반드시 Full 백업이 있어야 하며 중간에 하나라도 빠지면 복구가 어렵다."}, {"name": "아카이브 로그 백업", "en": "Archive Log Backup", "note": "백업 범위 기준. 트랜잭션의 로그 파일 백업. 데이터베이스 데이터 자체의 백업은 아니지만 특정 시점으로 복구가 가능한 장점이 있고, 복구 시 장애 시점 직전까지 복구 가능."}]}, "mnemonic": "🧊뜨🔥 / 전증차 — '차갑게 멈추면 콜드(Cold), 뜨겁게 운영하면 핫(Hot)', 범위는 '전체-증분-차등' 순서로 점점 비교 기준이 달라진다고 기억해! (전체=다 찍기, 증분=어제 이후만, 차등=전체 이후 전부)", "trap": "", "table": [], "sources": [{"title": "TOPCIT ESSENCE ver.3 — 데이터 이해와 활용", "note": "정보통신산업진흥원(NIPA) 공식 교재"}], "priority": 3}];
+const PRIO_LABEL = {1:'최우선', 2:'중요', 3:'보통', 4:'보조'};
+let curTab = 'all';
+let curPrio = 'all';
+let curLessonIdx = -1;
+let curPage = 0;
+let pages = [];
+
+function filterTab(btn, ch) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  curTab = ch;
+  applyFilters();
+}
+
+function filterPrio(btn) {
+  document.querySelectorAll('.pchip').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  curPrio = btn.dataset.prio;
+  applyFilters();
+}
+
+function applyFilters() {
+  const q = document.querySelector('.search').value.toLowerCase();
+  document.querySelectorAll('.section-group').forEach(grp => {
+    const chOk = curTab === 'all' || grp.dataset.chapter === curTab;
+    grp.classList.toggle('hidden', !chOk);
+    if (chOk) {
+      let any = false;
+      grp.querySelectorAll('.card').forEach(c => {
+        const qOk = !q || c.textContent.toLowerCase().includes(q);
+        const pOk = curPrio === 'all' || c.dataset.prio === curPrio;
+        const show = qOk && pOk;
+        c.classList.toggle('hidden-card', !show);
+        if (show) any = true;
+      });
+      if (q || curPrio !== 'all') grp.classList.toggle('hidden', !any);
+    }
+  });
+}
+
+function escHtml(str) {
+  return (str || '').replace(/[&<>"]/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[ch]);
+}
+
+function splitMnemonic(text) {
+  return (text || '')
+    .replace(/\r\n/g, '\n')
+    .replace(/\s+\/\s+/g, '\n')
+    .replace(/\s+vs\.\s+/gi, '\n')
+    .replace(/\s+→\s+/g, ' → ')
+    .replace(/\s+↔\s+/g, ' ↔ ')
+    .replace(/\.\s+/g, '.\n')
+    .replace(/다\.\s+/g, '다.\n')
+    .replace(/됨\.\s+/g, '됨.\n')
+    .split(/\n+/)
+    .map(line => line.trim())
+    .filter(Boolean);
+}
+
+function mnemonicIcon(tag, text) {
+  if (tag) return '◈';
+  if (text.includes('↔') || text.includes('=')) return '⇄';
+  if (text.includes('→')) return '→';
+  return '•';
+}
+
+function renderParagraph(text) {
+  return escHtml(text || '').replace(/\n/g, '<br>');
+}
+
+function renderFactSection(label, secClass, items) {
+  if (!items || !items.length) return '';
+  const html = items.map(item => `
+    <div class="fact-item">
+      ${item.label ? `<div class="fact-link-label">${escHtml(item.label)}</div>` : ''}
+      <div class="fact-term">${escHtml(item.term || '')}</div>
+      <div class="fact-note">${renderParagraph(item.note || '')}</div>
+    </div>`).join('');
+  return `<div class="sec ${secClass}"><div class="sec-label">${label}</div><div class="fact-list">${html}</div></div>`;
+}
+
+function renderTypesSection(types) {
+  if (!types) return '';
+  const items = Array.isArray(types) ? types : (types.items || []);
+  if (!items.length) return '';
+  const caption = !Array.isArray(types) && types.caption ? types.caption : '';
+  const scale = !Array.isArray(types) ? (types.scale || '') : '';
+  const scaleLabels = {
+    'strong-to-weak': ['강함','약함','reverse'],
+    'weak-to-strong': ['약함','강함',''],
+  };
+  const tierClass = {
+    'strong': 'tier-strong',
+    'mid': 'tier-mid',
+    'weak': 'tier-weak',
+  };
+  const tierLabel = {
+    'strong': '강함',
+    'mid': '중간',
+    'weak': '약함',
+  };
+  const rows = items.map(it => {
+    const tierCls = it.tier && tierClass[it.tier] ? tierClass[it.tier] : '';
+    const tierLbl = it.tier && tierLabel[it.tier] ? tierLabel[it.tier] : (it.tier || '');
+    return `
+      <div class="type-item">
+        <div class="type-body">
+          <div class="type-head">
+            <span class="type-name">${escHtml(it.name || '')}</span>
+            ${it.en ? `<span class="type-en">${escHtml(it.en)}</span>` : ''}
+            ${tierCls ? `<span class="type-tier ${tierCls}">${escHtml(tierLbl)}</span>` : ''}
+          </div>
+          <div class="type-note">${renderParagraph(it.note || '')}</div>
+        </div>
+      </div>`;
+  }).join('');
+  let scaleHtml = '';
+  if (scale && scaleLabels[scale]) {
+    const [L, R, rev] = scaleLabels[scale];
+    scaleHtml = `<div class="types-scale ${rev}"><span>${L}</span><span class="scale-arrow"></span><span>${R}</span></div>`;
+  }
+  return `<div class="sec sec-types">
+    <div class="sec-label">🗂️ 유형</div>
+    ${caption ? `<div class="types-caption">${renderParagraph(caption)}</div>` : ''}
+    <div class="types-list">${rows}</div>
+    ${scaleHtml}
+  </div>`;
+}
+
+function renderSourceSection(sources) {
+  if (!sources || !sources.length) return '';
+  const html = sources.map(src => {
+    const hasUrl = !!src.url;
+    let host = '';
+    if (hasUrl) {
+      try { host = new URL(src.url).hostname.replace(/^www\./, ''); } catch (_err) { host = ''; }
+    }
+    const inner = `
+        <span class="src-bullet">↗</span>
+        <span class="src-text">
+          ${escHtml(src.title || src.url || '')}
+          ${src.note ? `<span class="src-host">${escHtml(src.note)}</span>` : ''}
+          ${!src.note && host ? `<span class="src-host">${escHtml(host)}</span>` : ''}
+        </span>`;
+    if (hasUrl) {
+      return `<a class="src-link" href="${escHtml(src.url)}" target="_blank" rel="noreferrer">${inner}</a>`;
+    }
+    return `<div class="src-link">${inner}</div>`;
+  }).join('');
+  return `<div class="sec sec-src"><div class="sec-label">🔗 출처</div><div class="src-list">${html}</div></div>`;
+}
+
+function renderMnemonic(text) {
+  const lines = splitMnemonic(text);
+  if (!lines.length) return '';
+  const html = lines.map(line => {
+    const m = line.match(/^【([^】]+)】\s*(.*)$/);
+    const tag = m ? m[1].trim() : '';
+    const body = (m ? m[2] : line).trim();
+    const safeBody = escHtml(body).replace(/'([^']+)'/g, '<strong>$1</strong>');
+    return `
+      <div class="mn-line">
+        <span class="mn-picto">${mnemonicIcon(tag, body)}</span>
+        <div class="mn-main">
+          ${tag ? `<span class="mn-tag">${escHtml(tag)}</span>` : ''}
+          <div class="mn-text">${safeBody}</div>
+        </div>
+      </div>`;
+  }).join('');
+  return `<div class="sec sec-mn"><div class="sec-label">🧠 5초 암기</div><div class="mn-list">${html}</div></div>`;
+}
+
+function buildPages(lesson) {
+  return [
+    { type: 'learn', data: lesson },
+    { type: 'done',  data: lesson },
+  ];
+}
+
+function renderPage() {
+  const body = document.getElementById('l-body');
+  const page = pages[curPage];
+  body.innerHTML = '';
+  body.scrollTop = 0;
+
+  const wrap = document.createElement('div');
+  wrap.className = 'l-page';
+
+  if (page.type === 'learn') {
+    const d = page.data;
+    let h = '';
+    h += `<h1 class="l-page-title">${escHtml(d.title)}</h1>`;
+    const metaBits = [];
+    if (d.priority && PRIO_LABEL[d.priority]) {
+      metaBits.push(`<span class="chip chip-prio-${d.priority}">P${d.priority} · ${PRIO_LABEL[d.priority]}</span>`);
+    }
+    if (metaBits.length) h += `<div class="l-page-meta">${metaBits.join('')}</div>`;
+    if (d.keywords && d.keywords.length) {
+      h += `<div class="l-page-kw">${d.keywords.map(k => `<span>★ ${escHtml(k)}</span>`).join('')}</div>`;
+    }
+    if (d.summary)     h += `<div class="sec sec-summary"><div class="sec-label">📌 한 줄 요약</div><p>${renderParagraph(d.summary)}</p></div>`;
+    if (d.background)  h += `<div class="sec sec-bg"><div class="sec-label">📜 배경·맥락</div><p>${renderParagraph(d.background)}</p></div>`;
+    if (d.explanation) h += `<div class="sec sec-expl"><div class="sec-label">📖 핵심 설명</div><p>${renderParagraph(d.explanation)}</p></div>`;
+    if (d.types)       h += renderTypesSection(d.types);
+    if (d.why)         h += `<div class="sec sec-why"><div class="sec-label">🔍 왜 이렇게 됐나</div><p>${renderParagraph(d.why)}</p></div>`;
+    if (d.term_focus && d.term_focus.length)   h += renderFactSection('🈶 용어·한자 풀이', 'sec-term', d.term_focus);
+    if (d.connections && d.connections.length) h += renderFactSection('🧭 앞뒤 흐름 연결', 'sec-link', d.connections);
+    if (d.mnemonic)    h += renderMnemonic(d.mnemonic);
+    if (d.trap)        h += `<div class="sec sec-trap"><div class="sec-label">⚠️ 시험 함정</div><p>${renderParagraph(d.trap)}</p></div>`;
+    if (d.table && d.table.length) {
+      const cols = Object.keys(d.table[0]);
+      const head = cols.map(c => `<th>${escHtml(c)}</th>`).join('');
+      const rows = d.table.map(r => '<tr>' + cols.map(c => `<td>${escHtml(r[c] || '')}</td>`).join('') + '</tr>').join('');
+      h += `<div class="sec sec-summary" style="padding:0;background:transparent;border:none">
+        <div class="sec-label" style="padding-left:.3rem;color:#6b7280;margin-bottom:.5rem">📊 정리표</div>
+        <table class="ctable"><thead><tr>${head}</tr></thead><tbody>${rows}</tbody></table>
+      </div>`;
+    }
+    if (d.sources && d.sources.length) h += renderSourceSection(d.sources);
+    wrap.innerHTML = h;
+  }
+  else if (page.type === 'done') {
+    const d = page.data;
+    const hasNext = curLessonIdx + 1 < LESSONS.length;
+    wrap.innerHTML = `
+      <div class="done-page">
+        <div class="done-emoji">🎉</div>
+        <div class="done-title">레슨 완료!</div>
+        <div class="done-sub">${escHtml(d.title)}</div>
+        <div class="done-actions">
+          ${hasNext ? '<button class="done-btn done-btn-primary" onclick="startLesson(' + (curLessonIdx + 1) + ')">다음 개념 →</button>' : ''}
+          <button class="done-btn done-btn-sub" onclick="exitLesson()">목록으로 돌아가기</button>
+        </div>
+      </div>`;
+  }
+
+  body.appendChild(wrap);
+
+  document.getElementById('l-page-ind').textContent = `${curPage + 1} / ${pages.length}`;
+  document.getElementById('l-progress-bar').style.width = `${((curPage + 1) / pages.length) * 100}%`;
+  document.getElementById('l-prev').disabled = curPage === 0;
+  document.getElementById('l-next').disabled = curPage === pages.length - 1;
+  document.getElementById('l-next').textContent = curPage === pages.length - 2 ? '완료 🎉' : '다음 →';
+}
+
+function startLesson(idx) {
+  if (idx < 0 || idx >= LESSONS.length) return;
+  curLessonIdx = idx;
+  curPage = 0;
+  pages = buildPages(LESSONS[idx]);
+  document.getElementById('l-title').textContent = LESSONS[idx].title;
+  document.getElementById('lesson').classList.add('show');
+  document.body.style.overflow = 'hidden';
+  renderPage();
+}
+
+function exitLesson() {
+  document.getElementById('lesson').classList.remove('show');
+  document.body.style.overflow = '';
+  curLessonIdx = -1;
+}
+
+function nextPage() { if (curPage < pages.length - 1) { curPage++; renderPage(); } }
+function prevPage() { if (curPage > 0) { curPage--; renderPage(); } }
+
+document.addEventListener('keydown', e => {
+  if (curLessonIdx < 0) return;
+  if (e.key === 'ArrowLeft')  prevPage();
+  if (e.key === 'ArrowRight') nextPage();
+  if (e.key === 'Escape')     exitLesson();
+});
+</script>
+</body>
+</html>
