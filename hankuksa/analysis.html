@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>한국사 기출 분석 리포트</title>
+<style>
+:root{
+  --font-sans:"Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",system-ui,sans-serif;
+  --font-serif:"NanumMyeongjo","Nanum Myeongjo","Batang","Apple SD Gothic Neo",serif;
+  --main:#8b6f47; --sub:#5d4a30; --bg:#faf6f0; --ink:#2c2416;
+  --c-red:#a23244; --c-amber:#c9a14d; --c-green:#4a7d6d; --c-blue:#2c5fa8;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-sans);background:var(--bg);color:var(--ink);line-height:1.6;padding:2.5rem 1.25rem 4rem}
+.wrap{max-width:900px;margin:0 auto}
+
+h1{font-size:1.8rem;font-weight:800;font-family:var(--font-serif);margin-bottom:.3rem}
+h1 .tag{display:inline-block;background:var(--main);color:#fff;font-family:var(--font-sans);font-size:.7rem;font-weight:700;padding:.2rem .55rem;border-radius:.35rem;margin-left:.5rem;vertical-align:middle;letter-spacing:.05em}
+.lead{color:#666;font-size:.92rem;margin-bottom:2.5rem}
+.lead b{color:var(--ink)}
+
+section{background:#fff;border-radius:.8rem;padding:1.5rem 1.25rem;margin-bottom:1.25rem;box-shadow:0 1px 3px rgba(0,0,0,.04);border-left:4px solid var(--main)}
+section h2{font-family:var(--font-serif);font-size:1.15rem;font-weight:800;margin-bottom:.9rem;color:var(--sub);display:flex;align-items:center;gap:.5rem}
+section h2 .emoji{font-size:1.25rem}
+section p, section li{font-size:.92rem}
+
+/* 전체 규모 테이블 */
+.scale-table{width:100%;border-collapse:collapse;font-size:.85rem;margin-top:.3rem}
+.scale-table th, .scale-table td{padding:.45rem .6rem;text-align:right;border-bottom:1px solid #eee7dc}
+.scale-table th:first-child, .scale-table td:first-child{text-align:left}
+.scale-table thead th{background:#f6ede0;font-weight:700;color:var(--sub)}
+.scale-table tbody tr:hover{background:#faf6ee}
+.scale-table tfoot td{font-weight:800;background:#f6ede0;border-top:2px solid var(--main);border-bottom:none}
+
+/* 우선순위 카드 */
+.priority-grid{display:grid;grid-template-columns:1fr;gap:.85rem;margin-top:.5rem}
+@media(min-width:600px){.priority-grid{grid-template-columns:repeat(2,1fr)}}
+.p-card{background:#faf6ee;border-radius:.6rem;padding:1rem;border-left:3px solid var(--accent, var(--main))}
+.p-card h3{font-size:.92rem;font-weight:800;margin-bottom:.35rem;display:flex;align-items:center;gap:.3rem}
+.p-card .tag{font-size:.7rem;background:var(--accent);color:#fff;padding:.1rem .45rem;border-radius:.3rem;font-weight:700}
+.p-card .count{color:#777;font-size:.78rem;margin-bottom:.5rem}
+
+/* 빈도 뱃지 */
+.hit{display:inline-flex;align-items:center;gap:.25rem;background:#fff;border:1px solid #e8dcc8;border-radius:.3rem;padding:.25rem .55rem;font-size:.82rem;margin:.15rem .2rem .15rem 0;text-decoration:none;color:var(--ink)}
+.hit .n{color:var(--c-red);font-weight:800;font-size:.85rem}
+.hit .l{font-weight:700}
+.hit .c{color:#999;font-size:.72rem}
+
+/* 테이블 — 최빈출 */
+.top-table{width:100%;border-collapse:collapse;font-size:.88rem;margin-top:.3rem}
+.top-table th, .top-table td{padding:.55rem .6rem;text-align:left;border-bottom:1px solid #eee7dc}
+.top-table th{font-weight:700;color:var(--sub);background:#f6ede0;font-size:.8rem;letter-spacing:.03em}
+.top-table .n{color:var(--c-red);font-weight:800;text-align:center;width:60px}
+.top-table .chap{font-size:.75rem;color:#888;background:#f0e7d5;padding:.15rem .4rem;border-radius:.25rem;display:inline-block;white-space:nowrap}
+.top-table .label{font-weight:700}
+.top-table .concept{color:#666;font-size:.82rem}
+
+/* 단원 뱃지 색 */
+.chap-선사{background:#e8d5c0;color:#5d4a30}
+.chap-고대{background:#f4e4c0;color:#7a5e2a}
+.chap-고려{background:#c8e0d8;color:#2e5a4a}
+.chap-조선{background:#f0c8cf;color:#6e1f2c}
+.chap-근대{background:#d5bfa8;color:#3e2616}
+.chap-일제{background:#d0d0d0;color:#333}
+.chap-현대{background:#c8d5ec;color:#1a3d6e}
+
+/* 방치된 개념 리스트 */
+.neglect{margin-top:.5rem}
+.neglect .row{padding:.55rem 0;border-bottom:1px dashed #eee7dc;font-size:.88rem;display:flex;gap:.6rem;align-items:flex-start}
+.neglect .row:last-child{border-bottom:none}
+.neglect .badge{flex-shrink:0;font-size:.72rem;font-weight:800;padding:.2rem .5rem;border-radius:.3rem}
+.neglect .items{flex:1}
+.neglect .frac{color:var(--c-red);font-weight:700;font-size:.78rem}
+
+/* trivial list */
+.trivial ul{list-style:none;padding:0;margin-top:.4rem}
+.trivial li{padding:.4rem 0;font-size:.88rem;border-bottom:1px dashed #eee7dc}
+.trivial li:last-child{border-bottom:none}
+.trivial li strong{color:var(--sub)}
+.trivial .ex{color:#999;font-size:.82rem;margin-left:.3rem}
+
+/* 분석 한계 */
+.caveat{background:#fffaf0;border-left:3px solid var(--c-amber)}
+.caveat ul{margin-top:.4rem;padding-left:1.2rem}
+.caveat li{margin-bottom:.4rem;font-size:.88rem;color:#555}
+
+/* Nav pill */
+.nav-pill{position:fixed;top:1rem;right:1rem;background:var(--main);color:#fff;font-size:.78rem;font-weight:700;padding:.45rem .9rem;border-radius:2rem;text-decoration:none;box-shadow:0 2px 8px rgba(139,111,71,.3);transition:all .18s;z-index:100}
+.nav-pill:hover{background:var(--sub);transform:translateY(-1px)}
+</style>
+</head>
+<body>
+<a href="./" class="nav-pill">← 한국사 메인</a>
+
+<div class="wrap">
+
+<h1>한국사 기출 분석<span class="tag">심화 1급</span></h1>
+<p class="lead">
+  59~77회(최근 19회차) 기출 <b>1,294개 microtopic</b> × 7단원 데이터 기반 분석.
+  개념별 실제 출제 빈도·선지 전용 여부·방치된 영역을 교차 분석해 학습 우선순위를 4단계로 재분류했다.
+</p>
+
+<!-- ──────────────────────────────────── -->
+<section>
+<h2><span class="emoji">📊</span> 전체 규모</h2>
+<table class="scale-table">
+  <thead>
+    <tr><th>단원</th><th>총 개념</th><th>직접출제</th><th>선지전용</th><th>미출제</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>01 선사·고조선</td><td>109</td><td>46</td><td>7</td><td>55</td></tr>
+    <tr><td>02 고대</td><td>155</td><td>84</td><td>10</td><td>61</td></tr>
+    <tr><td>03 고려</td><td>186</td><td>87</td><td>18</td><td>76</td></tr>
+    <tr><td>04 조선</td><td>147</td><td>76</td><td>15</td><td>54</td></tr>
+    <tr><td>05 근대</td><td>286</td><td>99</td><td>65</td><td>109</td></tr>
+    <tr><td>06 일제강점기</td><td>210</td><td>93</td><td>42</td><td>71</td></tr>
+    <tr><td>07 현대</td><td>201</td><td>87</td><td>28</td><td>83</td></tr>
+  </tbody>
+  <tfoot>
+    <tr><td>합계</td><td>1,294</td><td>572</td><td>185</td><td>509</td></tr>
+  </tfoot>
+</table>
+<p style="font-size:.78rem;color:#888;margin-top:.5rem">
+  직접출제 = 문제 본문·선지 정답 맥락 매칭 / 선지전용 = 오답 선지에만 등장 / 미출제 = 0회
+</p>
+</section>
+
+<!-- ──────────────────────────────────── -->
+<section>
+<h2><span class="emoji">🎯</span> 학습 우선순위 4단계</h2>
+<div class="priority-grid">
+  <div class="p-card" style="--accent:var(--c-red)">
+    <h3><span class="tag">1순위</span> 최빈출</h3>
+    <div class="count">11회+ 등장 · <b>8개</b></div>
+    <p style="font-size:.85rem">시험마다 거의 등장. 무조건 암기.</p>
+  </div>
+  <div class="p-card" style="--accent:var(--c-amber)">
+    <h3><span class="tag">2순위</span> 중빈출</h3>
+    <div class="count">6-10회 등장 · <b>137개</b></div>
+    <p style="font-size:.85rem">반복 학습으로 안정적 정답.</p>
+  </div>
+  <div class="p-card" style="--accent:var(--c-green)">
+    <h3><span class="tag">3순위</span> 최근 트렌드</h3>
+    <div class="count">75-77회 출제+반복 · <b>211개</b></div>
+    <p style="font-size:.85rem">다음 회 출제 확률 高.</p>
+  </div>
+  <div class="p-card" style="--accent:var(--c-blue)">
+    <h3><span class="tag">보조</span> 선지 전용</h3>
+    <div class="count">오답 선지 단골 · <b>38개</b></div>
+    <p style="font-size:.85rem">정답 아니어도 혼동 방지용.</p>
+  </div>
+</div>
+</section>
+
+<!-- ──────────────────────────────────── -->
+<section>
+<h2><span class="emoji">🔥</span> 1순위 — 최빈출 TOP (11회+)</h2>
+<table class="top-table">
+  <thead><tr><th class="n">빈도</th><th>항목</th><th>단원·개념</th></tr></thead>
+  <tbody>
+    <tr><td class="n">17</td><td class="label">정우회 선언</td><td><span class="chap chap-일제">일제</span> <span class="concept">민족 유일당 운동과 신간회</span></td></tr>
+    <tr><td class="n">14</td><td class="label">계백</td><td><span class="chap chap-고대">고대</span> <span class="concept">삼국 통일 과정</span></td></tr>
+    <tr><td class="n">12</td><td class="label">중추원 개편 요구</td><td><span class="chap chap-근대">근대</span> <span class="concept">독립협회와 만민공동회</span></td></tr>
+    <tr><td class="n">11</td><td class="label">가락바퀴</td><td><span class="chap chap-선사">선사</span> <span class="concept">신석기 농경과 정착 생활</span></td></tr>
+    <tr><td class="n">11</td><td class="label">진흥왕</td><td><span class="chap chap-고대">고대</span> <span class="concept">진흥왕의 영토 확장</span></td></tr>
+    <tr><td class="n">11</td><td class="label">화랑도</td><td><span class="chap chap-고대">고대</span> <span class="concept">골품제·화백회의·화랑도</span></td></tr>
+    <tr><td class="n">11</td><td class="label">과거(科擧)</td><td><span class="chap chap-고려">고려</span> <span class="concept">광종의 왕권 강화</span></td></tr>
+    <tr><td class="n">11</td><td class="label">대한매일신보</td><td><span class="chap chap-근대">근대</span> <span class="concept">국채보상운동(1907)</span></td></tr>
+  </tbody>
+</table>
+</section>
+
+<!-- ──────────────────────────────────── -->
+<section>
+<h2><span class="emoji">⭐</span> 2순위 — 중빈출 샘플 (6-10회, 전 137개 중)</h2>
+<div style="margin-top:.3rem">
+  <span class="hit"><span class="n">10</span> <span class="l">고인돌</span> <span class="c">선사</span></span>
+  <span class="hit"><span class="n">10</span> <span class="l">을지문덕</span> <span class="c">고대</span></span>
+  <span class="hit"><span class="n">10</span> <span class="l">흑창</span> <span class="c">고려</span></span>
+  <span class="hit"><span class="n">10</span> <span class="l">과거제</span> <span class="c">고려</span></span>
+  <span class="hit"><span class="n">10</span> <span class="l">묘청</span> <span class="c">고려</span></span>
+  <span class="hit"><span class="n">10</span> <span class="l">삼별초</span> <span class="c">고려</span></span>
+  <span class="hit"><span class="n">10</span> <span class="l">개경</span> <span class="c">고려</span></span>
+  <span class="hit"><span class="n">10</span> <span class="l">노비</span> <span class="c">고려</span></span>
+  <span class="hit"><span class="n">10</span> <span class="l">장용영</span> <span class="c">조선</span></span>
+  <span class="hit"><span class="n">10</span> <span class="l">태형</span> <span class="c">일제</span></span>
+  <span class="hit"><span class="n">10</span> <span class="l">국가총동원법</span> <span class="c">일제</span></span>
+  <span class="hit"><span class="n">9</span> <span class="l">서희</span> <span class="c">고려</span></span>
+  <span class="hit"><span class="n">9</span> <span class="l">신돈</span> <span class="c">고려</span></span>
+  <span class="hit"><span class="n">9</span> <span class="l">서인</span> <span class="c">조선</span></span>
+  <span class="hit"><span class="n">8</span> <span class="l">의병</span> <span class="c">조선</span></span>
+  <span class="hit"><span class="n">8</span> <span class="l">인조</span> <span class="c">조선</span></span>
+  <span class="hit"><span class="n">8</span> <span class="l">규장각</span> <span class="c">조선</span></span>
+  <span class="hit"><span class="n">8</span> <span class="l">공인</span> <span class="c">조선</span></span>
+</div>
+</section>
+
+<!-- ──────────────────────────────────── -->
+<section>
+<h2><span class="emoji">📈</span> 3순위 — 최근 3회(75~77) 등장 + 반복</h2>
+<p style="margin-bottom:.6rem">
+  최근 시험(77회=2025 최신)에 나왔으면서 이전에도 3회 이상 반복된 항목들. 다음 회 출제 확률 가장 높음.
+</p>
+<div>
+  <span class="hit"><span class="n">77</span> <span class="l">계백</span> <span class="c">14회</span></span>
+  <span class="hit"><span class="n">77</span> <span class="l">가락바퀴</span> <span class="c">11회</span></span>
+  <span class="hit"><span class="n">77</span> <span class="l">고인돌</span> <span class="c">10회</span></span>
+  <span class="hit"><span class="n">77</span> <span class="l">을지문덕</span> <span class="c">10회</span></span>
+  <span class="hit"><span class="n">77</span> <span class="l">삼별초</span> <span class="c">10회</span></span>
+  <span class="hit"><span class="n">77</span> <span class="l">국가총동원법</span> <span class="c">10회</span></span>
+  <span class="hit"><span class="n">77</span> <span class="l">국내 진공 준비</span> <span class="c">10회</span></span>
+  <span class="hit"><span class="n">77</span> <span class="l">정우회 선언</span> <span class="c">17회</span></span>
+  <span class="hit"><span class="n">76</span> <span class="l">진흥왕</span> <span class="c">11회</span></span>
+  <span class="hit"><span class="n">76</span> <span class="l">과거(科擧)</span> <span class="c">11회</span></span>
+  <span class="hit"><span class="n">76</span> <span class="l">대한매일신보</span> <span class="c">11회</span></span>
+  <span class="hit"><span class="n">76</span> <span class="l">화랑도</span> <span class="c">11회</span></span>
+  <span class="hit"><span class="n">76</span> <span class="l">중추원 개편 요구</span> <span class="c">12회</span></span>
+</div>
+</section>
+
+<!-- ──────────────────────────────────── -->
+<section>
+<h2><span class="emoji">💡</span> 보조 — 선지 전용 (오답 회피용)</h2>
+<p style="margin-bottom:.6rem">
+  본문/정답 아니라 <b>반복 선지</b>로 등장. 알면 혼동 방지에 결정적.
+</p>
+<div>
+  <span class="hit"><span class="n">10</span> <span class="l">2·8 독립선언</span> <span class="c">일제 · 3·1운동 배경</span></span>
+  <span class="hit"><span class="n">8</span> <span class="l">간도 참변(1920)</span> <span class="c">일제</span></span>
+  <span class="hit"><span class="n">7</span> <span class="l">쌍성보 전투</span> <span class="c">일제</span></span>
+  <span class="hit"><span class="n">6</span> <span class="l">관민공동회</span> <span class="c">근대</span></span>
+  <span class="hit"><span class="n">6</span> <span class="l">영국</span> <span class="c">근대 · 거문도 사건</span></span>
+  <span class="hit"><span class="n">5</span> <span class="l">척화비</span> <span class="c">근대</span></span>
+  <span class="hit"><span class="n">5</span> <span class="l">김기수·영선사·메가타</span> <span class="c">근대 · 사절단</span></span>
+  <span class="hit"><span class="n">5</span> <span class="l">배재학당</span> <span class="c">근대</span></span>
+  <span class="hit"><span class="n">5</span> <span class="l">소론</span> <span class="c">조선</span></span>
+  <span class="hit"><span class="n">5</span> <span class="l">신해통공</span> <span class="c">조선</span></span>
+</div>
+</section>
+
+<!-- ──────────────────────────────────── -->
+<section>
+<h2><span class="emoji">⚠️</span> 방치된 핵심 개념 — 60%+ 미출제</h2>
+<p style="margin-bottom:.6rem;font-size:.88rem">
+  교과서엔 비중 있지만 기출에서는 거의 다루지 않은 영역. 출제 패턴이 고정화된 결과.
+  <b>→ 시험 대비 시 투자 비중을 낮추거나, 역으로 다음 시험의 신규 출제 가능성 대비</b>.
+</p>
+<div class="neglect">
+  <div class="row"><span class="badge chap-선사">선사</span>
+    <div class="items">신석기 신앙과 예술 <span class="frac">(0/6)</span> · 신석기 대표 유적 <span class="frac">(0/6)</span> · 단군 신화 <span class="frac">(2/9)</span> · 8조법 <span class="frac">(1/6)</span> · 위만조선 <span class="frac">(1/6)</span></div>
+  </div>
+  <div class="row"><span class="badge chap-고대">고대</span>
+    <div class="items">발해 건국·고구려 계승 <span class="frac">(0/8)</span> · 고대의 경제·사회 <span class="frac">(0/5)</span> · 불교 미술 <span class="frac">(1/7)</span></div>
+  </div>
+  <div class="row"><span class="badge chap-고려">고려</span>
+    <div class="items">고려 중앙 정치 제도 <span class="frac">(2/8)</span> · 고려 사회·신분 <span class="frac">(2/10)</span> · 문벌귀족 사회 <span class="frac">(1/5)</span></div>
+  </div>
+  <div class="row"><span class="badge chap-근대">근대</span>
+    <div class="items">경복궁 중건·원납전 <span class="frac">(0/6)</span> · 안중근 의거·간도협약 <span class="frac">(1/10)</span> · 정미의병·경술국치 <span class="frac">(1/9)</span></div>
+  </div>
+  <div class="row"><span class="badge chap-일제">일제</span>
+    <div class="items">회사령·경제 수탈 <span class="frac">(2/8)</span> · 산미증식계획 <span class="frac">(2/9)</span></div>
+  </div>
+  <div class="row"><span class="badge chap-현대">현대</span>
+    <div class="items">6·25 전쟁·인천상륙작전 <span class="frac">(1/12)</span> · 현대 경제·사회·문화 <span class="frac">(2/10)</span></div>
+  </div>
+</div>
+</section>
+
+<!-- ──────────────────────────────────── -->
+<section class="trivial">
+<h2><span class="emoji">🗑️</span> 지엽적 — 후순위 (시간 아끼자)</h2>
+<ul>
+  <li><strong>연도 숫자 단독</strong> 24개 <span class="ex">1126, 1135, 1019, 1107, 1232, 1270, 1273…</span>
+      <div style="font-size:.82rem;color:#777;margin-top:.2rem">연도로 묻는 경우 드물고, 사건 이름(묘청의 난, 강화도 천도)으로 묻는 게 정석</div></li>
+  <li><strong>부차적 인물</strong> <span class="ex">유수원, 이색, 소현세자 …</span>
+      <div style="font-size:.82rem;color:#777;margin-top:.2rem">실학자는 박지원·정약용·이익 중심으로</div></li>
+  <li><strong>세부 유적·유물</strong> <span class="ex">청원 두루봉 동굴, 양양 오산리, 다호리 …</span>
+      <div style="font-size:.82rem;color:#777;margin-top:.2rem">대표 1~2개만 외우면 충분</div></li>
+</ul>
+</section>
+
+<!-- ──────────────────────────────────── -->
+<section class="caveat">
+<h2><span class="emoji">📝</span> 분석의 한계</h2>
+<ul>
+  <li><b>교과서 중요도 ≠ 기출 빈도.</b> "방치된 개념"이 교과서엔 핵심이어도 기출은 고정 패턴일 수 있음.</li>
+  <li><b>period "기타"/None 통과.</b> 약 236개 문제는 시대 분류가 모호해 lenient 통과. 약간의 noise 존재.</li>
+  <li><b>최근 3~5회 가중치 미반영.</b> 62회 vs 77회 동등 취급. 추후 decay 반영 검토.</li>
+  <li><b>OCR 원본 기반 매칭.</b> PDF 2단 조판으로 인한 인접 문제 혼입이 일부 남아있을 수 있음.</li>
+</ul>
+</section>
+
+<p style="text-align:center;color:#999;font-size:.75rem;margin-top:3rem">
+  분석 대상 기출: 59~77회 · 1,294 microtopics · 최종 정리 2026-04-24
+</p>
+
+</div>
+</body>
+</html>
