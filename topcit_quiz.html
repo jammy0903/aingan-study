@@ -74,6 +74,15 @@
     }
     .mode-btn.active { background: var(--text); color: white; border-color: var(--text); }
     .mode-btn:hover:not(.active) { background: rgba(0,0,0,0.05); }
+    .src-btn {
+      padding: 5px 11px; border: 1.5px solid var(--border);
+      border-radius: 8px; background: white;
+      font-size: 12px; font-weight: 700; cursor: pointer;
+      color: var(--muted); transition: all .15s; font-family: inherit;
+    }
+    .src-btn.active { background: linear-gradient(90deg, #2563eb, #7c3aed); color: white; border-color: transparent; }
+    .src-btn:hover:not(.active) { background: rgba(0,0,0,0.05); }
+    .src-group { display: flex; gap: 4px; flex-shrink: 0; }
     .reset-btn {
       padding: 5px 11px; border: 1.5px solid rgba(220,38,38,.3);
       border-radius: 8px; background: transparent;
@@ -274,9 +283,8 @@
     #lb-close:hover { background: rgba(255,255,255,.3); }
 
     @media (max-width: 560px) {
-      .site-title { display: none; }
       .pb-wrap { max-width: none; }
-      .mode-btn, .reset-btn { padding: 4px 8px; font-size: 11px; }
+      .mode-btn, .reset-btn, .src-btn { padding: 4px 8px; font-size: 11px; }
       .q-text { font-size: 14px; }
     }
   </style>
@@ -286,7 +294,10 @@
 <header id="hdr">
   <div class="hdr-l">
     <a href="./index.html" class="back-link">← 목록</a>
-    <span class="site-title">TOPCIT 기출 퀴즈</span>
+    <div class="src-group">
+      <button class="src-btn active" id="btn-src-exam" onclick="setSource('exam')">기출 <span id="src-cnt-exam"></span></button>
+      <button class="src-btn"        id="btn-src-prac" onclick="setSource('practice')">예상 <span id="src-cnt-prac"></span></button>
+    </div>
   </div>
   <div class="hdr-c">
     <div class="pb-wrap"><div class="pb-fill" id="pb-fill"></div></div>
@@ -327,9 +338,11 @@ const IMG_BASE = '/topcit_exam_images/';
 /* ─────────────────────────────────────────────────────
    State
 ───────────────────────────────────────────────────── */
-let ST = { revealed: [], chosen: {}, mode: 'flashcard', fc_g: 0, fc_q: 0 };
+let ST = { revealed: [], chosen: {}, mode: 'flashcard', fc_g: 0, fc_q: 0, source: 'exam' };
 let GROUPS = [];   // [{cfg, qs:[...]}]
 let ALL_QS = [];
+let EXAM_QS = [];
+let PRACTICE_QS = [];
 let saveTimer = null;
 
 /* ─────────────────────────────────────────────────────
@@ -351,30 +364,43 @@ function gIdx(topic) {
 ───────────────────────────────────────────────────── */
 async function init() {
   try {
-    const [eRes, pRes] = await Promise.all([
+    const [eRes, prRes, progRes] = await Promise.all([
       fetch('/topcit_json_v2/topcit_exam.json'),
+      fetch('/topcit_json_v2/topcit_practice.json').catch(() => null),
       fetch('/api/progress'),
     ]);
     const exam = await eRes.json();
-    const prog = await pRes.json();
+    const practice = prRes && prRes.ok ? await prRes.json() : { questions: [] };
+    const prog = await progRes.json();
 
     for (const yr of exam.years)
-      for (const q of yr.questions) ALL_QS.push(q);
-
-    const buckets = GC.map(() => []);
-    for (const q of ALL_QS) buckets[gIdx(q.topic)].push(q);
-    GROUPS = GC.map((cfg, i) => ({ cfg, qs: buckets[i] }));
+      for (const q of yr.questions) EXAM_QS.push(q);
+    for (const q of (practice.questions || [])) PRACTICE_QS.push(q);
 
     if (Array.isArray(prog.revealed)) ST.revealed = prog.revealed;
     if (prog.chosen && typeof prog.chosen === 'object') ST.chosen = prog.chosen;
     if (prog.mode) ST.mode = prog.mode;
+    if (prog.source === 'exam' || prog.source === 'practice') ST.source = prog.source;
+
+    document.getElementById('loading-msg')?.remove();
+    document.getElementById('src-cnt-exam').textContent = EXAM_QS.length;
+    document.getElementById('src-cnt-prac').textContent = PRACTICE_QS.length;
+    if (PRACTICE_QS.length === 0) {
+      document.getElementById('btn-src-prac').disabled = true;
+      document.getElementById('btn-src-prac').style.opacity = '.4';
+      document.getElementById('btn-src-prac').style.cursor = 'not-allowed';
+      ST.source = 'exam';
+    }
+
+    rebuildGroups();
+
     if (typeof prog.fc_g === 'number') ST.fc_g = Math.min(prog.fc_g, GROUPS.length - 1);
     if (typeof prog.fc_q === 'number') {
       const g = GROUPS[ST.fc_g];
       ST.fc_q = g ? Math.min(prog.fc_q, g.qs.length - 1) : 0;
     }
 
-    document.getElementById('loading-msg')?.remove();
+    applySource(ST.source);
     buildFC();
     buildList();
     updatePB();
@@ -383,6 +409,32 @@ async function init() {
     const el = document.getElementById('loading-msg');
     if (el) el.textContent = '오류: ' + e.message;
   }
+}
+
+function rebuildGroups() {
+  ALL_QS = ST.source === 'practice' ? PRACTICE_QS : EXAM_QS;
+  const buckets = GC.map(() => []);
+  for (const q of ALL_QS) buckets[gIdx(q.topic)].push(q);
+  GROUPS = GC.map((cfg, i) => ({ cfg, qs: buckets[i] }));
+}
+
+function applySource(src) {
+  document.getElementById('btn-src-exam').classList.toggle('active', src === 'exam');
+  document.getElementById('btn-src-prac').classList.toggle('active', src === 'practice');
+}
+
+function setSource(src) {
+  if (src === ST.source) return;
+  if (src === 'practice' && PRACTICE_QS.length === 0) return;
+  ST.source = src;
+  ST.fc_g = 0;
+  ST.fc_q = 0;
+  rebuildGroups();
+  applySource(src);
+  save();
+  buildFC();
+  buildList();
+  updatePB();
 }
 
 /* ─────────────────────────────────────────────────────
@@ -396,7 +448,8 @@ function save() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         revealed: ST.revealed, chosen: ST.chosen,
-        mode: ST.mode, fc_g: ST.fc_g, fc_q: ST.fc_q
+        mode: ST.mode, fc_g: ST.fc_g, fc_q: ST.fc_q,
+        source: ST.source
       }),
     });
   }, 600);
