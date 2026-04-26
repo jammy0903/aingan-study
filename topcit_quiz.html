@@ -371,7 +371,7 @@ async function init() {
     ]);
     const exam = await eRes.json();
     const practice = prRes && prRes.ok ? await prRes.json() : { questions: [] };
-    const prog = await progRes.json();
+    const prog = progRes.ok ? await progRes.json() : {};
 
     for (const yr of exam.years)
       for (const q of yr.questions) EXAM_QS.push(q);

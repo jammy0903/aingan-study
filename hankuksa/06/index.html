@@ -512,7 +512,10 @@ function renderPage() {
   // 진도/네비
   document.getElementById('l-page-ind').textContent = `${curPage + 1} / ${pages.length}`;
   document.getElementById('l-progress-bar').style.width = `${((curPage + 1) / pages.length) * 100}%`;
-  document.getElementById('l-prev').disabled = curPage === 0;
+  const atFirstPage = curPage === 0;
+  const hasPrevLesson = curLessonIdx > 0;
+  document.getElementById('l-prev').disabled = !hasPrevLesson && atFirstPage;
+  document.getElementById('l-prev').textContent = atFirstPage ? (hasPrevLesson ? '← 이전 목록' : '목록 처음') : '← 이전';
   const atLastPage = curPage === pages.length - 1;
   const hasNextLesson = curLessonIdx + 1 < LESSONS.length;
   document.getElementById('l-next').disabled = !hasNextLesson && atLastPage;
@@ -549,6 +552,16 @@ function prevPage() {
   if (curPage > 0) {
     curPage--;
     renderPage();
+    return;
+  }
+  if (curLessonIdx > 0) {
+    const prevIdx = curLessonIdx - 1;
+    const prevPages = buildPages(LESSONS[prevIdx]);
+    curLessonIdx = prevIdx;
+    pages = prevPages;
+    curPage = pages.length - 1;
+    document.getElementById('l-title').textContent = LESSONS[prevIdx].title;
+    renderPage();
   }
 }
 
@@ -560,16 +573,6 @@ document.addEventListener('keydown', e => {
   if (e.key === 'Escape')     exitLesson();
 });
 
-// 모바일 스와이프
-let touchStartX = 0;
-document.getElementById('l-body').addEventListener('touchstart', e => { touchStartX = e.touches[0].clientX; }, {passive: true});
-document.getElementById('l-body').addEventListener('touchend', e => {
-  if (curLessonIdx < 0) return;
-  const dx = e.changedTouches[0].clientX - touchStartX;
-  if (Math.abs(dx) < 50) return;
-  if (dx > 0) prevPage();
-  else        nextPage();
-}, {passive: true});
 </script>
 </body>
 </html>
