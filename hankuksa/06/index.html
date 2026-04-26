@@ -489,8 +489,6 @@ function renderPage() {
     }
     if (d.explanation) h += `<div class="sec sec-expl"><div class="sec-label">📖 핵심 설명</div><p>${renderParagraph(d.explanation)}</p></div>`;
     if (contextText)   h += `<div class="sec sec-bg"><div class="sec-label">📜 배경·왜 이렇게 됐나</div><p>${renderParagraph(contextText)}</p></div>`;
-    if (d.term_focus && d.term_focus.length) h += renderTermFocus(d.term_focus);
-    if (d.summary)     h += `<div class="sec sec-summary"><div class="sec-label">📌 핵심 요약</div><p>${renderParagraph(d.summary)}</p></div>`;
     h += `<div class="sec sec-trap"><div class="sec-label">⚠️ 틀리기 쉬운 부분</div><p>${renderParagraph(trapText)}</p></div>`;
     if (d.table && d.table.length) {
       const cols = Object.keys(d.table[0]);
@@ -502,7 +500,6 @@ function renderPage() {
       </div>`;
     }
     if (d.connections && d.connections.length) h += renderFactSection('🧭 앞뒤 흐름 연결', 'sec-link', d.connections);
-    if (d.mnemonic)    h += renderMnemonic(d.mnemonic);
     if (d.sources && d.sources.length) h += renderSourceSection(d.sources);
     wrap.innerHTML = h;
   }
