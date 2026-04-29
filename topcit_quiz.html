@@ -884,6 +884,11 @@ window.addEventListener('pageshow', function(e) {
    Keyboard shortcuts
 ───────────────────────────────────────────────────── */
 document.addEventListener('keydown', function(e) {
+  if (e.target.classList.contains('answer-input') && e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    document.querySelector(`.check-btn[data-qid="${e.target.dataset.qid}"]`)?.click();
+    return;
+  }
   if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
   if (ST.mode === 'flashcard') {
     if (e.key === 'ArrowLeft')  document.querySelector('[data-action="fc-prev"]:not([disabled])')?.click();
