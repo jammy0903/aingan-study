@@ -605,6 +605,8 @@ function cardHTML(q) {
 function buildFC() {
   const g = GROUPS[ST.fc_g];
   if (!g || !g.qs.length) return;
+  // focus answer input after render (via microtask so DOM is settled)
+  setTimeout(() => document.querySelector('.answer-input')?.focus(), 0);
 
   const tabs = GROUPS.map((gr, i) => {
     const done   = gr.qs.filter(q => isRevealed(q.id)).length;
