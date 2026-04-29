@@ -890,6 +890,14 @@ document.addEventListener('keydown', function(e) {
     return;
   }
   if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+  if (e.key === 'Enter' && ST.mode === 'flashcard') {
+    const g = GROUPS[ST.fc_g];
+    const curQ = g?.qs[ST.fc_q];
+    if (curQ && FEEDBACK[curQ.id] !== undefined) {
+      document.querySelector('[data-action="fc-next"]:not([disabled])')?.click();
+      return;
+    }
+  }
   if (ST.mode === 'flashcard') {
     if (e.key === 'ArrowLeft')  document.querySelector('[data-action="fc-prev"]:not([disabled])')?.click();
     if (e.key === 'ArrowRight') document.querySelector('[data-action="fc-next"]:not([disabled])')?.click();
