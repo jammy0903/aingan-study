@@ -133,11 +133,11 @@
     .fc-dots {
       display: grid;
       grid-column: 1 / -1;
-      grid-template-columns: repeat(20, 8px);
+      grid-template-columns: repeat(30, 8px);
       gap: 5px;
       align-items: center;
       justify-content: center;
-      max-width: 255px;
+      max-width: 385px;
     }
     .fc-dot {
       width: 8px; height: 8px; border-radius: 50%;
@@ -209,6 +209,44 @@
     }
     .reveal-btn:hover:not(.done) { background: #f0f0f0; border-color: #bbb; }
     .reveal-btn.done { background: #f0fdf4; border-color: #16a34a; color: #15803d; cursor: default; }
+
+    /* Code block */
+    .code-block {
+      background: #1e1e2e; color: #cdd6f4;
+      border-radius: 8px; padding: 12px 14px;
+      font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+      font-size: 13px; line-height: 1.6;
+      overflow-x: auto; margin: 8px 0;
+      white-space: pre; word-break: normal;
+    }
+    .code-block code { background: none; color: inherit; font-size: inherit; }
+
+    /* Answer input (short-answer) */
+    .answer-input-wrap { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; }
+    .answer-input {
+      width: 100%; padding: 10px 13px;
+      border: 1.5px solid var(--border); border-radius: 10px;
+      font-size: 14px; font-family: inherit; line-height: 1.5;
+      resize: vertical; outline: none; transition: border .15s;
+      background: #fafafa; color: var(--text);
+    }
+    .answer-input:focus { border-color: #2563eb; background: white; }
+    .check-btn {
+      align-self: flex-start;
+      padding: 8px 18px; border: 1.5px solid #2563eb;
+      border-radius: 10px; background: #2563eb;
+      font-size: 13px; font-weight: 700; cursor: pointer;
+      color: white; transition: all .15s; font-family: inherit;
+    }
+    .check-btn:hover { background: #1d4ed8; border-color: #1d4ed8; }
+
+    /* Answer feedback */
+    .fb-result {
+      padding: 9px 14px; border-radius: 10px;
+      font-size: 14px; font-weight: 700; margin-bottom: 16px;
+    }
+    .fb-correct { background: #f0fdf4; border: 1.5px solid #16a34a; color: #15803d; }
+    .fb-wrong   { background: #fef2f2; border: 1.5px solid #dc2626; color: #dc2626; }
 
     /* Answer */
     .answer-wrap { border-top: 1px solid var(--border); padding-top: 16px; margin-top: 16px; }
@@ -356,6 +394,7 @@ const IMG_BASE = '/topcit_exam_images/';
    State
 ───────────────────────────────────────────────────── */
 let ST = { revealed: [], chosen: {}, mode: 'flashcard', fc_g: 0, fc_q: 0, source: 'exam' };
+const FEEDBACK = {}; // transient: { qid: 'correct'|'wrong'|'unknown' } — not persisted
 let GROUPS = [];   // [{cfg, qs:[...]}]
 let ALL_QS = [];
 let EXAM_QS = [];
@@ -484,6 +523,16 @@ function esc(s) {
     .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 }
 
+function renderText(s) {
+  const parts = (s || '').split(/```([a-z]*)\n([\s\S]*?)```/);
+  let result = '';
+  for (let i = 0; i < parts.length; i++) {
+    if (i % 3 === 0) result += esc(parts[i]);
+    else if (i % 3 === 2) result += `<pre class="code-block"><code>${esc(parts[i])}</code></pre>`;
+  }
+  return result;
+}
+
 function updatePB() {
   const done = ST.revealed.length, total = ALL_QS.length;
   const pct = total ? done / total * 100 : 0;
@@ -508,6 +557,8 @@ function cardHTML(q) {
       ).join('')}</div>`
     : '';
 
+  const fb = FEEDBACK[q.id]; // 'correct'|'wrong'|'unknown'|undefined
+
   let interact = '';
   if (isMCQ) {
     interact = `<div class="choices">${(q.choices || []).map((c, i) => {
@@ -515,15 +566,23 @@ function cardHTML(q) {
       if (revealed) cls += (i === ci ? ' correct' : (i === chosen ? ' wrong' : ''));
       return `<button class="${cls}" data-qid="${esc(q.id)}" data-idx="${i}"${revealed ? ' disabled' : ''}>${esc(c)}</button>`;
     }).join('')}</div>`;
+  } else if (fb !== undefined) {
+    const fbMap = { correct: ['✓ 정답!', 'fb-correct'], wrong: ['✗ 틀렸습니다', 'fb-wrong'], unknown: ['✗ 몰라서 못 씀', 'fb-wrong'] };
+    const [fbText, fbCls] = fbMap[fb];
+    interact = `<div class="fb-result ${fbCls}">${fbText}</div>`;
   } else {
-    interact = `<button class="reveal-btn${revealed ? ' done' : ''}" data-qid="${esc(q.id)}" data-action="reveal">${revealed ? '✓ 정답 확인됨' : '정답 확인하기'}</button>`;
+    interact = `<div class="answer-input-wrap">
+      <textarea class="answer-input" data-qid="${esc(q.id)}" placeholder="정답을 입력하세요..." rows="2"></textarea>
+      <button class="check-btn" data-qid="${esc(q.id)}" data-action="check">확인하기</button>
+    </div>`;
   }
 
-  const ansHTML = revealed ? `
+  const showAns = isMCQ ? revealed : fb !== undefined;
+  const ansHTML = showAns ? `
     <div class="answer-wrap">
       <div class="ans-label">정답</div>
-      <div class="ans-text">${esc(q.answer)}</div>
-      ${q.explanation ? `<div class="exp-label">해설</div><div class="exp-text">${esc(q.explanation)}</div>` : ''}
+      <div class="ans-text">${renderText(q.answer)}</div>
+      ${q.explanation ? `<div class="exp-label">해설</div><div class="exp-text">${renderText(q.explanation)}</div>` : ''}
     </div>` : '';
 
   return `<article class="q-card" data-qid="${esc(q.id)}">
@@ -534,7 +593,7 @@ function cardHTML(q) {
   </div>
   <div class="q-body">
     <div class="q-topic">${esc(q.topic)}</div>
-    <div class="q-text">${esc(q.question)}</div>
+    <div class="q-text">${renderText(q.question)}</div>
     ${imgsHTML}${interact}${ansHTML}
   </div>
 </article>`;
@@ -686,10 +745,32 @@ document.addEventListener('click', function(e) {
     return;
   }
 
-  // Reveal button (non-MCQ)
+  // Reveal button (non-MCQ, legacy)
   const revealBtn = e.target.closest('[data-action="reveal"]:not(.done)');
   if (revealBtn) {
     const qid = revealBtn.dataset.qid;
+    markRevealed(qid);
+    save();
+    afterReveal(qid);
+    return;
+  }
+
+  // Check button (short-answer input)
+  const checkBtn = e.target.closest('[data-action="check"]');
+  if (checkBtn) {
+    const qid = checkBtn.dataset.qid;
+    const q = ALL_QS.find(x => x.id === qid);
+    if (!q) return;
+    const wrap = checkBtn.closest('.answer-input-wrap');
+    const textarea = wrap?.querySelector('.answer-input');
+    const userAns = (textarea?.value || '').trim();
+    if (!userAns) {
+      FEEDBACK[qid] = 'unknown';
+    } else {
+      const norm = s => s.toLowerCase().replace(/\s+/g, ' ').trim();
+      const ca = norm(q.answer), ua = norm(userAns);
+      FEEDBACK[qid] = (ca === ua || ca.includes(ua) || ua.includes(ca)) ? 'correct' : 'wrong';
+    }
     markRevealed(qid);
     save();
     afterReveal(qid);
@@ -709,6 +790,8 @@ document.addEventListener('click', function(e) {
   // Dot nav
   const dot = e.target.closest('[data-action="dot"]');
   if (dot) {
+    const curQ = GROUPS[ST.fc_g]?.qs[ST.fc_q];
+    if (curQ) delete FEEDBACK[curQ.id];
     ST.fc_q = parseInt(dot.dataset.i);
     save();
     buildFC();
@@ -717,11 +800,15 @@ document.addEventListener('click', function(e) {
 
   // FC prev / next
   if (e.target.closest('[data-action="fc-prev"]')) {
+    const curQ = GROUPS[ST.fc_g]?.qs[ST.fc_q];
+    if (curQ) delete FEEDBACK[curQ.id];
     if (ST.fc_q > 0) { ST.fc_q--; save(); buildFC(); }
     return;
   }
   if (e.target.closest('[data-action="fc-next"]')) {
     const g = GROUPS[ST.fc_g];
+    const curQ = g?.qs[ST.fc_q];
+    if (curQ) delete FEEDBACK[curQ.id];
     if (g && ST.fc_q < g.qs.length - 1) { ST.fc_q++; save(); buildFC(); }
     return;
   }
@@ -778,6 +865,7 @@ function lbClose(e) {
 function doReset() {
   if (!confirm('모든 진행 상황을 초기화하시겠습니까?')) return;
   ST.revealed = []; ST.chosen = {}; ST.fc_g = 0; ST.fc_q = 0;
+  Object.keys(FEEDBACK).forEach(k => delete FEEDBACK[k]);
   save();
   buildFC();
   buildList();
