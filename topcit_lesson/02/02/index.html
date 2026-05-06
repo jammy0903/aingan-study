@@ -6,67 +6,135 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <title>TOPCIT 02-02 데이터 모델링 & ERD</title>
 <style>
-:root{--font-sans:Roboto,'Noto Sans KR','Malgun Gothic',sans-serif;--font-serif:"NanumMyeongjo","Nanum Myeongjo","Batang","Apple SD Gothic Neo",serif}
+:root{--g-blue:#1558d6;--g-url:#0d652d;--g-text:#4d5156;--g-border:#dfe1e5}
 *{box-sizing:border-box;margin:0;padding:0}
-html,body{overflow-x:hidden}
-body{font-family:var(--font-sans);background:#f1f3f4;color:#202124;min-height:100vh}
+html,body{background:#fff;color:#202124;font-family:Roboto,'Noto Sans KR',arial,sans-serif}
 
-.header{background:#0e9488;color:#fff;padding:.85rem 1.25rem;display:flex;align-items:center;gap:.75rem;position:sticky;top:0;z-index:20;box-shadow:0 2px 10px rgba(0,0,0,.15)}
-.header-back{color:#fff;text-decoration:none;font-size:1.2rem;opacity:.85}
-.header h1{font-size:1rem;font-weight:800;flex:1;font-family:var(--font-serif)}
-.header-cnt{font-size:.75rem;opacity:.8;white-space:nowrap}
+/* ── Google 헤더 ── */
+.g-header{display:flex;align-items:center;gap:20px;padding:6px 20px 0;border-bottom:1px solid var(--g-border);position:sticky;top:0;background:#fff;z-index:20;flex-wrap:wrap}
+.g-logo{font-size:1.7rem;font-weight:700;letter-spacing:-1px;margin-bottom:6px;flex-shrink:0}
+.g-logo span:nth-child(1){color:#4285f4}
+.g-logo span:nth-child(2){color:#ea4335}
+.g-logo span:nth-child(3){color:#fbbc05}
+.g-logo span:nth-child(4){color:#4285f4}
+.g-logo span:nth-child(5){color:#34a853}
+.g-logo span:nth-child(6){color:#ea4335}
 
-.search-wrap{padding:.7rem 1.25rem .3rem}
-.search{width:100%;padding:.6rem 1rem;border:2px solid #dadce0;border-radius:2rem;font-size:.88rem;outline:none;background:#fff;transition:border .2s}
-.search:focus{border-color:#0e9488}
+.g-searchbar{display:flex;align-items:center;gap:10px;border:1px solid var(--g-border);border-radius:24px;padding:8px 16px;min-width:260px;max-width:580px;flex:1;box-shadow:0 1px 6px rgba(32,33,36,.18);margin-bottom:6px}
+.g-searchbar input{border:none;outline:none;font-size:16px;color:#202124;flex:1;background:transparent;font-family:inherit}
+.g-search-icon{color:#4285f4;font-size:18px;flex-shrink:0}
+.g-mic{color:#4285f4;font-size:18px;cursor:pointer;flex-shrink:0}
 
-.tabs{display:flex;gap:.35rem;padding:.4rem 1.25rem .3rem;overflow-x:auto;scrollbar-width:none}
-.tabs::-webkit-scrollbar{display:none}
-.tab{flex-shrink:0;padding:.32rem .8rem;border-radius:2rem;border:1.5px solid #0e9488;background:#fff;color:#0e9488;font-size:.74rem;font-weight:700;cursor:pointer;white-space:nowrap;transition:all .15s;font-family:inherit}
-.tab.active,.tab:hover{background:#0e9488;color:#fff}
+.g-tabs{display:flex;gap:0;overflow-x:auto;scrollbar-width:none;align-self:flex-end}
+.g-tabs::-webkit-scrollbar{display:none}
+.g-tab{padding:10px 16px;font-size:13px;color:#5f6368;cursor:pointer;border-bottom:3px solid transparent;white-space:nowrap;display:flex;align-items:center;gap:5px;text-decoration:none}
+.g-tab.active{color:#1558d6;border-bottom-color:#1558d6;font-weight:500}
+.g-tab:hover{background:#f8f9fa;color:#202124}
 
-.prio-bar{display:flex;gap:.3rem;padding:.2rem 1.25rem .6rem;overflow-x:auto;scrollbar-width:none}
-.prio-bar::-webkit-scrollbar{display:none}
-.pchip{flex-shrink:0;padding:.28rem .7rem;border-radius:2rem;border:1.5px solid #dadce0;background:#fff;color:#475569;font-size:.72rem;font-weight:700;cursor:pointer;white-space:nowrap;transition:all .15s;font-family:inherit}
-.pchip:hover{border-color:var(--pc,#80868b);color:#202124}
-.pchip.active{background:var(--pc,#0e9488);border-color:var(--pc,#0e9488);color:#fff}
-.pchip[data-prio="all"].active{background:#0e9488;border-color:#0e9488;color:#fff}
+/* ── 검색 필터 바 ── */
+.g-tools{display:flex;align-items:center;gap:8px;padding:10px 20px;border-bottom:1px solid var(--g-border);overflow-x:auto;scrollbar-width:none;background:#fff}
+.g-tools::-webkit-scrollbar{display:none}
+.g-tool-btn{padding:5px 12px;border:1px solid var(--g-border);border-radius:100px;font-size:12px;color:#202124;cursor:pointer;white-space:nowrap;background:#fff;font-family:inherit;transition:background .1s}
+.g-tool-btn:hover,.g-tool-btn.active{background:#e8eaed}
+.g-tool-sep{width:1px;height:20px;background:var(--g-border);flex-shrink:0}
 
-.section-group{padding:.3rem 1.25rem .8rem}
-.section-group.hidden{display:none}
-.section-label{font-size:.72rem;font-weight:800;color:#115e59;letter-spacing:.04em;padding:.4rem 0 .35rem;border-bottom:2px solid #0e948833;margin-bottom:.55rem;font-family:var(--font-serif)}
-.card-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:.55rem}
-@media(min-width:540px){.card-grid{grid-template-columns:repeat(3,1fr)}}
-@media(min-width:900px){.card-grid{grid-template-columns:repeat(4,1fr)}}
-@media(min-width:1200px){.card-grid{grid-template-columns:repeat(5,1fr)}}
-.card{background:#fff;border-radius:.7rem;padding:.85rem .8rem .65rem;cursor:pointer;border:1.5px solid #dadce0;transition:all .18s;box-shadow:0 1px 3px rgba(0,0,0,.04);position:relative;display:flex;flex-direction:column;gap:.35rem;min-height:9rem}
-.card:hover{border-color:#0e9488;box-shadow:0 4px 14px #0e948833;transform:translateY(-2px)}
-.card-badges{position:absolute;top:.45rem;right:.5rem;display:flex;gap:.2rem;font-size:.64rem}
-.card-badges span{padding:.1rem .42rem;border-radius:.4rem;font-weight:700;line-height:1.4;white-space:nowrap}
-.b-prio-1{background:#fee2e2;color:#991b1b}
-.b-prio-2{background:#fef3c7;color:#92400e}
-.b-prio-3{background:#dcfce7;color:#166534}
-.b-prio-4{background:#f1f5f9;color:#475569}
-.b-mn{background:#ede9fe;color:#5b21b6}
-.card-title{font-size:.86rem;font-weight:700;color:#202124;line-height:1.35;padding-right:4.5rem;font-family:var(--font-serif)}
-.card-preview{font-size:.7rem;color:#5f6368;line-height:1.5;flex:1}
-.card-cta{font-size:.68rem;color:#0e9488;font-weight:700;text-align:right;margin-top:.25rem}
-.card.hidden-card{display:none!important}
+/* ── 결과 영역 ── */
+.g-body{display:flex;padding:0 20px;max-width:900px}
+.g-results{flex:1;padding-top:8px;min-width:0}
 
-/* ───────── 레슨 모드 (풀스크린) ───────── */
+.g-result-info{font-size:13px;color:#70757a;padding:8px 0 12px}
+
+/* ── 검색 결과 아이템 (카드 → 검색 결과) ── */
+.card-grid{display:flex!important;flex-direction:column!important;gap:0!important}
+
+.card{
+  background:transparent!important;
+  border:none!important;
+  border-radius:0!important;
+  box-shadow:none!important;
+  padding:16px 0 24px!important;
+  border-bottom:none!important;
+  min-height:0!important;
+  cursor:pointer;
+  position:relative;
+  display:block!important;
+  gap:0!important;
+  transition:none!important;
+}
+.card:hover{transform:none!important;box-shadow:none!important}
+
+.card-badges{display:none!important}
+
+/* URL 라인 */
+.card::before{
+  content:attr(data-url);
+  display:block;
+  font-size:13px;
+  color:var(--g-url);
+  margin-bottom:2px;
+  line-height:1.4;
+}
+
+/* 제목 */
+.card-title{
+  font-size:20px!important;
+  font-weight:400!important;
+  color:var(--g-blue)!important;
+  line-height:1.3!important;
+  padding-right:0!important;
+  font-family:inherit!important;
+  margin-bottom:4px;
+}
+.card:hover .card-title{text-decoration:underline;color:#1a0dab!important}
+
+/* 설명 */
+.card-preview{
+  font-size:13.5px!important;
+  color:var(--g-text)!important;
+  line-height:1.58!important;
+  display:-webkit-box!important;
+  -webkit-line-clamp:3!important;
+  -webkit-box-orient:vertical!important;
+  overflow:hidden!important;
+  flex:none!important;
+}
+.card-cta{display:none!important}
+
+/* 섹션 그룹 */
+.section-group{padding:0!important}
+.section-group.hidden{display:none!important}
+.section-label{
+  font-size:12px;
+  color:#70757a;
+  padding:16px 0 8px;
+  border-bottom:none!important;
+  margin-bottom:0!important;
+  letter-spacing:.02em;
+  font-weight:400;
+}
+
+/* 검색창/탭/필터 숨기기 */
+.search-wrap{display:none!important}
+.tabs{display:none!important}
+.prio-bar{display:none!important}
+.header{display:none!important}
+
+/* 상단 여백 */
+#card-content{padding-top:0}
+
+/* ── 레슨 모드 (기존 유지) ── */
 .lesson{display:none;position:fixed;inset:0;background:#f1f3f4;z-index:100000;flex-direction:column}
 .lesson.show{display:flex}
-.l-head{background:#0e9488;color:#fff;padding:.7rem 1rem;display:flex;align-items:center;gap:.7rem;flex-shrink:0}
+.l-head{background:#1a73e8;color:#fff;padding:.7rem 1rem;display:flex;align-items:center;gap:.7rem;flex-shrink:0}
 .l-back{background:none;border:none;color:#fff;font-size:1.3rem;cursor:pointer;padding:0;line-height:1;opacity:.9}
-.l-title{flex:1;font-size:.92rem;font-weight:800;font-family:var(--font-serif);line-height:1.3;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.l-title{flex:1;font-size:.92rem;font-weight:700;font-family:inherit;line-height:1.3;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .l-page-ind{font-size:.78rem;font-weight:700;background:rgba(0,0,0,.18);padding:.18rem .55rem;border-radius:1rem;flex-shrink:0}
 .l-progress{height:4px;background:rgba(0,0,0,.15);flex-shrink:0}
 .l-progress-bar{height:100%;background:#fff;width:0%;transition:width .3s ease}
 .l-body{flex:1;overflow-y:auto;padding:1.2rem 1.25rem 5rem;display:flex;flex-direction:column;gap:1rem;align-items:center}
 .l-page{width:100%;max-width:680px;animation:slideIn .25s ease}
 @keyframes slideIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
-
-.l-page-title{font-size:1.5rem;font-weight:800;color:#115e59;margin-bottom:.5rem;font-family:var(--font-serif);line-height:1.3}
+.l-page-title{font-size:1.5rem;font-weight:700;color:#1557b0;margin-bottom:.5rem;line-height:1.3}
 .l-page-meta{display:flex;flex-wrap:wrap;gap:.35rem;margin-bottom:.85rem}
 .l-page-meta .chip{padding:.18rem .55rem;border-radius:1rem;font-size:.7rem;font-weight:700}
 .chip-prio-1{background:#fee2e2;color:#991b1b}
@@ -74,90 +142,77 @@ body{font-family:var(--font-sans);background:#f1f3f4;color:#202124;min-height:10
 .chip-prio-3{background:#dcfce7;color:#166534}
 .chip-prio-4{background:#f1f5f9;color:#475569}
 .l-page-kw{display:flex;flex-wrap:wrap;gap:.3rem;margin-bottom:1.2rem}
-.l-page-kw span{background:#0e948822;color:#115e59;border:1px solid #0e948855;border-radius:1rem;padding:.18rem .65rem;font-size:.72rem;font-weight:700}
-
+.l-page-kw span{background:#1a73e822;color:#1557b0;border:1px solid #1a73e855;border-radius:1rem;padding:.18rem .65rem;font-size:.72rem;font-weight:700}
 .sec{border-radius:.7rem;padding:1rem 1.1rem;line-height:1.65;margin-bottom:.85rem}
-.sec-summary{background:#0e948811;border-left:5px solid #0e9488;font-size:.95rem;color:#202124;font-weight:600}
-.sec-bg{background:#fef7ec;border-left:5px solid #d97706}
+.sec-summary{background:#1a73e811;border-left:5px solid #1a73e8;font-size:.95rem;color:#202124;font-weight:600}
+.sec-bg{background:#fef7ec;border-left:5px solid #f9ab00}
 .sec-expl{background:#eef2ff;border-left:5px solid #4f46e5}
 .sec-why{background:#ecfdf5;border-left:5px solid #059669}
 .sec-term{background:#faf5ff;border-left:5px solid #7c3aed}
 .sec-link{background:#fff7ed;border-left:5px solid #c2410c}
-.sec-mn{background:linear-gradient(145deg,#fffef5 0%,#fff7d6 56%,#0e948820 100%);color:#202124;font-weight:600;border:1.5px solid #0e948833;border-left:5px solid #0e9488;box-shadow:0 10px 26px #0e948814}
+.sec-mn{background:linear-gradient(145deg,#fffef5 0%,#fff7d6 56%,#1a73e820 100%);color:#202124;font-weight:600;border:1.5px solid #1a73e833;border-left:5px solid #1a73e8;box-shadow:0 10px 26px #1a73e814}
 .sec-trap{background:#fff1f2;border:1.5px solid #fda4af;border-left:5px solid #e11d48;color:#881337}
-.sec-src{background:#fff;border:1.5px solid #dadce0;border-left:5px solid #475569}
+.sec-src{background:#fff;border:1.5px solid #dadce0;border-left:5px solid #5f6368}
 .sec-types{background:#f0f9ff;border:1.5px solid #bae6fd;border-left:5px solid #0284c7}
 .sec-types .sec-label{color:#075985}
-.types-caption{font-size:.8rem;color:#334155;margin-bottom:.6rem;line-height:1.55}
+.types-caption{font-size:.8rem;color:#3c4043;margin-bottom:.6rem;line-height:1.55}
 .types-list{display:flex;flex-direction:column;gap:.55rem;counter-reset:tc}
 .type-item{display:grid;grid-template-columns:2rem 1fr;gap:.55rem;align-items:start;background:#fff;border:1px solid #e0f2fe;border-radius:.7rem;padding:.7rem .78rem;counter-increment:tc;position:relative}
-.type-item::before{content:counter(tc);display:inline-flex;align-items:center;justify-content:center;width:1.7rem;height:1.7rem;border-radius:.5rem;background:#0e948816;color:#115e59;font-size:.8rem;font-weight:800;line-height:1}
+.type-item::before{content:counter(tc);display:inline-flex;align-items:center;justify-content:center;width:1.7rem;height:1.7rem;border-radius:.5rem;background:#1a73e816;color:#1557b0;font-size:.8rem;font-weight:700;line-height:1}
 .type-body{min-width:0}
 .type-head{display:flex;flex-wrap:wrap;gap:.35rem;align-items:center;margin-bottom:.2rem}
-.type-name{font-size:.92rem;font-weight:800;color:#0f172a;font-family:var(--font-serif)}
-.type-en{font-size:.72rem;color:#64748b;font-weight:700}
-.type-tier{display:inline-flex;align-items:center;padding:.08rem .42rem;border-radius:999px;font-size:.62rem;font-weight:800;letter-spacing:.04em}
-.tier-strong{background:#fee2e2;color:#991b1b}
-.tier-mid{background:#fef3c7;color:#92400e}
-.tier-weak{background:#dcfce7;color:#166534}
-.type-note{font-size:.86rem;line-height:1.68;color:#334155;word-break:keep-all}
-.types-scale{display:flex;align-items:center;gap:.45rem;margin-top:.65rem;padding:.5rem .7rem;background:rgba(255,255,255,.7);border:1px dashed #bae6fd;border-radius:.6rem;font-size:.72rem;color:#475569;font-weight:700}
+.type-name{font-size:.92rem;font-weight:700;color:#0f172a}
+.type-en{font-size:.72rem;color:#5f6368;font-weight:700}
+.type-tier{display:inline-flex;align-items:center;padding:.08rem .42rem;border-radius:999px;font-size:.62rem;font-weight:700;letter-spacing:.04em}
+.tier-strong{background:#fee2e2;color:#991b1b}.tier-mid{background:#fef3c7;color:#92400e}.tier-weak{background:#dcfce7;color:#166534}
+.type-note{font-size:.86rem;line-height:1.68;color:#3c4043;word-break:keep-all}
+.types-scale{display:flex;align-items:center;gap:.45rem;margin-top:.65rem;padding:.5rem .7rem;background:rgba(255,255,255,.7);border:1px dashed #bae6fd;border-radius:.6rem;font-size:.72rem;color:#5f6368;font-weight:700}
 .types-scale .scale-arrow{flex:1;height:6px;border-radius:999px;background:linear-gradient(90deg,#16a34a,#d97706,#dc2626)}
 .types-scale.reverse .scale-arrow{background:linear-gradient(90deg,#dc2626,#d97706,#16a34a)}
-.sec-label{font-size:.7rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;margin-bottom:.5rem}
-.sec-bg .sec-label{color:#92400e}
-.sec-expl .sec-label{color:#3730a3}
-.sec-why .sec-label{color:#065f46}
-.sec-term .sec-label{color:#5b21b6}
-.sec-link .sec-label{color:#9a3412}
-.sec-mn .sec-label{color:#115e59}
-.sec-trap .sec-label{color:#9f1239}
-.sec-summary .sec-label{color:#0e9488}
-.sec-src .sec-label{color:#334155}
+.sec-label{font-size:.7rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;margin-bottom:.5rem}
+.sec-bg .sec-label{color:#92400e}.sec-expl .sec-label{color:#3730a3}.sec-why .sec-label{color:#065f46}
+.sec-term .sec-label{color:#5b21b6}.sec-link .sec-label{color:#9a3412}.sec-mn .sec-label{color:#1557b0}
+.sec-trap .sec-label{color:#9f1239}.sec-summary .sec-label{color:#1a73e8}.sec-src .sec-label{color:#3c4043}
 .sec p{font-size:.92rem;line-height:1.7}
 .sec-mn p{font-size:.98rem}
 .fact-list{display:flex;flex-direction:column;gap:.65rem}
 .fact-item{background:rgba(255,255,255,.85);border:1px solid rgba(0,0,0,.06);border-radius:.85rem;padding:.78rem .85rem}
-.fact-term{font-size:.86rem;font-weight:800;color:#202124;margin-bottom:.22rem}
+.fact-term{font-size:.86rem;font-weight:700;color:#202124;margin-bottom:.22rem}
 .fact-note{font-size:.9rem;line-height:1.72;color:#3c4043;word-break:keep-all}
-.fact-link-label{display:inline-flex;align-items:center;padding:.12rem .45rem;border-radius:999px;background:#0e948814;color:#115e59;font-size:.64rem;font-weight:800;letter-spacing:.04em;margin-bottom:.38rem}
+.fact-link-label{display:inline-flex;align-items:center;padding:.12rem .45rem;border-radius:999px;background:#1a73e814;color:#1557b0;font-size:.64rem;font-weight:700;letter-spacing:.04em;margin-bottom:.38rem}
 .src-list{display:flex;flex-direction:column;gap:.5rem}
-.src-link{display:flex;align-items:flex-start;gap:.45rem;text-decoration:none;color:#202124;background:#f8f9fa;border:1px solid #dadce0;border-radius:.8rem;padding:.72rem .82rem;transition:border-color .15s,transform .15s}
-.src-link:hover{border-color:#0e9488;transform:translateY(-1px)}
-.src-bullet{flex-shrink:0;color:#0e9488;font-weight:800}
+.src-link{display:flex;align-items:flex-start;gap:.45rem;text-decoration:none;color:#202124;background:#f8f9fa;border:1px solid #dadce0;border-radius:.8rem;padding:.72rem .82rem;transition:border-color .15s}
+.src-link:hover{border-color:#1a73e8}
+.src-bullet{flex-shrink:0;color:#1a73e8;font-weight:700}
 .src-text{font-size:.85rem;line-height:1.55}
 .src-host{display:block;font-size:.72rem;color:#5f6368;margin-top:.1rem}
 .mn-list{display:flex;flex-direction:column;gap:.55rem}
-.mn-line{display:flex;align-items:flex-start;gap:.72rem;background:rgba(255,255,255,.82);border:1px solid #0e948822;border-radius:.9rem;padding:.72rem .8rem .68rem;box-shadow:0 4px 12px rgba(0,0,0,.04)}
-.mn-picto{flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;width:1.6rem;height:1.6rem;border-radius:.45rem;background:#0e948816;border:1px solid #0e948826;font-size:.76rem;font-weight:800;line-height:1;color:#115e59}
+.mn-line{display:flex;align-items:flex-start;gap:.72rem;background:rgba(255,255,255,.82);border:1px solid #1a73e822;border-radius:.9rem;padding:.72rem .8rem .68rem;box-shadow:0 4px 12px rgba(0,0,0,.04)}
+.mn-picto{flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;width:1.6rem;height:1.6rem;border-radius:.45rem;background:#1a73e816;border:1px solid #1a73e826;font-size:.76rem;font-weight:700;line-height:1;color:#1557b0}
 .mn-main{display:flex;flex-direction:column;gap:.28rem;min-width:0}
-.mn-tag{display:inline-flex;align-items:center;width:fit-content;padding:.12rem .45rem;border-radius:999px;background:#0e948818;color:#115e59;font-size:.64rem;font-weight:800;letter-spacing:.05em}
+.mn-tag{display:inline-flex;align-items:center;width:fit-content;padding:.12rem .45rem;border-radius:999px;background:#1a73e818;color:#1557b0;font-size:.64rem;font-weight:700;letter-spacing:.05em}
 .mn-text{font-size:.95rem;line-height:1.76;color:#202124;word-break:keep-all}
-.mn-text strong{color:#0e9488;font-weight:800}
-
+.mn-text strong{color:#1a73e8;font-weight:700}
 .ctable{width:100%;border-collapse:collapse;font-size:.82rem;background:#fff;border-radius:.5rem;overflow:hidden;margin-top:.4rem}
-.ctable th{background:#0e9488;color:#fff;padding:.55rem .65rem;text-align:left;font-weight:700;font-size:.78rem}
+.ctable th{background:#1a73e8;color:#fff;padding:.55rem .65rem;text-align:left;font-weight:700;font-size:.78rem}
 .ctable td{padding:.55rem .65rem;border-top:1px solid #dadce0;vertical-align:top;line-height:1.55}
 .ctable tr:nth-child(even) td{background:#f8f9fa}
-
 .done-page{text-align:center;padding:2.5rem 1rem}
 .done-emoji{font-size:4.5rem;margin-bottom:1rem;animation:pop .4s ease}
 @keyframes pop{from{transform:scale(0)}80%{transform:scale(1.2)}to{transform:scale(1)}}
-.done-title{font-size:1.5rem;font-weight:800;color:#115e59;margin-bottom:.5rem;font-family:var(--font-serif)}
+.done-title{font-size:1.5rem;font-weight:700;color:#1557b0;margin-bottom:.5rem}
 .done-sub{font-size:.95rem;color:#5f6368;margin-bottom:2rem}
 .done-actions{display:flex;flex-direction:column;gap:.6rem;max-width:300px;margin:0 auto}
 .done-btn{padding:.85rem 1.4rem;border-radius:.7rem;font-size:.95rem;font-weight:700;cursor:pointer;border:none;font-family:inherit;transition:all .15s}
-.done-btn-primary{background:#0e9488;color:#fff}
-.done-btn-primary:hover{transform:translateY(-2px);box-shadow:0 4px 14px #0e948855}
-.done-btn-sub{background:#fff;color:#0e9488;border:1.5px solid #0e9488}
-.done-btn-sub:hover{background:#0e948811}
-
+.done-btn-primary{background:#1a73e8;color:#fff}
+.done-btn-primary:hover{box-shadow:0 4px 14px #1a73e855}
+.done-btn-sub{background:#fff;color:#1a73e8;border:1.5px solid #1a73e8}
 .l-foot{position:fixed;bottom:0;left:0;right:0;background:#fff;padding:.7rem 1rem;display:flex;gap:.5rem;border-top:1px solid #dadce0;z-index:1010}
-.l-nav-btn{flex:1;padding:.7rem;border-radius:.55rem;border:1.5px solid #0e9488;background:#fff;color:#0e9488;font-size:.88rem;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s}
-.l-nav-btn:hover:not(:disabled){background:#0e948811}
+.l-nav-btn{flex:1;padding:.7rem;border-radius:.55rem;border:1.5px solid #1a73e8;background:#fff;color:#1a73e8;font-size:.88rem;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s}
+.l-nav-btn:hover:not(:disabled){background:#1a73e811}
 .l-nav-btn:disabled{opacity:.35;cursor:not-allowed}
-.l-nav-btn.primary{background:#0e9488;color:#fff;border-color:#0e9488}
-.l-nav-btn.primary:hover:not(:disabled){background:#115e59;border-color:#115e59}
+.l-nav-btn.primary{background:#1a73e8;color:#fff;border-color:#1a73e8}
+.l-nav-btn.primary:hover:not(:disabled){background:#1557b0;border-color:#1557b0}
 </style>
 <script src="../../../chrome-frame.js"></script>
 </head>
@@ -195,7 +250,7 @@ body{font-family:var(--font-sans);background:#f1f3f4;color:#202124;min-height:10
 </div>
 
 <script>
-const LESSONS = [{"title": "개념적/논리적 모델링에 대한 학계와 산업계의 이해 차이", "keywords": ["기술", "주로", "테이블", "산출물로", "개념적", "참고로", "과정", "상관", "이를", "업무"], "summary": "", "background": "데이터베이스 설계 순서를 학교에서 배운 방식 그대로 회사에서 쓰려고 했더니 선배들이 다르게 말하는 거야. 학교(학계)랑 실제 회사(산업계)가 '개념적 설계', '논리적 설계'라는 단어를 서로 다른 의미로 쓰고 있었던 거지!", "explanation": "학교에서는 ERD 그리는 것 자체가 '개념적 모델링'이야. 근데 회사에서는 ERD 그리는 건 '논리적 모델링'이고, 그 전에 더 큰 그림(핵심 주제영역만 대충 요약)을 그리는 걸 '개념적 모델링'이라고 불러. 마치 학교에서 '스케치'라고 부르는 걸 회사에서는 '밑그림'이라 부르고, 회사의 '스케치'는 훨씬 더 날림으로 그린 초안인 느낌이야!", "why": "", "term_focus": [], "connections": [], "types": null, "mnemonic": "🏫학교 = ERD가 곧 개념! / 🏢회사 = ERD는 논리, 그 위에 '슈퍼 요약본'이 개념! → '학개(학교=개념=ERD), 산논(산업=논리=ERD)' 으로 외워!", "trap": "", "table": [], "sources": [], "priority": 3}, {"title": "프로세스 모델링의 개념", "keywords": ["기술", "주로", "테이블", "산출물로", "개념적", "참고로", "과정", "상관", "이를", "업무"], "summary": "", "background": "옛날에 회사 시스템을 만들 때 '어떤 일을 해야 하는지' 정리 없이 바로 개발했다가 중요한 기능이 빠지거나 쓸데없는 기능이 잔뜩 들어가는 문제가 생겼어. 그래서 개발 전에 '어떤 업무(프로세스)가 필요한지' 미리 체계적으로 정리하는 방법이 필요해졌어.", "explanation": "프로세스 모델링은 쉽게 말해 '해야 할 일 목록을 빠짐없이 정리하는 것'이야. 예를 들어 학교 축제를 준비할 때 '공연 섭외 → 무대 설치 → 홍보 → 당일 진행'처럼 해야 할 일을 순서대로 빠짐없이 정리하는 것처럼, 시스템을 만들기 전에 필요한 모든 업무를 큰 것부터 작은 것까지 단계별로 쪼개서 정리하는 과정이야. 이렇게 하면 나중에 '이 기능 왜 없어?'라는 상황을 미리 막을 수 있어.", "why": "", "term_focus": [], "connections": [], "types": null, "mnemonic": "프로세스 모델링 = '프리(미리) 정리'! 개발 전에 할 일을 미리(프리) 빠짐없이 정리한다 → '프리정리' 기억해!", "trap": "", "table": [], "sources": [], "priority": 3}, {"title": "데이터 모델링 단계", "keywords": ["데이터 모델링", "개념적", "논리적", "물리적", "모델링 절차"], "summary": "", "background": "데이터베이스 설계는 추상 수준에서 구체 수준으로 단계적으로 진행된다. 각 단계마다 다루는 대상과 산출물, 주된 결정 사항이 다르다. 이 흐름을 알아야 DB 설계 전 과정을 체계적으로 수행할 수 있다.", "explanation": "데이터 모델링은 개념적 → 논리적 → 물리적 3단계로 진행된다. 상위 단계일수록 추상적이고 DBMS와 독립적이며, 하위 단계일수록 구체적이고 특정 DBMS·하드웨어에 종속된다. 각 단계의 상세는 이 section의 개별 카드를 참고.", "why": "", "term_focus": [], "connections": [], "types": {"caption": "데이터 모델링의 3단계. 추상에서 구체로 진행되며 각 단계의 산출물이 다음 단계의 입력이 된다.", "items": [{"name": "개념적 모델링", "en": "Conceptual Modeling", "note": "1단계. 업무 도메인을 파악하고 주요 엔터티·관계를 식별한다. DBMS와 무관하게 '무엇을' 관리할지를 정의. 주 산출물: ER 다이어그램. 현업·경영진과의 소통 도구."}, {"name": "논리적 모델링", "en": "Logical Modeling", "note": "2단계. 개념 모델을 관계형 스키마로 변환하고 정규화를 수행. 테이블·칼럼·관계·키를 구체적으로 정의. DBMS 제품과는 여전히 독립적. 주 산출물: 논리 데이터 모델·정규화된 테이블 스키마."}, {"name": "물리적 모델링", "en": "Physical Modeling", "note": "3단계. 특정 DBMS와 하드웨어를 고려해 저장 구조·인덱스·파티션·반정규화 등을 결정. 성능·용량·보안 요구사항이 반영된다. 주 산출물: 물리 데이터 모델·DDL 스크립트."}]}, "mnemonic": "【순서】개념 → 논리 → 물리. '업무 이해 → 테이블 스키마 → 실제 저장 구조'의 3단계 깔때기.", "trap": "", "table": [], "sources": [{"title": "TOPCIT ESSENCE ver.3 — 데이터 이해와 활용", "note": "정보통신산업진흥원(NIPA) 공식 교재"}], "priority": 2}, {"title": "개념적 모델링", "keywords": [], "summary": "", "background": "옛날에 개발자들이 바로 컴퓨터 코드부터 짜다 보니까 '어, 이 데이터가 왜 필요하지?' 하고 나중에 다 뒤엎는 일이 너무 많았어. 그래서 코딩 전에 '우리가 다룰 데이터가 뭔지' 먼저 큰 그림으로 정리하는 단계가 필요해졌어.", "explanation": "학교 도서관 시스템을 만든다고 생각해봐. 코드 짜기 전에 먼저 '책', '학생', '대출' 이런 중요한 덩어리들이 뭔지 찾고, 그것들이 서로 어떻게 연결되는지를 그림(ER 다이어그램)으로 그려보는 거야. 마치 집 짓기 전에 설계도 스케치를 먼저 대충 그려보는 것처럼, 복잡한 기술 없이 '뭘 저장할지' 큰 그림만 잡는 단계야.", "why": "", "term_focus": [], "connections": [], "types": null, "mnemonic": "개념적 모델링 = '개그맨(개-그-맨)' → 개(개념), 그(그림으로), 맨(맨 먼저)! 맨 먼저 그림으로 개념 잡기!", "trap": "", "table": [], "sources": [], "priority": 2}, {"title": "논리적 모델링", "keywords": [], "summary": "", "background": "옛날에 사람들이 머릿속으로만 생각한 정보 구조를 컴퓨터가 이해할 수 있게 바꾸는 과정이 없어서 개발자마다 제멋대로 데이터를 저장했어. 그러다 보니 같은 정보가 여기저기 중복되고 나중에 수정할 때 엄청 힘들어졌거든, 그래서 사람의 언어를 컴퓨터 언어로 '번역'하는 중간 단계가 필요해진 거야.", "explanation": "논리적 모델링은 마치 건축가가 집 설계 스케치를 실제 도면으로 바꾸는 것과 같아. 사람이 '침실이 필요해'라고 그린 대략적인 그림을, 공사할 수 있도록 정확한 치수와 규칙이 담긴 도면으로 변환하는 단계거든. 이 과정에서 중복된 내용을 없애고(정규화), 테이블끼리 연결하는 고리(외래키)도 만들어줘.", "why": "", "term_focus": [], "connections": [], "types": null, "mnemonic": "논리적 모델링 = '번·정·키' 기억해! 번역(사람 언어 → 컴퓨터 언어), 정규화(중복 제거), 키(외래키로 연결) — 이 세 단어만 떠올리면 끝!", "trap": "", "table": [], "sources": [], "priority": 2}, {"title": "물리적 모델링", "keywords": [], "summary": "", "background": "데이터를 어떻게 저장할지 설계는 했는데, 실제 컴퓨터 하드디스크에 딱 맞게 구체적으로 어떻게 넣을지는 따로 정해야 했어. 그래서 '실제 저장 방식'을 결정하는 물리적 모델링 단계가 생겨났어.", "explanation": "논리적 모델링이 '집 설계 도면'이라면, 물리적 모델링은 '실제 공사 시방서'야. 어떤 자재(데이터 형식)를 쓸지, 문을 어디 달지(인덱스), 규칙은 뭔지(제약조건)를 딱딱 정하는 단계야. 쉽게 말해 '빠르고 효율적으로 데이터를 꺼낼 수 있게' 실제 저장 방법을 최종 확정하는 거야.", "why": "", "term_focus": [], "connections": [], "types": null, "mnemonic": "물리 = 몸(실제 몸으로 구현!) → '형·제·인' 세 가지 결정! (데이터 형식 / 제약조건 / 인덱스)", "trap": "", "table": [], "sources": [], "priority": 2}, {"title": "일반화/특수화(Generalization/Specialization)", "keywords": [], "summary": "", "background": "데이터베이스를 설계하다 보니 '학생', '교수', '직원'처럼 비슷한 정보를 가진 것들을 따로따로 관리하면 너무 중복이 많아지는 문제가 생겼어. 그래서 공통점은 묶고 차이점은 나누는 방법이 필요해졌지!", "explanation": "동물원을 생각해봐. '동물'이라는 큰 카테고리 안에 '강아지', '고양이', '새'가 있잖아. 큰 카테고리(동물)에서 세부 종류로 나누는 게 '특수화', 반대로 강아지·고양이·새를 보고 '얘네 다 동물이네!'하고 하나로 묶는 게 '일반화'야. 이 둘은 같은 관계를 위에서 보냐, 아래서 보냐의 차이일 뿐이야!", "why": "", "term_focus": [], "connections": [], "types": null, "mnemonic": "일반화 = '일단 합쳐!' (여러 개 → 하나로 위로 올라감 ⬆️), 특수화 = '특별히 나눠!' (하나 → 여러 개로 아래로 내려감 ⬇️) — '일합특나' 로 기억해!", "trap": "", "table": [], "sources": [], "priority": 3}, {"title": "엔터티(Entity)", "keywords": [], "summary": "", "background": "옛날에 컴퓨터로 정보를 저장할 때 '도대체 무엇에 대한 정보를 저장해야 하지?'라는 혼란이 있었어. 그래서 '저장할 대상'을 명확하게 구분하고 이름 붙이는 개념이 필요해졌어.", "explanation": "엔터티는 쉽게 말해 '데이터베이스에 저장할 대상'이야. 예를 들어 학교 시스템을 만든다면 '학생', '선생님', '과목'처럼 정보를 따로따로 관리해야 할 '것'들이 각각 엔터티야. 현실 세계에서 구별할 수 있는 모든 사물이나 개념이 엔터티가 될 수 있어.", "why": "", "term_focus": [], "connections": [], "types": null, "mnemonic": "엔터티 = '엔터(Enter)해서 저장할 것' — 데이터베이스에 입력(Enter)할 대상!", "trap": "", "table": [], "sources": [], "priority": 2}, {"title": "속성(Attribute)", "keywords": [], "summary": "", "background": "옛날에 컴퓨터로 사람 정보를 저장하려고 했는데, 그냥 막 저장하면 나중에 찾을 수가 없어서 '이름', '나이', '주소' 같은 항목을 미리 정해두고 저장하는 방식이 필요했어. 그래서 데이터를 설명해주는 각각의 항목들을 '속성(Attribute)'이라고 부르게 됐어.", "explanation": "속성은 어떤 대상을 설명하는 특징들이야. 예를 들어 학생이라는 대상을 설명할 때 '이름', '학번', '나이', '전공' 같은 것들이 바로 속성이야. 마치 사람 소개서에 적는 항목들처럼, 대상의 특징 하나하나가 다 속성이라고 보면 돼.", "why": "", "term_focus": [], "connections": [], "types": null, "mnemonic": "속성 = 소개팅 프로필 항목! 이름/나이/키/직업 → 각각 하나하나가 '속성'", "trap": "", "table": [], "sources": [], "priority": 2}, {"title": "엔터티의 특징", "keywords": [], "summary": "", "background": "옛날에 데이터베이스를 만들 때 '뭘 저장해야 하지?'를 제멋대로 정하다 보니 쓸데없는 정보가 가득 차거나 정작 필요한 정보가 빠지는 문제가 생겼어. 그래서 '저장할 대상(엔터티)이 되려면 이런 조건을 갖춰야 해!'라는 기준을 딱 정해놓은 거야.", "explanation": "엔터티는 쉽게 말해 데이터베이스에 '등록 자격'이 있는 대상이야. 예를 들어 학교 학생부에 올라가려면 ① 실제 우리 학교 학생이어야 하고 ② 학번으로 구별되어야 하고 ③ 한 명이 아니라 여러 명이 있어야 하고 ④ 실제 수업·출결 등 학교 업무에 쓰여야 하고 ⑤ 이름·나이 같은 정보가 있어야 하고 ⑥ 반, 과목 같은 다른 대상과 연결되어야 해. 이 6가지 조건을 다 만족해야 엔터티로 인정받을 수 있어!", "why": "", "term_focus": [], "connections": [], "types": null, "mnemonic": "👉 '필식영업속관' 으로 외워! → 필(필요한 정보) 식(식별자 있음) 영(영속적으로 2개 이상) 업(업무에 이용됨) 속(속성 있음) 관(다른 엔터티와 관계 있음) — '필식영업속관' 6글자만 기억하면 엔터티 6가지 특징 끝!", "trap": "", "table": [], "sources": [], "priority": 3}, {"title": "엔터티의 분류", "keywords": [], "summary": "", "background": "데이터베이스를 만들 때 세상의 모든 정보를 무작정 집어넣으면 너무 복잡해지는 문제가 있었어. 그래서 '어떤 종류의 정보인지'와 '언제 생겨나는 정보인지'를 기준으로 미리 분류해두면 설계가 훨씬 쉬워진다는 걸 알게 됐지.", "explanation": "엔터티 분류는 쉽게 말해 정보를 두 가지 기준으로 나눠 정리하는 거야. 첫 번째는 '형태가 있냐 없냐'로 나누는 건데, 사원·물품처럼 실제로 존재하는 것(유형), 부서·계좌처럼 개념적인 것(개념), 주문·계약처럼 사건인 것(사건)으로 구분해. 두 번째는 '언제 생기냐'로 나누는 건데, 처음부터 있는 기본 정보(사원, 부서), 기본 정보들이 합쳐져 생기는 중심 정보(접수, 계약), 활동하면서 추가로 생기는 행위 정보(주문 이력 등)로 나눠.", "why": "", "term_focus": [], "connections": [], "types": {"caption": "엔터티는 보통 두 가지 기준으로 분류된다: 유무(유형)에 따른 분류와 발생시점에 따른 분류.", "items": [{"name": "유형 엔터티", "en": "Tangible Entity", "note": "유무형 기준. 물리적으로 존재하는 엔터티. 예: 사원, 물품."}, {"name": "개념 엔터티", "en": "Conceptual Entity", "note": "유무형 기준. 물리적 실체 없이 개념적으로 존재. 예: 부서, 조직."}, {"name": "사건 엔터티", "en": "Event Entity", "note": "유무형 기준. 업무 수행 중 발생하는 사건. 예: 주문, 계약."}, {"name": "기본(키) 엔터티", "en": "Fundamental / Key Entity", "note": "발생시점 기준. 업무에 원래 존재하는 엔터티로 다른 엔터티의 부모 역할을 한다. 예: 사원, 부서, 물품."}, {"name": "중심 엔터티", "en": "Main Entity", "note": "발생시점 기준. 기본 엔터티로부터 파생되거나 관계를 맺으며 업무의 중심 역할. 예: 주문, 계약."}, {"name": "행위 엔터티", "en": "Active Entity", "note": "발생시점 기준. 2개 이상의 엔터티로부터 발생하는 행위의 결과. 예: 주문상세, 계약변경."}]}, "mnemonic": "분류 기준 두 개를 '유발'로 기억해! '유'형(형태 기준: 유형·개념·사건) + '발'생시점(시점 기준: 기본·중심·행위) → '유발'되는 엔터티!", "trap": "", "table": [], "sources": [{"title": "TOPCIT ESSENCE ver.3 — 데이터 이해와 활용", "note": "정보통신산업진흥원(NIPA) 공식 교재"}], "priority": 2}, {"title": "속성의 분류", "keywords": [], "summary": "", "background": "데이터베이스를 설계하다 보니 속성마다 성격이 달랐어. 어떤 건 원래부터 존재하는 정보고, 어떤 건 설계하면서 새로 만들어지고, 어떤 건 다른 값을 계산해서 나오는 거라 구분이 필요해졌어.", "explanation": "예를 들어 쇼핑몰을 만든다고 해봐. '상품 이름'이나 '단가'처럼 원래부터 있는 정보는 기본속성, 관리하려고 새로 만든 '상품코드' 같은 건 설계속성, 그리고 단가×수량으로 계산되는 '총금액'처럼 다른 값에서 뽑아내는 건 파생속성이야. 즉, 속성은 '원래 있던 것', '새로 만든 것', '계산된 것' 이렇게 세 종류로 나뉘어!", "why": "", "term_focus": [], "connections": [], "types": {"caption": "속성은 어디서 도출되었고 어떻게 생성되는지에 따라 기본·설계·파생 3가지로 분류된다.", "items": [{"name": "기본속성", "en": "Basic Attribute", "note": "업무 분석을 통해 바로 정의한, 원래 업무에 존재하는 속성. 예: 제품이름, 제조년월, 제조원가."}, {"name": "설계속성", "en": "Designed Attribute", "note": "원래 업무상 존재하지는 않지만 설계를 하면서 도출해내는 속성. 예: 약품용기 코드 같은 치환 코드."}, {"name": "파생속성", "en": "Derived Attribute", "note": "다른 속성으로부터 계산이나 변형이 되어 생성되는 속성. 예: 용기의 총금액(= 수량 × 단가) 같은 계산값."}]}, "mnemonic": "기·설·파 → '기'본은 원래 있고, '설'계는 새로 만들고, '파'생은 계산해서 파생된다! (기설파~🎵)", "trap": "", "table": [], "sources": [{"title": "TOPCIT ESSENCE ver.3 — 데이터 이해와 활용", "note": "정보통신산업진흥원(NIPA) 공식 교재"}], "priority": 2}, {"title": "관계", "keywords": [], "summary": "", "background": "옛날에 데이터베이스를 설계할 때 '이 데이터가 저 데이터랑 어떻게 연결되어 있지?'를 그림으로 표현하는 방법이 제각각이라 협업할 때 너무 헷갈렸어. 그래서 Crow's Foot(까마귀 발) 같은 표준 표기법을 만들어서 관계의 필수/선택 여부, 개수 등을 누가 봐도 똑같이 읽을 수 있게 정리한 거야.", "explanation": "사원과 부서를 예로 들면, '사원은 반드시 하나의 부서에 속해야 해(필수)' 또는 '부서는 사원이 없을 수도 있어(선택)'처럼 두 데이터가 연결되는 규칙을 선으로 표현하는 게 관계야. Crow's Foot 표기법에서는 선 끝 모양이 까마귀 발처럼 퍼지면 '여러 개', 세로 막대면 '꼭 1개', 동그라미면 '없어도 됨(선택)'을 뜻해. 즉 선 끝 모양만 봐도 '몇 개인지, 있어야 하는지'를 바로 알 수 있어.", "why": "", "term_focus": [], "connections": [], "types": null, "mnemonic": "🦶 '발(足) 모양으로 읽어!' → 까마귀 발(여러 개) / 막대(딱 1개) / 동그라미(0도 OK) — '발·막·동' 세 글자만 기억하면 Crow's Foot 끝!", "trap": "", "table": [], "sources": [], "priority": 2}, {"title": "식별자의 분류", "keywords": [], "summary": "", "background": "데이터베이스에서 수많은 데이터를 저장하다 보니 '이 데이터가 누구 건지' 구별할 방법이 필요했어. 그래서 각 데이터를 딱 집어낼 수 있는 '식별자'를 체계적으로 분류하게 됐어.", "explanation": "식별자는 학교에서 학생을 구별하는 '학번' 같은 거야. 분류 기준이 4가지인데, 대표인지 아닌지(주/보조), 스스로 만들었는지 외부에서 받았는지(내부/외부), 하나짜리인지 여러 개짜리인지(단일/복합), 업무상 자연스럽게 생긴 건지 편의상 만든 건지(본질/인조)로 나눠. 예를 들어 주민번호는 '주식별자+내부+단일+본질' 식별자고, 편의상 붙인 일련번호는 '인조 식별자'야.", "why": "", "term_focus": [], "connections": [], "types": {"caption": "식별자는 대표성, 스스로 생성 여부, 속성의 수, 대체 여부 4가지 기준으로 분류된다.", "items": [{"name": "주식별자", "en": "Primary Identifier", "note": "대표성 기준. 엔터티 내 각 어커런스를 구분할 수 있고, 타 엔터티와 참조관계를 연결할 수 있는 식별자."}, {"name": "보조식별자", "en": "Alternate Identifier", "note": "대표성 기준. 엔터티 내 각 어커런스를 구분할 수 있으나 대표성을 가지지 못해 참조관계 연결을 못 함."}, {"name": "내부식별자", "en": "Internal Identifier", "note": "스스로 생성 여부 기준. 엔터티 내부에서 스스로 만들어지는 식별자."}, {"name": "외부식별자", "en": "External / Foreign Identifier", "note": "스스로 생성 여부 기준. 타 엔터티와의 관계를 통해 타 엔터티로부터 받아오는 식별자(FOREIGN KEY)."}, {"name": "단일식별자", "en": "Single Identifier", "note": "속성의 수 기준. 하나의 속성으로 구성된 식별자."}, {"name": "복합식별자", "en": "Composite Identifier", "note": "속성의 수 기준. 둘 이상의 속성으로 구성된 식별자."}, {"name": "본질식별자", "en": "Original Identifier", "note": "대체 여부 기준. 업무에 의해 만들어지는 식별자. 예: 주민등록번호."}, {"name": "인조식별자", "en": "Surrogate Identifier", "note": "대체 여부 기준. 업무적으로 만들어지지는 않지만 원조식별자가 복잡한 구성을 가져 인위적으로 만든 식별자. 예: 일련번호."}]}, "mnemonic": "식별자 4분류 = '주보 내외 단복 본인' → 주보(주/보조)는 대표성, 내외(내부/외부)는 출처, 단복(단일/복합)은 개수, 본인(본질/인조)은 자연산 vs 인공산!", "trap": "", "table": [], "sources": [{"title": "TOPCIT ESSENCE ver.3 — 데이터 이해와 활용", "note": "정보통신산업진흥원(NIPA) 공식 교재"}], "priority": 2}, {"title": "식별자관계와 비식별자관계", "keywords": [], "summary": "", "background": "데이터베이스에서 여러 테이블이 서로 연결될 때, 부모 테이블의 정보를 자식 테이블이 받아쓰는 상황이 생겼어. 근데 그 받은 정보를 '자식의 신분증(주식별자)'으로 쓸지, 그냥 '참고용 메모'로만 쓸지 규칙이 필요해졌지.", "explanation": "학교에서 반 배정을 생각해봐. '3학년 2반 15번' 학생이 있으면, 여기서 '3학년 2반'은 부모(반) 정보야. 이 반 정보를 학생 번호에 포함시켜서 신분증처럼 쓰면 '식별자 관계'고, 그냥 어느 반인지 참고만 하고 학생 번호는 따로 매기면 '비식별자 관계'야. 쉽게 말해 부모 정보가 내 이름표의 일부냐, 아니면 그냥 메모냐의 차이야!", "why": "", "term_focus": [], "connections": [], "types": null, "mnemonic": "식별자=신분증 포함 / 비식별자=그냥 메모 → '식포, 비메' 로 외워! (식별자는 포함, 비식별자는 메모)", "trap": "", "table": [], "sources": [], "priority": 3}, {"title": "슈퍼타입과 서브타입", "keywords": [], "summary": "", "background": "옛날에 데이터베이스를 만들 때 '직원'이라는 표 하나에 정규직, 알바, 임원 정보를 다 때려박다 보니 빈 칸이 너무 많고 관리가 엉망이 됐어. 그래서 공통 정보는 하나로 묶고, 각각 다른 정보는 따로 분리하는 방법이 생긴 거야.", "explanation": "슈퍼타입은 '동물'이고 서브타입은 '개', '고양이', '새'라고 생각해봐. 배타적 서브타입은 한 동물이 개이거나 고양이이거나 둘 중 하나만 될 수 있는 것이고, 포괄적 서브타입은 한 존재가 '학생'이면서 동시에 '아르바이트생'도 될 수 있는 것처럼 여러 서브타입에 동시에 속할 수 있는 거야. 쉽게 말해 배타적은 '택1', 포괄적은 '중복 선택 가능'이야.", "why": "", "term_focus": [], "connections": [], "types": null, "mnemonic": "배타적 = 배타(거부)하니까 하나만! '배-하나', 포괄적 = 포용하니까 여러 개! '포-여럿' → 배하나, 포여럿!", "trap": "", "table": [], "sources": [], "priority": 3}, {"title": "부채꼴 함정", "keywords": [], "summary": "", "background": "옛날에 데이터베이스를 설계할 때 여러 테이블을 연결하다 보면 어떤 직원이 어느 부서에 속하는지 알 수 없는 황당한 상황이 생겼어. 관계를 잘못 이어놓으면 경로가 여러 갈래로 퍼져서 정확한 정보를 뽑을 수 없는 문제가 자꾸 발생했거든.", "explanation": "예를 들어 '지사 → 부서'도 연결되고 '지사 → 직원'도 연결되어 있는데, 정작 '직원이 어느 부서 소속인지'는 알 수 없는 상황이야. 마치 부채꼴처럼 지사에서 부서랑 직원이 각각 따로따로 펼쳐져 있어서, 직원-부서 사이의 연결고리가 없는 거지. 이걸 해결하려면 직원과 부서를 직접 연결해주는 관계를 추가해야 해.", "why": "", "term_focus": [], "connections": [], "types": null, "mnemonic": "부채꼴 = '부'서랑 직원이 따로따로 '채'각각 펼쳐져서 연결이 '꼴'불견! → 직접 이어줘야 해결!", "trap": "", "table": [], "sources": [], "priority": 4}, {"title": "균열 함정", "keywords": [], "summary": "", "background": "데이터베이스에서 여러 테이블을 연결해서 정보를 찾으려고 했는데, 연결고리가 중간에 끊겨서 일부 데이터가 아예 조회가 안 되는 문제가 생겼어. 이 현상을 정식으로 정의하고 예방하기 위해 '균열 함정'이라는 개념이 만들어졌어.", "explanation": "회사에 지사, 직원, 차량이 있다고 해봐. '차량 → 직원 → 지사' 순으로 연결되어 있으면, 차량이 있는 직원의 지사는 찾을 수 있지만 차량이 없는 직원의 지사는 아예 찾을 수가 없어. 마치 다리가 중간에 끊겨서 건너갈 수 없는 것처럼, 연결 경로가 잘못 설계되면 일부 정보가 완전히 사라져 버리는 거야.", "why": "", "term_focus": [], "connections": [], "types": null, "mnemonic": "균열 = '금 가서 끊김' → 다리에 금이 가면 못 건너가듯, 연결 경로에 금 가면 데이터 못 찾는다!", "trap": "", "table": [], "sources": [], "priority": 4}, {"title": "객체관계 데이터베이스(ORDB)", "keywords": ["콘텐츠", "타입", "내부선언:", "외부선언:", "동일한", "언어", "리소스", "리소스간"], "summary": "", "background": "옛날에 표(행/열) 형태로만 데이터를 저장하는 관계형 DB는 사진, 동영상, 복잡한 정보를 다루기가 너무 불편했어. 그래서 객체 지향 DB가 나왔는데, 이번엔 기업들이 쓰기엔 너무 낯설고 불안정해서 결국 두 방식을 합친 객체관계형 DB가 탄생하게 됐어.", "explanation": "관계형 DB가 '일반 자동차'라면, 객체 지향 DB는 '스포츠카'야. 둘 다 장단점이 있으니까 일반 자동차에 스포츠카 엔진을 얹은 '하이브리드 차'를 만든 게 바로 객체관계형 DB야. Oracle, DB2, SQL Server 같은 우리가 실제로 많이 쓰는 DB들이 다 이 방식이야.", "why": "", "term_focus": [], "connections": [], "types": null, "mnemonic": "관계형 + 객체 지향 = ORDB 👉 'OR(이것도 저것도)'처럼, 두 개를 OR로 합쳤다고 기억해!", "trap": "", "table": [], "sources": [], "priority": 3}, {"title": "XML(Extensible Markup Language)의 개념과 특징", "keywords": ["콘텐츠", "타입", "내부선언:", "외부선언:", "동일한", "언어", "리소스", "리소스간"], "summary": "", "background": "옛날에 웹페이지 만들 때 쓰던 HTML은 '어떻게 보여줄까'에만 집중해서, 데이터가 무슨 의미인지는 표현을 못 했어. 그래서 '이 데이터가 이름인지, 나이인지, 주소인지' 같은 정보를 컴퓨터끼리 주고받을 방법이 필요했지.", "explanation": "XML은 내가 직접 태그 이름을 만들 수 있는 언어야. 예를 들어 HTML은 <b>굵게</b> 처럼 생긴 것만 쓸 수 있는데, XML은 <이름>홍길동</이름>, <나이>20</나이> 처럼 내 맘대로 태그를 만들어서 데이터 의미까지 담을 수 있어. 덕분에 서로 다른 프로그램이나 회사끼리도 데이터를 쉽게 주고받을 수 있게 됐지.", "why": "", "term_focus": [], "connections": [], "types": null, "mnemonic": "XML = '내 맘대로 태그!' → X(eXtensible, 확장가능) = 내가 태그를 직접 만든다! HTML이 '정해진 메뉴만 파는 식당'이라면, XML은 '내가 메뉴 이름도 직접 짓는 식당'이야", "trap": "", "table": [], "sources": [], "priority": 4}, {"title": "XML의 구성도 및 구성요소", "keywords": ["콘텐츠", "타입", "내부선언:", "외부선언:", "동일한", "언어", "리소스", "리소스간"], "summary": "", "background": "옛날에 인터넷으로 데이터를 주고받을 때 각 회사마다 데이터 형식이 달라서 서로 알아볼 수가 없었어. 그래서 '우리 이 형식으로 통일하자!' 하고 만든 공통 규칙이 바로 XML이야.", "explanation": "XML은 레고 블록 세트라고 생각해봐. 블록(데이터)을 어떻게 생겼는지 설명하는 설명서가 DTD/Schema이고, 원하는 블록만 쏙 찾아주는 도구가 XPath/XQuery야. 그리고 XSL은 그 레고를 예쁘게 전시하는 방법이고, XLink는 블록들끼리 연결하는 끈 역할을 해. 이 도구들이 모여서 XML 데이터를 만들고, 찾고, 꾸미고, 연결하는 전체 시스템을 이루는 거야.", "why": "", "term_focus": [], "connections": [], "types": null, "mnemonic": "**'만찾꾸연'** 으로 외워! → 📄만들기(DTD/Schema) → 🔍찾기(XPath/XQuery) → 🎨꾸미기(XSL/XSLT) → 🔗연결하기(XLink) — XML의 4가지 역할!", "trap": "", "table": [], "sources": [], "priority": 4}, {"title": "XML 구성", "keywords": ["콘텐츠", "타입", "내부선언:", "외부선언:", "동일한", "언어", "리소스", "리소스간"], "summary": "", "background": "옛날에 인터넷에서 데이터를 주고받을 때 각 프로그램마다 형식이 달라서 서로 못 알아듣는 문제가 있었어. 그래서 '우리 이 형식으로 통일하자!'고 만든 게 XML이고, 그걸 제대로 쓰기 위한 규칙들과 도구들이 함께 생겨난 거야.", "explanation": "XML은 데이터를 태그로 포장해서 보내는 방식인데, DTD랑 Schema는 '이 데이터는 이런 형태여야 해!'라는 설명서 역할이고, XPath는 '이 데이터 더미에서 특정 위치 찾아가는 GPS', XQuery는 '데이터 더미에서 원하는 것만 쏙 뽑아내는 검색창', XSL은 '딱딱한 데이터를 예쁘게 꾸며주는 디자이너' 역할이야.", "why": "", "term_focus": [], "connections": [], "types": null, "mnemonic": "DTD→Schema→XPath→XQuery→XSL 순서를 '**규칙 업그레이드 → 길찾기 → 검색 → 꾸미기**'로 기억해! 줄여서 **'규업길검꾸'** — 규칙을 업그레이드하고, 길찾아서, 검색하고, 꾸민다!", "trap": "", "table": [], "sources": [], "priority": 4}, {"title": "XML Processor의 구조 및 주요 구성요소", "keywords": ["콘텐츠", "타입", "내부선언:", "외부선언:", "동일한", "언어", "리소스", "리소스간"], "summary": "", "background": "옛날에 웹에서 데이터를 주고받을 때 서로 형식이 달라서 컴퓨터들이 서로 못 알아먹는 문제가 있었어. 그래서 XML이라는 공통 언어를 만들고, 그걸 읽고 처리하는 전담 도구 묶음인 XML Processor가 탄생했지.", "explanation": "XML Processor는 XML 문서를 처리하는 팀이라고 생각해봐. 팀 안에 XML Parser(문법 검사관)는 문서가 규칙대로 잘 쓰였는지 맞춤법 검사해주고, 구문분석기는 문서 구조를 트리 모양으로 정리해주고(마치 목차 만들기처럼), XSL 이지는 XML 문서를 보기 좋은 다른 형식(예: 예쁜 웹페이지)으로 꾸며주는 역할을 해. 즉, 검사→정리→꾸미기 세 단계로 XML을 완성시켜주는 거야.", "why": "", "term_focus": [], "connections": [], "types": null, "mnemonic": "✅ '검-정-꾸' 로 외워! → Parser가 검사하고 → DOM이 정리하고 → XSL이 꾸민다! (검-정-꾸, 검-정-꾸 🎵)", "trap": "", "table": [], "sources": [], "priority": 4}, {"title": "XML문서 작성 절차", "keywords": ["콘텐츠", "타입", "내부선언:", "외부선언:", "동일한", "언어", "리소스", "리소스간"], "summary": "", "background": "옛날엔 문서를 만들 때 내용이랑 디자인이 한 파일에 뒤섞여 있어서 나중에 수정하거나 다른 곳에서 재활용하기가 너무 힘들었어. 그래서 '내용'과 '모양'을 딱 분리해서 체계적으로 작성하는 절차가 필요하게 된 거야.", "explanation": "XML 문서 만드는 건 집 짓는 것과 똑같아. 먼저 '어떤 집을 지을지(용도 결정)' 정하고, '설계도(논리 구조)' 그리고, '뼈대 규칙(DTD/Schema)' 세우고, 그 규칙대로 '실제 집(XML 파일)'을 짓고, 마지막으로 '인테리어(Style Sheet)'로 예쁘게 꾸미는 거야. 핵심은 설계도(내용)랑 인테리어(디자인)가 서로 다른 파일로 분리된다는 점이야.", "why": "", "term_focus": [], "connections": [], "types": null, "mnemonic": "**'용구논뼈작꾸'** 👉 용도 → 구조 → 논리요소 → 뼈대(DTD/Schema) → 작성(XML) → 꾸미기(Style Sheet) / '용감한 구렁이 논에서 뼈 작게 꾸몄다'로 순서를 기억해!", "trap": "", "table": [], "sources": [], "priority": 4}, {"title": "DTD 개념 및 작성 절차", "keywords": ["콘텐츠", "타입", "내부선언:", "외부선언:", "동일한", "언어", "리소스", "리소스간"], "summary": "", "background": "옛날에 여러 사람이 XML 문서를 막 만들다 보니까 어떤 사람은 '이름'을 name으로 쓰고, 어떤 사람은 '성명'으로 써서 서로 문서를 못 알아보는 문제가 생겼어. 그래서 '우리 이 문서는 이런 구조로 써야 해!'라고 미리 약속해두는 설명서가 필요해진 거야.", "explanation": "DTD는 레고 설명서 같은 거야. 레고를 조립하기 전에 '이 세트엔 이런 부품들이 있고, 이렇게 끼워야 해'라고 알려주는 것처럼, DTD는 XML 문서에 '이 문서엔 이런 항목들이 있고, 이런 순서로 써야 해'를 미리 정해두는 파일이야. 덕분에 문서를 받은 컴퓨터나 사람이 '아, 이 문서 구조는 이렇구나!'하고 바로 이해할 수 있어.", "why": "", "term_focus": [], "connections": [], "types": null, "mnemonic": "DTD = '**D**ocument **T**emplate **D**efinition** → 문서 틀 정의서!' 로 외워봐. 레고 설명서처럼 **틀(Template)**을 먼저 **정의(Definition)**해두는 **문서(Document)** — D·T·D 순서 그대로야!", "trap": "", "table": [], "sources": [], "priority": 4}, {"title": "XSL 개념 및 특징", "keywords": ["콘텐츠", "타입", "내부선언:", "외부선언:", "동일한", "언어", "리소스", "리소스간"], "summary": "", "background": "옛날에 웹페이지에서 링크라고 하면 그냥 '클릭하면 다른 페이지로 이동'하는 단순한 기능뿐이었어. 근데 XML 문서가 복잡해지면서 문서 안의 특정 부분만 가리키거나, 양방향으로 연결하거나, 여러 곳을 한 번에 연결하는 더 똑똑한 링크가 필요해졌어.", "explanation": "XLink는 일반 하이퍼링크가 '한 방향 외길'이라면, XLink는 '양방향 고속도로 + 인터체인지'라고 생각하면 돼. 예를 들어 일반 링크는 A에서 B로만 가는데, XLink는 A↔B 양방향도 되고, 문서 안의 딱 원하는 문단 한 줄만 콕 집어서 가리킬 수도 있어. 링크 형태도 Simple(단순), Extended(확장), Locator(위치지정) 등 5가지나 돼서 훨씬 다양하게 연결할 수 있어.", "why": "", "term_focus": [], "connections": [], "types": null, "mnemonic": "XLink = '엑스(X)자 링크' → 일반 링크(→)가 아니라 X자처럼 '양방향 + 여러 방향'으로 연결된다고 기억해! 'X는 방향이 여러 개!''", "trap": "", "table": [], "sources": [], "priority": 4}, {"title": "클래스의 변환", "keywords": [], "summary": "", "background": "옛날에 프로그래머들이 객체지향 언어로 만든 '클래스'를 데이터베이스 테이블로 옮겨야 하는 상황이 자주 생겼어. 클래스와 테이블은 구조가 달라서 어떻게 변환할지 규칙이 필요했지.", "explanation": "클래스를 테이블로 바꾸는 건 마치 '학생 정보 양식지(클래스)'를 '엑셀 표(테이블)'로 옮기는 것과 같아. 양식지에 있는 항목들(이름, 나이, 점수)이 엑셀의 열(컬럼)이 되고, 각 학생 한 명이 엑셀의 한 행(row)이 되는 거야. 특히 부모-자식 클래스 관계(상속)가 있으면, 부모 정보를 별도 테이블로 빼거나 한 테이블에 합치는 방식 중에 골라야 해.", "why": "", "term_focus": [], "connections": [], "types": null, "mnemonic": "클래스 → 테이블 변환 공식: '클(클래스 이름) → 표 이름, 속(속성) → 열, 객(객체 하나) → 행' = **클속객** (클래스는 속성이 객체를 낳는다!)", "trap": "", "table": [], "sources": [], "priority": 3}, {"title": "클래스 관계의 관계형 관계(Relational Relationship)의 변환", "keywords": [], "summary": "", "background": "옛날에 프로그램에서 '학생'이나 '선생님' 같은 개념들을 서로 묶어서 표현했는데, 이걸 실제 데이터베이스 표(테이블)로 옮기려니 어떻게 쪼개야 할지 몰라서 엉망이 됐어. 그래서 클래스들 사이의 관계를 깔끔하게 테이블로 바꾸는 규칙이 생긴 거야.", "explanation": "예를 들어 '학생'이랑 '수업' 두 개의 그룹이 서로 연결되어 있으면, 그 연결 자체를 별도의 표(테이블)로 만들어야 해. 마치 학생 명단 노트, 수업 목록 노트, 그리고 '누가 어떤 수업 들어요' 연결 노트, 이렇게 3개로 나눠 적는 거랑 똑같아. 이렇게 하면 데이터가 중복 없이 깔끔하게 정리돼!", "why": "", "term_focus": [], "connections": [], "types": null, "mnemonic": "🔗 '관계는 노트 따로!' — 두 그룹이 연결되면, 연결만 담당하는 노트(테이블)를 하나 더 만든다!", "trap": "", "table": [], "sources": [], "priority": 3}];
+const LESSONS = [{"title":"개념적/논리적 모델링에 대한 학계와 산업계의 이해 차이","keywords":["기술","주로","테이블","산출물로","개념적","참고로","과정","상관","이를","업무"],"summary":"","background":"데이터베이스 설계 순서를 학교에서 배운 방식 그대로 회사에서 쓰려고 했더니 선배들이 다르게 말하는 거야. 학교(학계)랑 실제 회사(산업계)가 '개념적 설계', '논리적 설계'라는 단어를 서로 다른 의미로 쓰고 있었던 거지!","explanation":"학교에서는 ERD 그리는 것 자체가 '개념적 모델링'이야. 근데 회사에서는 ERD 그리는 건 '논리적 모델링'이고, 그 전에 더 큰 그림(핵심 주제영역만 대충 요약)을 그리는 걸 '개념적 모델링'이라고 불러. 마치 학교에서 '스케치'라고 부르는 걸 회사에서는 '밑그림'이라 부르고, 회사의 '스케치'는 훨씬 더 날림으로 그린 초안인 느낌이야!","why":"","term_focus":[],"connections":[],"types":null,"mnemonic":"🏫학교 = ERD가 곧 개념! / 🏢회사 = ERD는 논리, 그 위에 '슈퍼 요약본'이 개념! → '학개(학교=개념=ERD), 산논(산업=논리=ERD)' 으로 외워!","trap":"","table":[],"sources":[],"priority":3},{"title":"프로세스 모델링의 개념","keywords":["기술","주로","테이블","산출물로","개념적","참고로","과정","상관","이를","업무"],"summary":"","background":"옛날에 회사 시스템을 만들 때 '어떤 일을 해야 하는지' 정리 없이 바로 개발했다가 중요한 기능이 빠지거나 쓸데없는 기능이 잔뜩 들어가는 문제가 생겼어. 그래서 개발 전에 '어떤 업무(프로세스)가 필요한지' 미리 체계적으로 정리하는 방법이 필요해졌어.","explanation":"프로세스 모델링은 쉽게 말해 '해야 할 일 목록을 빠짐없이 정리하는 것'이야. 예를 들어 학교 축제를 준비할 때 '공연 섭외 → 무대 설치 → 홍보 → 당일 진행'처럼 해야 할 일을 순서대로 빠짐없이 정리하는 것처럼, 시스템을 만들기 전에 필요한 모든 업무를 큰 것부터 작은 것까지 단계별로 쪼개서 정리하는 과정이야. 이렇게 하면 나중에 '이 기능 왜 없어?'라는 상황을 미리 막을 수 있어.","why":"","term_focus":[],"connections":[],"types":null,"mnemonic":"프로세스 모델링 = '프리(미리) 정리'! 개발 전에 할 일을 미리(프리) 빠짐없이 정리한다 → '프리정리' 기억해!","trap":"","table":[],"sources":[],"priority":3},{"title":"데이터 모델링 단계","keywords":["데이터 모델링","개념적","논리적","물리적","모델링 절차"],"summary":"","background":"데이터베이스 설계는 추상 수준에서 구체 수준으로 단계적으로 진행된다. 각 단계마다 다루는 대상과 산출물, 주된 결정 사항이 다르다. 이 흐름을 알아야 DB 설계 전 과정을 체계적으로 수행할 수 있다.","explanation":"데이터 모델링은 개념적 → 논리적 → 물리적 3단계로 진행된다. 상위 단계일수록 추상적이고 DBMS와 독립적이며, 하위 단계일수록 구체적이고 특정 DBMS·하드웨어에 종속된다. 각 단계의 상세는 이 section의 개별 카드를 참고.","why":"","term_focus":[],"connections":[],"types":{"caption":"데이터 모델링의 3단계. 추상에서 구체로 진행되며 각 단계의 산출물이 다음 단계의 입력이 된다.","items":[{"name":"개념적 모델링","en":"Conceptual Modeling","note":"1단계. 업무 도메인을 파악하고 주요 엔터티·관계를 식별한다. DBMS와 무관하게 '무엇을' 관리할지를 정의. 주 산출물: ER 다이어그램. 현업·경영진과의 소통 도구."},{"name":"논리적 모델링","en":"Logical Modeling","note":"2단계. 개념 모델을 관계형 스키마로 변환하고 정규화를 수행. 테이블·칼럼·관계·키를 구체적으로 정의. DBMS 제품과는 여전히 독립적. 주 산출물: 논리 데이터 모델·정규화된 테이블 스키마."},{"name":"물리적 모델링","en":"Physical Modeling","note":"3단계. 특정 DBMS와 하드웨어를 고려해 저장 구조·인덱스·파티션·반정규화 등을 결정. 성능·용량·보안 요구사항이 반영된다. 주 산출물: 물리 데이터 모델·DDL 스크립트."}]},"mnemonic":"【순서】개념 → 논리 → 물리. '업무 이해 → 테이블 스키마 → 실제 저장 구조'의 3단계 깔때기.","trap":"","table":[],"sources":[{"title":"TOPCIT ESSENCE ver.3 — 데이터 이해와 활용","note":"정보통신산업진흥원(NIPA) 공식 교재"}],"priority":2},{"title":"개념적 모델링","keywords":[],"summary":"","background":"옛날에 개발자들이 바로 컴퓨터 코드부터 짜다 보니까 '어, 이 데이터가 왜 필요하지?' 하고 나중에 다 뒤엎는 일이 너무 많았어. 그래서 코딩 전에 '우리가 다룰 데이터가 뭔지' 먼저 큰 그림으로 정리하는 단계가 필요해졌어.","explanation":"학교 도서관 시스템을 만든다고 생각해봐. 코드 짜기 전에 먼저 '책', '학생', '대출' 이런 중요한 덩어리들이 뭔지 찾고, 그것들이 서로 어떻게 연결되는지를 그림(ER 다이어그램)으로 그려보는 거야. 마치 집 짓기 전에 설계도 스케치를 먼저 대충 그려보는 것처럼, 복잡한 기술 없이 '뭘 저장할지' 큰 그림만 잡는 단계야.","why":"","term_focus":[],"connections":[],"types":null,"mnemonic":"개념적 모델링 = '개그맨(개-그-맨)' → 개(개념), 그(그림으로), 맨(맨 먼저)! 맨 먼저 그림으로 개념 잡기!","trap":"","table":[],"sources":[],"priority":2},{"title":"논리적 모델링","keywords":[],"summary":"","background":"옛날에 사람들이 머릿속으로만 생각한 정보 구조를 컴퓨터가 이해할 수 있게 바꾸는 과정이 없어서 개발자마다 제멋대로 데이터를 저장했어. 그러다 보니 같은 정보가 여기저기 중복되고 나중에 수정할 때 엄청 힘들어졌거든, 그래서 사람의 언어를 컴퓨터 언어로 '번역'하는 중간 단계가 필요해진 거야.","explanation":"논리적 모델링은 마치 건축가가 집 설계 스케치를 실제 도면으로 바꾸는 것과 같아. 사람이 '침실이 필요해'라고 그린 대략적인 그림을, 공사할 수 있도록 정확한 치수와 규칙이 담긴 도면으로 변환하는 단계거든. 이 과정에서 중복된 내용을 없애고(정규화), 테이블끼리 연결하는 고리(외래키)도 만들어줘.","why":"","term_focus":[],"connections":[],"types":null,"mnemonic":"논리적 모델링 = '번·정·키' 기억해! 번역(사람 언어 → 컴퓨터 언어), 정규화(중복 제거), 키(외래키로 연결) — 이 세 단어만 떠올리면 끝!","trap":"","table":[],"sources":[],"priority":2},{"title":"물리적 모델링","keywords":[],"summary":"","background":"데이터를 어떻게 저장할지 설계는 했는데, 실제 컴퓨터 하드디스크에 딱 맞게 구체적으로 어떻게 넣을지는 따로 정해야 했어. 그래서 '실제 저장 방식'을 결정하는 물리적 모델링 단계가 생겨났어.","explanation":"논리적 모델링이 '집 설계 도면'이라면, 물리적 모델링은 '실제 공사 시방서'야. 어떤 자재(데이터 형식)를 쓸지, 문을 어디 달지(인덱스), 규칙은 뭔지(제약조건)를 딱딱 정하는 단계야. 쉽게 말해 '빠르고 효율적으로 데이터를 꺼낼 수 있게' 실제 저장 방법을 최종 확정하는 거야.","why":"","term_focus":[],"connections":[],"types":null,"mnemonic":"물리 = 몸(실제 몸으로 구현!) → '형·제·인' 세 가지 결정! (데이터 형식 / 제약조건 / 인덱스)","trap":"","table":[],"sources":[],"priority":2},{"title":"일반화/특수화(Generalization/Specialization)","keywords":[],"summary":"","background":"데이터베이스를 설계하다 보니 '학생', '교수', '직원'처럼 비슷한 정보를 가진 것들을 따로따로 관리하면 너무 중복이 많아지는 문제가 생겼어. 그래서 공통점은 묶고 차이점은 나누는 방법이 필요해졌지!","explanation":"동물원을 생각해봐. '동물'이라는 큰 카테고리 안에 '강아지', '고양이', '새'가 있잖아. 큰 카테고리(동물)에서 세부 종류로 나누는 게 '특수화', 반대로 강아지·고양이·새를 보고 '얘네 다 동물이네!'하고 하나로 묶는 게 '일반화'야. 이 둘은 같은 관계를 위에서 보냐, 아래서 보냐의 차이일 뿐이야!","why":"","term_focus":[],"connections":[],"types":null,"mnemonic":"일반화 = '일단 합쳐!' (여러 개 → 하나로 위로 올라감 ⬆️), 특수화 = '특별히 나눠!' (하나 → 여러 개로 아래로 내려감 ⬇️) — '일합특나' 로 기억해!","trap":"","table":[],"sources":[],"priority":3},{"title":"엔터티(Entity)","keywords":[],"summary":"","background":"옛날에 컴퓨터로 정보를 저장할 때 '도대체 무엇에 대한 정보를 저장해야 하지?'라는 혼란이 있었어. 그래서 '저장할 대상'을 명확하게 구분하고 이름 붙이는 개념이 필요해졌어.","explanation":"엔터티는 쉽게 말해 '데이터베이스에 저장할 대상'이야. 예를 들어 학교 시스템을 만든다면 '학생', '선생님', '과목'처럼 정보를 따로따로 관리해야 할 '것'들이 각각 엔터티야. 현실 세계에서 구별할 수 있는 모든 사물이나 개념이 엔터티가 될 수 있어.","why":"","term_focus":[],"connections":[],"types":null,"mnemonic":"엔터티 = '엔터(Enter)해서 저장할 것' — 데이터베이스에 입력(Enter)할 대상!","trap":"","table":[],"sources":[],"priority":2},{"title":"속성(Attribute)","keywords":[],"summary":"","background":"옛날에 컴퓨터로 사람 정보를 저장하려고 했는데, 그냥 막 저장하면 나중에 찾을 수가 없어서 '이름', '나이', '주소' 같은 항목을 미리 정해두고 저장하는 방식이 필요했어. 그래서 데이터를 설명해주는 각각의 항목들을 '속성(Attribute)'이라고 부르게 됐어.","explanation":"속성은 어떤 대상을 설명하는 특징들이야. 예를 들어 학생이라는 대상을 설명할 때 '이름', '학번', '나이', '전공' 같은 것들이 바로 속성이야. 마치 사람 소개서에 적는 항목들처럼, 대상의 특징 하나하나가 다 속성이라고 보면 돼.","why":"","term_focus":[],"connections":[],"types":null,"mnemonic":"속성 = 소개팅 프로필 항목! 이름/나이/키/직업 → 각각 하나하나가 '속성'","trap":"","table":[],"sources":[],"priority":2},{"title":"엔터티의 특징","keywords":[],"summary":"","background":"옛날에 데이터베이스를 만들 때 '뭘 저장해야 하지?'를 제멋대로 정하다 보니 쓸데없는 정보가 가득 차거나 정작 필요한 정보가 빠지는 문제가 생겼어. 그래서 '저장할 대상(엔터티)이 되려면 이런 조건을 갖춰야 해!'라는 기준을 딱 정해놓은 거야.","explanation":"엔터티는 쉽게 말해 데이터베이스에 '등록 자격'이 있는 대상이야. 예를 들어 학교 학생부에 올라가려면 ① 실제 우리 학교 학생이어야 하고 ② 학번으로 구별되어야 하고 ③ 한 명이 아니라 여러 명이 있어야 하고 ④ 실제 수업·출결 등 학교 업무에 쓰여야 하고 ⑤ 이름·나이 같은 정보가 있어야 하고 ⑥ 반, 과목 같은 다른 대상과 연결되어야 해. 이 6가지 조건을 다 만족해야 엔터티로 인정받을 수 있어!","why":"","term_focus":[],"connections":[],"types":null,"mnemonic":"👉 '필식영업속관' 으로 외워! → 필(필요한 정보) 식(식별자 있음) 영(영속적으로 2개 이상) 업(업무에 이용됨) 속(속성 있음) 관(다른 엔터티와 관계 있음) — '필식영업속관' 6글자만 기억하면 엔터티 6가지 특징 끝!","trap":"","table":[],"sources":[],"priority":3},{"title":"엔터티의 분류","keywords":[],"summary":"","background":"데이터베이스를 만들 때 세상의 모든 정보를 무작정 집어넣으면 너무 복잡해지는 문제가 있었어. 그래서 '어떤 종류의 정보인지'와 '언제 생겨나는 정보인지'를 기준으로 미리 분류해두면 설계가 훨씬 쉬워진다는 걸 알게 됐지.","explanation":"엔터티 분류는 쉽게 말해 정보를 두 가지 기준으로 나눠 정리하는 거야. 첫 번째는 '형태가 있냐 없냐'로 나누는 건데, 사원·물품처럼 실제로 존재하는 것(유형), 부서·계좌처럼 개념적인 것(개념), 주문·계약처럼 사건인 것(사건)으로 구분해. 두 번째는 '언제 생기냐'로 나누는 건데, 처음부터 있는 기본 정보(사원, 부서), 기본 정보들이 합쳐져 생기는 중심 정보(접수, 계약), 활동하면서 추가로 생기는 행위 정보(주문 이력 등)로 나눠.","why":"","term_focus":[],"connections":[],"types":{"caption":"엔터티는 보통 두 가지 기준으로 분류된다: 유무(유형)에 따른 분류와 발생시점에 따른 분류.","items":[{"name":"유형 엔터티","en":"Tangible Entity","note":"유무형 기준. 물리적으로 존재하는 엔터티. 예: 사원, 물품."},{"name":"개념 엔터티","en":"Conceptual Entity","note":"유무형 기준. 물리적 실체 없이 개념적으로 존재. 예: 부서, 조직."},{"name":"사건 엔터티","en":"Event Entity","note":"유무형 기준. 업무 수행 중 발생하는 사건. 예: 주문, 계약."},{"name":"기본(키) 엔터티","en":"Fundamental / Key Entity","note":"발생시점 기준. 업무에 원래 존재하는 엔터티로 다른 엔터티의 부모 역할을 한다. 예: 사원, 부서, 물품."},{"name":"중심 엔터티","en":"Main Entity","note":"발생시점 기준. 기본 엔터티로부터 파생되거나 관계를 맺으며 업무의 중심 역할. 예: 주문, 계약."},{"name":"행위 엔터티","en":"Active Entity","note":"발생시점 기준. 2개 이상의 엔터티로부터 발생하는 행위의 결과. 예: 주문상세, 계약변경."}]},"mnemonic":"분류 기준 두 개를 '유발'로 기억해! '유'형(형태 기준: 유형·개념·사건) + '발'생시점(시점 기준: 기본·중심·행위) → '유발'되는 엔터티!","trap":"","table":[],"sources":[{"title":"TOPCIT ESSENCE ver.3 — 데이터 이해와 활용","note":"정보통신산업진흥원(NIPA) 공식 교재"}],"priority":2},{"title":"속성의 분류","keywords":[],"summary":"","background":"데이터베이스를 설계하다 보니 속성마다 성격이 달랐어. 어떤 건 원래부터 존재하는 정보고, 어떤 건 설계하면서 새로 만들어지고, 어떤 건 다른 값을 계산해서 나오는 거라 구분이 필요해졌어.","explanation":"예를 들어 쇼핑몰을 만든다고 해봐. '상품 이름'이나 '단가'처럼 원래부터 있는 정보는 기본속성, 관리하려고 새로 만든 '상품코드' 같은 건 설계속성, 그리고 단가×수량으로 계산되는 '총금액'처럼 다른 값에서 뽑아내는 건 파생속성이야. 즉, 속성은 '원래 있던 것', '새로 만든 것', '계산된 것' 이렇게 세 종류로 나뉘어!","why":"","term_focus":[],"connections":[],"types":{"caption":"속성은 어디서 도출되었고 어떻게 생성되는지에 따라 기본·설계·파생 3가지로 분류된다.","items":[{"name":"기본속성","en":"Basic Attribute","note":"업무 분석을 통해 바로 정의한, 원래 업무에 존재하는 속성. 예: 제품이름, 제조년월, 제조원가."},{"name":"설계속성","en":"Designed Attribute","note":"원래 업무상 존재하지는 않지만 설계를 하면서 도출해내는 속성. 예: 약품용기 코드 같은 치환 코드."},{"name":"파생속성","en":"Derived Attribute","note":"다른 속성으로부터 계산이나 변형이 되어 생성되는 속성. 예: 용기의 총금액(= 수량 × 단가) 같은 계산값."}]},"mnemonic":"기·설·파 → '기'본은 원래 있고, '설'계는 새로 만들고, '파'생은 계산해서 파생된다! (기설파~🎵)","trap":"","table":[],"sources":[{"title":"TOPCIT ESSENCE ver.3 — 데이터 이해와 활용","note":"정보통신산업진흥원(NIPA) 공식 교재"}],"priority":2},{"title":"관계","keywords":[],"summary":"","background":"옛날에 데이터베이스를 설계할 때 '이 데이터가 저 데이터랑 어떻게 연결되어 있지?'를 그림으로 표현하는 방법이 제각각이라 협업할 때 너무 헷갈렸어. 그래서 Crow's Foot(까마귀 발) 같은 표준 표기법을 만들어서 관계의 필수/선택 여부, 개수 등을 누가 봐도 똑같이 읽을 수 있게 정리한 거야.","explanation":"사원과 부서를 예로 들면, '사원은 반드시 하나의 부서에 속해야 해(필수)' 또는 '부서는 사원이 없을 수도 있어(선택)'처럼 두 데이터가 연결되는 규칙을 선으로 표현하는 게 관계야. Crow's Foot 표기법에서는 선 끝 모양이 까마귀 발처럼 퍼지면 '여러 개', 세로 막대면 '꼭 1개', 동그라미면 '없어도 됨(선택)'을 뜻해. 즉 선 끝 모양만 봐도 '몇 개인지, 있어야 하는지'를 바로 알 수 있어.","why":"","term_focus":[],"connections":[],"types":null,"mnemonic":"🦶 '발(足) 모양으로 읽어!' → 까마귀 발(여러 개) / 막대(딱 1개) / 동그라미(0도 OK) — '발·막·동' 세 글자만 기억하면 Crow's Foot 끝!","trap":"","table":[],"sources":[],"priority":2},{"title":"식별자의 분류","keywords":[],"summary":"","background":"데이터베이스에서 수많은 데이터를 저장하다 보니 '이 데이터가 누구 건지' 구별할 방법이 필요했어. 그래서 각 데이터를 딱 집어낼 수 있는 '식별자'를 체계적으로 분류하게 됐어.","explanation":"식별자는 학교에서 학생을 구별하는 '학번' 같은 거야. 분류 기준이 4가지인데, 대표인지 아닌지(주/보조), 스스로 만들었는지 외부에서 받았는지(내부/외부), 하나짜리인지 여러 개짜리인지(단일/복합), 업무상 자연스럽게 생긴 건지 편의상 만든 건지(본질/인조)로 나눠. 예를 들어 주민번호는 '주식별자+내부+단일+본질' 식별자고, 편의상 붙인 일련번호는 '인조 식별자'야.","why":"","term_focus":[],"connections":[],"types":{"caption":"식별자는 대표성, 스스로 생성 여부, 속성의 수, 대체 여부 4가지 기준으로 분류된다.","items":[{"name":"주식별자","en":"Primary Identifier","note":"대표성 기준. 엔터티 내 각 어커런스를 구분할 수 있고, 타 엔터티와 참조관계를 연결할 수 있는 식별자."},{"name":"보조식별자","en":"Alternate Identifier","note":"대표성 기준. 엔터티 내 각 어커런스를 구분할 수 있으나 대표성을 가지지 못해 참조관계 연결을 못 함."},{"name":"내부식별자","en":"Internal Identifier","note":"스스로 생성 여부 기준. 엔터티 내부에서 스스로 만들어지는 식별자."},{"name":"외부식별자","en":"External / Foreign Identifier","note":"스스로 생성 여부 기준. 타 엔터티와의 관계를 통해 타 엔터티로부터 받아오는 식별자(FOREIGN KEY)."},{"name":"단일식별자","en":"Single Identifier","note":"속성의 수 기준. 하나의 속성으로 구성된 식별자."},{"name":"복합식별자","en":"Composite Identifier","note":"속성의 수 기준. 둘 이상의 속성으로 구성된 식별자."},{"name":"본질식별자","en":"Original Identifier","note":"대체 여부 기준. 업무에 의해 만들어지는 식별자. 예: 주민등록번호."},{"name":"인조식별자","en":"Surrogate Identifier","note":"대체 여부 기준. 업무적으로 만들어지지는 않지만 원조식별자가 복잡한 구성을 가져 인위적으로 만든 식별자. 예: 일련번호."}]},"mnemonic":"식별자 4분류 = '주보 내외 단복 본인' → 주보(주/보조)는 대표성, 내외(내부/외부)는 출처, 단복(단일/복합)은 개수, 본인(본질/인조)은 자연산 vs 인공산!","trap":"","table":[],"sources":[{"title":"TOPCIT ESSENCE ver.3 — 데이터 이해와 활용","note":"정보통신산업진흥원(NIPA) 공식 교재"}],"priority":2},{"title":"식별자관계와 비식별자관계","keywords":[],"summary":"","background":"데이터베이스에서 여러 테이블이 서로 연결될 때, 부모 테이블의 정보를 자식 테이블이 받아쓰는 상황이 생겼어. 근데 그 받은 정보를 '자식의 신분증(주식별자)'으로 쓸지, 그냥 '참고용 메모'로만 쓸지 규칙이 필요해졌지.","explanation":"학교에서 반 배정을 생각해봐. '3학년 2반 15번' 학생이 있으면, 여기서 '3학년 2반'은 부모(반) 정보야. 이 반 정보를 학생 번호에 포함시켜서 신분증처럼 쓰면 '식별자 관계'고, 그냥 어느 반인지 참고만 하고 학생 번호는 따로 매기면 '비식별자 관계'야. 쉽게 말해 부모 정보가 내 이름표의 일부냐, 아니면 그냥 메모냐의 차이야!","why":"","term_focus":[],"connections":[],"types":null,"mnemonic":"식별자=신분증 포함 / 비식별자=그냥 메모 → '식포, 비메' 로 외워! (식별자는 포함, 비식별자는 메모)","trap":"","table":[],"sources":[],"priority":3},{"title":"슈퍼타입과 서브타입","keywords":[],"summary":"","background":"옛날에 데이터베이스를 만들 때 '직원'이라는 표 하나에 정규직, 알바, 임원 정보를 다 때려박다 보니 빈 칸이 너무 많고 관리가 엉망이 됐어. 그래서 공통 정보는 하나로 묶고, 각각 다른 정보는 따로 분리하는 방법이 생긴 거야.","explanation":"슈퍼타입은 '동물'이고 서브타입은 '개', '고양이', '새'라고 생각해봐. 배타적 서브타입은 한 동물이 개이거나 고양이이거나 둘 중 하나만 될 수 있는 것이고, 포괄적 서브타입은 한 존재가 '학생'이면서 동시에 '아르바이트생'도 될 수 있는 것처럼 여러 서브타입에 동시에 속할 수 있는 거야. 쉽게 말해 배타적은 '택1', 포괄적은 '중복 선택 가능'이야.","why":"","term_focus":[],"connections":[],"types":null,"mnemonic":"배타적 = 배타(거부)하니까 하나만! '배-하나', 포괄적 = 포용하니까 여러 개! '포-여럿' → 배하나, 포여럿!","trap":"","table":[],"sources":[],"priority":3},{"title":"부채꼴 함정","keywords":[],"summary":"","background":"옛날에 데이터베이스를 설계할 때 여러 테이블을 연결하다 보면 어떤 직원이 어느 부서에 속하는지 알 수 없는 황당한 상황이 생겼어. 관계를 잘못 이어놓으면 경로가 여러 갈래로 퍼져서 정확한 정보를 뽑을 수 없는 문제가 자꾸 발생했거든.","explanation":"예를 들어 '지사 → 부서'도 연결되고 '지사 → 직원'도 연결되어 있는데, 정작 '직원이 어느 부서 소속인지'는 알 수 없는 상황이야. 마치 부채꼴처럼 지사에서 부서랑 직원이 각각 따로따로 펼쳐져 있어서, 직원-부서 사이의 연결고리가 없는 거지. 이걸 해결하려면 직원과 부서를 직접 연결해주는 관계를 추가해야 해.","why":"","term_focus":[],"connections":[],"types":null,"mnemonic":"부채꼴 = '부'서랑 직원이 따로따로 '채'각각 펼쳐져서 연결이 '꼴'불견! → 직접 이어줘야 해결!","trap":"","table":[],"sources":[],"priority":4},{"title":"균열 함정","keywords":[],"summary":"","background":"데이터베이스에서 여러 테이블을 연결해서 정보를 찾으려고 했는데, 연결고리가 중간에 끊겨서 일부 데이터가 아예 조회가 안 되는 문제가 생겼어. 이 현상을 정식으로 정의하고 예방하기 위해 '균열 함정'이라는 개념이 만들어졌어.","explanation":"회사에 지사, 직원, 차량이 있다고 해봐. '차량 → 직원 → 지사' 순으로 연결되어 있으면, 차량이 있는 직원의 지사는 찾을 수 있지만 차량이 없는 직원의 지사는 아예 찾을 수가 없어. 마치 다리가 중간에 끊겨서 건너갈 수 없는 것처럼, 연결 경로가 잘못 설계되면 일부 정보가 완전히 사라져 버리는 거야.","why":"","term_focus":[],"connections":[],"types":null,"mnemonic":"균열 = '금 가서 끊김' → 다리에 금이 가면 못 건너가듯, 연결 경로에 금 가면 데이터 못 찾는다!","trap":"","table":[],"sources":[],"priority":4},{"title":"객체관계 데이터베이스(ORDB)","keywords":["콘텐츠","타입","내부선언","외부선언","동일한","언어","리소스","리소스간"],"summary":"","background":"옛날에 표(행/열) 형태로만 데이터를 저장하는 관계형 DB는 사진, 동영상, 복잡한 정보를 다루기가 너무 불편했어. 그래서 객체 지향 DB가 나왔는데, 이번엔 기업들이 쓰기엔 너무 낯설고 불안정해서 결국 두 방식을 합친 객체관계형 DB가 탄생하게 됐어.","explanation":"관계형 DB가 '일반 자동차'라면, 객체 지향 DB는 '스포츠카'야. 둘 다 장단점이 있으니까 일반 자동차에 스포츠카 엔진을 얹은 '하이브리드 차'를 만든 게 바로 객체관계형 DB야. Oracle, DB2, SQL Server 같은 우리가 실제로 많이 쓰는 DB들이 다 이 방식이야.","why":"","term_focus":[],"connections":[],"types":null,"mnemonic":"관계형 + 객체 지향 = ORDB 👉 'OR(이것도 저것도)'처럼, 두 개를 OR로 합쳤다고 기억해!","trap":"","table":[],"sources":[],"priority":3},{"title":"XML(Extensible Markup Language)의 개념과 특징","keywords":["콘텐츠","타입","내부선언","외부선언","동일한","언어","리소스","리소스간"],"summary":"","background":"옛날에 웹페이지 만들 때 쓰던 HTML은 '어떻게 보여줄까'에만 집중해서, 데이터가 무슨 의미인지는 표현을 못 했어. 그래서 '이 데이터가 이름인지, 나이인지, 주소인지' 같은 정보를 컴퓨터끼리 주고받을 방법이 필요했지.","explanation":"XML은 내가 직접 태그 이름을 만들 수 있는 언어야. 예를 들어 HTML은 <b>굵게</b> 처럼 생긴 것만 쓸 수 있는데, XML은 <이름>홍길동</이름>, <나이>20</나이> 처럼 내 맘대로 태그를 만들어서 데이터 의미까지 담을 수 있어. 덕분에 서로 다른 프로그램이나 회사끼리도 데이터를 쉽게 주고받을 수 있게 됐지.","why":"","term_focus":[],"connections":[],"types":null,"mnemonic":"XML = '내 맘대로 태그!' → X(eXtensible, 확장가능) = 내가 태그를 직접 만든다! HTML이 '정해진 메뉴만 파는 식당'이라면, XML은 '내가 메뉴 이름도 직접 짓는 식당'이야","trap":"","table":[],"sources":[],"priority":4},{"title":"XML의 구성도 및 구성요소","keywords":["콘텐츠","타입","내부선언","외부선언","동일한","언어","리소스","리소스간"],"summary":"","background":"옛날에 인터넷으로 데이터를 주고받을 때 각 회사마다 데이터 형식이 달라서 서로 알아볼 수가 없었어. 그래서 '우리 이 형식으로 통일하자!' 하고 만든 공통 규칙이 바로 XML이야.","explanation":"XML은 레고 블록 세트라고 생각해봐. 블록(데이터)을 어떻게 생겼는지 설명하는 설명서가 DTD/Schema이고, 원하는 블록만 쏙 찾아주는 도구가 XPath/XQuery야. 그리고 XSL은 그 레고를 예쁘게 전시하는 방법이고, XLink는 블록들끼리 연결하는 끈 역할을 해. 이 도구들이 모여서 XML 데이터를 만들고, 찾고, 꾸미고, 연결하는 전체 시스템을 이루는 거야.","why":"","term_focus":[],"connections":[],"types":null,"mnemonic":"**'만찾꾸연'** 으로 외워! → 📄만들기(DTD/Schema) → 🔍찾기(XPath/XQuery) → 🎨꾸미기(XSL/XSLT) → 🔗연결하기(XLink) — XML의 4가지 역할!","trap":"","table":[],"sources":[],"priority":4},{"title":"XML 구성","keywords":["콘텐츠","타입","내부선언","외부선언","동일한","언어","리소스","리소스간"],"summary":"","background":"옛날에 인터넷에서 데이터를 주고받을 때 각 프로그램마다 형식이 달라서 서로 못 알아듣는 문제가 있었어. 그래서 '우리 이 형식으로 통일하자!'고 만든 게 XML이고, 그걸 제대로 쓰기 위한 규칙들과 도구들이 함께 생겨난 거야.","explanation":"XML은 데이터를 태그로 포장해서 보내는 방식인데, DTD랑 Schema는 '이 데이터는 이런 형태여야 해!'라는 설명서 역할이고, XPath는 '이 데이터 더미에서 특정 위치 찾아가는 GPS', XQuery는 '데이터 더미에서 원하는 것만 쏙 뽑아내는 검색창', XSL은 '딱딱한 데이터를 예쁘게 꾸며주는 디자이너' 역할이야.","why":"","term_focus":[],"connections":[],"types":null,"mnemonic":"DTD→Schema→XPath→XQuery→XSL 순서를 '**규칙 업그레이드 → 길찾기 → 검색 → 꾸미기**'로 기억해! 줄여서 **'규업길검꾸'** — 규칙을 업그레이드하고, 길찾아서, 검색하고, 꾸민다!","trap":"","table":[],"sources":[],"priority":4},{"title":"XML Processor의 구조 및 주요 구성요소","keywords":["콘텐츠","타입","내부선언","외부선언","동일한","언어","리소스","리소스간"],"summary":"","background":"옛날에 웹에서 데이터를 주고받을 때 서로 형식이 달라서 컴퓨터들이 서로 못 알아먹는 문제가 있었어. 그래서 XML이라는 공통 언어를 만들고, 그걸 읽고 처리하는 전담 도구 묶음인 XML Processor가 탄생했지.","explanation":"XML Processor는 XML 문서를 처리하는 팀이라고 생각해봐. 팀 안에 XML Parser(문법 검사관)는 문서가 규칙대로 잘 쓰였는지 맞춤법 검사해주고, 구문분석기는 문서 구조를 트리 모양으로 정리해주고(마치 목차 만들기처럼), XSL 이지는 XML 문서를 보기 좋은 다른 형식(예: 예쁜 웹페이지)으로 꾸며주는 역할을 해. 즉, 검사→정리→꾸미기 세 단계로 XML을 완성시켜주는 거야.","why":"","term_focus":[],"connections":[],"types":null,"mnemonic":"✅ '검-정-꾸' 로 외워! → Parser가 검사하고 → DOM이 정리하고 → XSL이 꾸민다! (검-정-꾸, 검-정-꾸 🎵)","trap":"","table":[],"sources":[],"priority":4},{"title":"XML문서 작성 절차","keywords":["콘텐츠","타입","내부선언","외부선언","동일한","언어","리소스","리소스간"],"summary":"","background":"옛날엔 문서를 만들 때 내용이랑 디자인이 한 파일에 뒤섞여 있어서 나중에 수정하거나 다른 곳에서 재활용하기가 너무 힘들었어. 그래서 '내용'과 '모양'을 딱 분리해서 체계적으로 작성하는 절차가 필요하게 된 거야.","explanation":"XML 문서 만드는 건 집 짓는 것과 똑같아. 먼저 '어떤 집을 지을지(용도 결정)' 정하고, '설계도(논리 구조)' 그리고, '뼈대 규칙(DTD/Schema)' 세우고, 그 규칙대로 '실제 집(XML 파일)'을 짓고, 마지막으로 '인테리어(Style Sheet)'로 예쁘게 꾸미는 거야. 핵심은 설계도(내용)랑 인테리어(디자인)가 서로 다른 파일로 분리된다는 점이야.","why":"","term_focus":[],"connections":[],"types":null,"mnemonic":"**'용구논뼈작꾸'** 👉 용도 → 구조 → 논리요소 → 뼈대(DTD/Schema) → 작성(XML) → 꾸미기(Style Sheet) / '용감한 구렁이 논에서 뼈 작게 꾸몄다'로 순서를 기억해!","trap":"","table":[],"sources":[],"priority":4},{"title":"DTD 개념 및 작성 절차","keywords":["콘텐츠","타입","내부선언","외부선언","동일한","언어","리소스","리소스간"],"summary":"","background":"옛날에 여러 사람이 XML 문서를 막 만들다 보니까 어떤 사람은 '이름'을 name으로 쓰고, 어떤 사람은 '성명'으로 써서 서로 문서를 못 알아보는 문제가 생겼어. 그래서 '우리 이 문서는 이런 구조로 써야 해!'라고 미리 약속해두는 설명서가 필요해진 거야.","explanation":"DTD는 레고 설명서 같은 거야. 레고를 조립하기 전에 '이 세트엔 이런 부품들이 있고, 이렇게 끼워야 해'라고 알려주는 것처럼, DTD는 XML 문서에 '이 문서엔 이런 항목들이 있고, 이런 순서로 써야 해'를 미리 정해두는 파일이야. 덕분에 문서를 받은 컴퓨터나 사람이 '아, 이 문서 구조는 이렇구나!'하고 바로 이해할 수 있어.","why":"","term_focus":[],"connections":[],"types":null,"mnemonic":"DTD = '**D**ocument **T**emplate **D**efinition** → 문서 틀 정의서!' 로 외워봐. 레고 설명서처럼 **틀(Template)**을 먼저 **정의(Definition)**해두는 **문서(Document)** — D·T·D 순서 그대로야!","trap":"","table":[],"sources":[],"priority":4},{"title":"XSL 개념 및 특징","keywords":["콘텐츠","타입","내부선언","외부선언","동일한","언어","리소스","리소스간"],"summary":"","background":"옛날에 웹페이지에서 링크라고 하면 그냥 '클릭하면 다른 페이지로 이동'하는 단순한 기능뿐이었어. 근데 XML 문서가 복잡해지면서 문서 안의 특정 부분만 가리키거나, 양방향으로 연결하거나, 여러 곳을 한 번에 연결하는 더 똑똑한 링크가 필요해졌어.","explanation":"XLink는 일반 하이퍼링크가 '한 방향 외길'이라면, XLink는 '양방향 고속도로 + 인터체인지'라고 생각하면 돼. 예를 들어 일반 링크는 A에서 B로만 가는데, XLink는 A↔B 양방향도 되고, 문서 안의 딱 원하는 문단 한 줄만 콕 집어서 가리킬 수도 있어. 링크 형태도 Simple(단순), Extended(확장), Locator(위치지정) 등 5가지나 돼서 훨씬 다양하게 연결할 수 있어.","why":"","term_focus":[],"connections":[],"types":null,"mnemonic":"XLink = '엑스(X)자 링크' → 일반 링크(→)가 아니라 X자처럼 '양방향 + 여러 방향'으로 연결된다고 기억해! 'X는 방향이 여러 개!''","trap":"","table":[],"sources":[],"priority":4},{"title":"클래스의 변환","keywords":[],"summary":"","background":"옛날에 프로그래머들이 객체지향 언어로 만든 '클래스'를 데이터베이스 테이블로 옮겨야 하는 상황이 자주 생겼어. 클래스와 테이블은 구조가 달라서 어떻게 변환할지 규칙이 필요했지.","explanation":"클래스를 테이블로 바꾸는 건 마치 '학생 정보 양식지(클래스)'를 '엑셀 표(테이블)'로 옮기는 것과 같아. 양식지에 있는 항목들(이름, 나이, 점수)이 엑셀의 열(컬럼)이 되고, 각 학생 한 명이 엑셀의 한 행(row)이 되는 거야. 특히 부모-자식 클래스 관계(상속)가 있으면, 부모 정보를 별도 테이블로 빼거나 한 테이블에 합치는 방식 중에 골라야 해.","why":"","term_focus":[],"connections":[],"types":null,"mnemonic":"클래스 → 테이블 변환 공식: '클(클래스 이름) → 표 이름, 속(속성) → 열, 객(객체 하나) → 행' = **클속객** (클래스는 속성이 객체를 낳는다!)","trap":"","table":[],"sources":[],"priority":3},{"title":"클래스 관계의 관계형 관계(Relational Relationship)의 변환","keywords":[],"summary":"","background":"옛날에 프로그램에서 '학생'이나 '선생님' 같은 개념들을 서로 묶어서 표현했는데, 이걸 실제 데이터베이스 표(테이블)로 옮기려니 어떻게 쪼개야 할지 몰라서 엉망이 됐어. 그래서 클래스들 사이의 관계를 깔끔하게 테이블로 바꾸는 규칙이 생긴 거야.","explanation":"예를 들어 '학생'이랑 '수업' 두 개의 그룹이 서로 연결되어 있으면, 그 연결 자체를 별도의 표(테이블)로 만들어야 해. 마치 학생 명단 노트, 수업 목록 노트, 그리고 '누가 어떤 수업 들어요' 연결 노트, 이렇게 3개로 나눠 적는 거랑 똑같아. 이렇게 하면 데이터가 중복 없이 깔끔하게 정리돼!","why":"","term_focus":[],"connections":[],"types":null,"mnemonic":"🔗 '관계는 노트 따로!' — 두 그룹이 연결되면, 연결만 담당하는 노트(테이블)를 하나 더 만든다!","trap":"","table":[],"sources":[],"priority":3}];
 const PRIO_LABEL = {1:'최우선', 2:'중요', 3:'보통', 4:'보조'};
 let curTab = 'all';
 let curPrio = 'all';
