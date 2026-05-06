@@ -1,38 +1,133 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>TOPCIT 04 정보보안</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
-:root{--font-sans:Roboto,'Noto Sans KR','Malgun Gothic',sans-serif;--font-serif:"NanumMyeongjo","Nanum Myeongjo","Batang","Apple SD Gothic Neo",serif}
+:root{--g-blue:#1558d6;--g-url:#0d652d;--g-text:#4d5156;--g-border:#dfe1e5}
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:var(--font-sans);background:#f1f3f4;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:0 0 3rem;color:#202124}
-.s-header{background:#dc2626;color:#fff;width:100%;padding:.9rem 1.25rem;display:flex;align-items:center;gap:.75rem;box-shadow:0 2px 10px rgba(0,0,0,.15);margin-bottom:2rem}
-.s-back{color:#fff;text-decoration:none;font-size:1.2rem;opacity:.85}
-.s-header h1{font-size:1.05rem;font-weight:800;flex:1;font-family:var(--font-serif)}
-.s-header span.cnt{font-size:.78rem;opacity:.8;white-space:nowrap}
-.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:.85rem;width:100%;max-width:780px;padding:0 1.25rem}
-@media(min-width:600px){.grid{grid-template-columns:repeat(3,1fr)}}
-.chap-card{background:#fff;border-radius:.85rem;padding:1.3rem 1rem;text-decoration:none;border:2px solid var(--main);transition:all .18s;display:flex;flex-direction:column;gap:.2rem;position:relative;overflow:hidden;color:inherit}
-.chap-card::before{content:'';position:absolute;top:0;left:0;right:0;height:5px;background:var(--main)}
-.chap-card:hover{transform:translateY(-3px);box-shadow:0 4px 8px rgba(60,64,67,.3),0 1px 3px rgba(60,64,67,.15)}
-.chap-emoji{font-size:1.8rem;margin-bottom:.15rem}
-.chap-num{font-size:.7rem;font-weight:800;color:var(--sub);letter-spacing:.07em}
-.chap-title{font-size:.95rem;font-weight:800;line-height:1.35;font-family:var(--font-serif)}
-.chap-status{font-size:.7rem;color:var(--main);font-weight:700;margin-top:.3rem}
-.footer{margin-top:2rem;font-size:.75rem;color:#80868b;text-align:center}
+html,body{background:#fff;color:#202124;font-family:Roboto,'Noto Sans KR',arial,sans-serif;font-size:14px}
+.g-body{display:flex;padding:0 0 0 148px;max-width:1200px}
+@media(max-width:900px){.g-body{padding:0 24px}}
+.g-results{flex:1;max-width:660px;padding-top:4px}
+.g-result-info{font-size:13px;color:#70757a;padding:5px 0 14px;border-bottom:1px solid var(--g-border);margin-bottom:4px}
+.g-top-bar{padding:6px 0 4px;font-size:13px}
+.g-site-row{display:flex;align-items:center;gap:8px;margin-bottom:4px}
+.g-favicon{width:26px;height:26px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0}
+.g-site-meta{display:flex;flex-direction:column;gap:1px;flex:1;min-width:0}
+.g-site-name{font-size:13px;color:#202124;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.g-site-url{font-size:12px;color:#4d5156;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.g-dots{background:none;border:none;cursor:pointer;color:#5f6368;font-size:16px;padding:4px 6px;border-radius:50%;flex-shrink:0;line-height:1;transition:background .1s}
+.g-dots:hover{background:#f1f3f4}
+.g-date{color:#70757a}
+.g-result-item{padding:16px 0 12px;border-bottom:1px solid transparent;cursor:pointer;display:block;text-decoration:none;color:inherit}
+.g-result-item:hover .g-result-title{text-decoration:underline;color:#1a0dab}
+.g-result-title{font-size:20px;font-weight:400;color:var(--g-blue);line-height:1.3;margin-bottom:3px}
+.g-result-snippet{font-size:13.5px;color:var(--g-text);line-height:1.58;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.g-sep{height:1px;background:var(--g-border);margin:0}
 </style>
 </head>
 <body>
-<div class="s-header">
-  <a href="../" class="s-back">←</a>
-  <span style="font-size:1.2rem">🔒</span>
-  <h1>04 &nbsp;정보보안</h1>
-  <span class="cnt">70개 개념</span>
+<div class="g-body">
+  <div class="g-results">
+    <div class="g-top-bar"><span style="color:#70757a">검색 결과: </span><span style="color:#202124;font-weight:500">TOPCIT 04 정보보안</span></div>
+    <div class="g-result-info">약 1,501개 결과 (0.31초)</div>
+    
+<div class="g-result-item">
+  <div class="g-site-row">
+    <span class="g-favicon" style="background:#fff;color:#eb5641;border:1px solid #dadce0">T</span>
+    <span class="g-site-meta">
+      <span class="g-site-name">티스토리</span>
+      <span class="g-site-url">https://tistory.com › 04/cryptography</span>
+    </span>
+    <button class="g-dots" onclick="event.stopPropagation()">⋮</button>
+  </div>
+  <div class="g-result-title">암호화 기초</div>
+  <div class="g-result-snippet"><span class="g-date">2025. 11. 12. — </span>대칭키, 공개키, 해시 함수, PKI 인프라 핵심 이해</div>
 </div>
-<div class="grid"><a href="./01/" class="chap-card" style="--main:#dc2626;--sub:#991b1b"><div class="chap-emoji">🔒</div><div class="chap-num">01</div><div class="chap-title">정보보안 기초</div><div class="chap-status">10개 개념</div></a><a href="./02/" class="chap-card" style="--main:#dc2626;--sub:#991b1b"><div class="chap-emoji">🔒</div><div class="chap-num">02</div><div class="chap-title">암호 기술</div><div class="chap-status">17개 개념</div></a><a href="./03/" class="chap-card" style="--main:#dc2626;--sub:#991b1b"><div class="chap-emoji">🔒</div><div class="chap-num">03</div><div class="chap-title">애플리케이션 &amp; 시큐어 코딩</div><div class="chap-status">11개 개념</div></a><a href="./04/" class="chap-card" style="--main:#dc2626;--sub:#991b1b"><div class="chap-emoji">🔒</div><div class="chap-num">04</div><div class="chap-title">보안관리 &amp; 표준</div><div class="chap-status">7개 개념</div></a><a href="./05/" class="chap-card" style="--main:#dc2626;--sub:#991b1b"><div class="chap-emoji">🔒</div><div class="chap-num">05</div><div class="chap-title">데이터베이스 보안</div><div class="chap-status">20개 개념</div></a><a href="./06/" class="chap-card" style="--main:#dc2626;--sub:#991b1b"><div class="chap-emoji">🔒</div><div class="chap-num">06</div><div class="chap-title">네트워크 보안</div><div class="chap-status">3개 개념</div></a><a href="./07/" class="chap-card" style="--main:#dc2626;--sub:#991b1b"><div class="chap-emoji">🔒</div><div class="chap-num">07</div><div class="chap-title">개인정보 보호</div><div class="chap-status">2개 개념</div></a></div>
-<div class="footer">챕터를 선택해 개념을 학습하세요</div>
+<div class="g-sep"></div>
+<div class="g-result-item">
+  <div class="g-site-row">
+    <span class="g-favicon" style="background:#20c997;color:#fff;border:1px solid #dadce0">V</span>
+    <span class="g-site-meta">
+      <span class="g-site-name">Velog</span>
+      <span class="g-site-url">https://velog.io › @dev_study › 04/auth-access-control</span>
+    </span>
+    <button class="g-dots" onclick="event.stopPropagation()">⋮</button>
+  </div>
+  <div class="g-result-title">인증 & 접근제어</div>
+  <div class="g-result-snippet"><span class="g-date">2025. 9. 4. — </span>SSO, MFA, OAuth, RBAC, 생체인증 기술</div>
+</div>
+<div class="g-sep"></div>
+<div class="g-result-item">
+  <div class="g-site-row">
+    <span class="g-favicon" style="background:#24292e;color:#fff;border:1px solid #dadce0">GH</span>
+    <span class="g-site-meta">
+      <span class="g-site-name">GitHub</span>
+      <span class="g-site-url">https://github.com › wiki › 04/secure-coding</span>
+    </span>
+    <button class="g-dots" onclick="event.stopPropagation()">⋮</button>
+  </div>
+  <div class="g-result-title">시큐어 코딩</div>
+  <div class="g-result-snippet"><span class="g-date">2025. 7. 28. — </span>OWASP Top 10, 입력 검증, SQL 인젝션 방어 기법</div>
+</div>
+<div class="g-sep"></div>
+<div class="g-result-item">
+  <div class="g-site-row">
+    <span class="g-favicon" style="background:#ffeee6;color:#ff4500;border:1px solid #dadce0">r/</span>
+    <span class="g-site-meta">
+      <span class="g-site-name">Reddit</span>
+      <span class="g-site-url">https://reddit.com › r/KR › 04/security-threats</span>
+    </span>
+    <button class="g-dots" onclick="event.stopPropagation()">⋮</button>
+  </div>
+  <div class="g-result-title">보안 위협 & 대응</div>
+  <div class="g-result-snippet"><span class="g-date">2026. 1. 15. — </span>악성코드, 랜섬웨어, APT 공격, 위협 인텔리전스</div>
+</div>
+<div class="g-sep"></div>
+<div class="g-result-item">
+  <div class="g-site-row">
+    <span class="g-favicon" style="background:#03c75a;color:#fff;border:1px solid #dadce0">N</span>
+    <span class="g-site-meta">
+      <span class="g-site-name">네이버 블로그</span>
+      <span class="g-site-url">https://blog.naver.com › 04/network-sec</span>
+    </span>
+    <button class="g-dots" onclick="event.stopPropagation()">⋮</button>
+  </div>
+  <div class="g-result-title">네트워크 보안</div>
+  <div class="g-result-snippet"><span class="g-date">2024. 12. 3. — </span>패킷 분석, 침투 테스트, 취약점 스캔 도구 활용</div>
+</div>
+<div class="g-sep"></div>
+<div class="g-result-item">
+  <div class="g-site-row">
+    <span class="g-favicon" style="background:#1e88e5;color:#fff;border:1px solid #dadce0">M</span>
+    <span class="g-site-meta">
+      <span class="g-site-name">MDN</span>
+      <span class="g-site-url">https://developer.mozilla.org › 04/privacy-law</span>
+    </span>
+    <button class="g-dots" onclick="event.stopPropagation()">⋮</button>
+  </div>
+  <div class="g-result-title">개인정보 & 법규</div>
+  <div class="g-result-snippet"><span class="g-date">2025. 3. 20. — </span>GDPR, PIPA, 정보보호 관리체계, 컴플라이언스</div>
+</div>
+<div class="g-sep"></div>
+<div class="g-result-item">
+  <div class="g-site-row">
+    <span class="g-favicon" style="background:#fff;color:#f48024;border:1px solid #dadce0">S</span>
+    <span class="g-site-meta">
+      <span class="g-site-name">Stack Overflow</span>
+      <span class="g-site-url">https://stackoverflow.com › 04/security-management</span>
+    </span>
+    <button class="g-dots" onclick="event.stopPropagation()">⋮</button>
+  </div>
+  <div class="g-result-title">보안 관리체계</div>
+  <div class="g-result-snippet"><span class="g-date">2025. 8. 7. — </span>ISO 27001, ISMS, 보안 감사, 사고 대응 절차</div>
+</div>
+<div class="g-sep"></div>
+  </div>
+</div>
 </body>
 </html>

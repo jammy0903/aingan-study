@@ -1,38 +1,120 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>TOPCIT 레슨</title>
+<title>TOPCIT 학습 시스템</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
-:root{--font-sans:Roboto,'Noto Sans KR','Malgun Gothic',sans-serif;--font-serif:"NanumMyeongjo","Nanum Myeongjo","Batang","Apple SD Gothic Neo",serif}
+:root{--g-blue:#1558d6;--g-url:#0d652d;--g-text:#4d5156;--g-border:#dfe1e5}
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:var(--font-sans);background:#f1f3f4;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:2.5rem 1.25rem;color:#202124}
-h1{font-size:1.6rem;font-weight:800;margin-bottom:.4rem;font-family:var(--font-serif);text-align:center}
-.sub{color:#5f6368;font-size:.88rem;margin-bottom:2rem;text-align:center}
-.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:.85rem;width:100%;max-width:780px}
-@media(min-width:600px){.grid{grid-template-columns:repeat(3,1fr)}}
-.subj-card{background:#fff;border-radius:.85rem;padding:1.3rem 1rem;text-decoration:none;border:2px solid var(--main);transition:all .18s;display:flex;flex-direction:column;gap:.2rem;position:relative;overflow:hidden;color:inherit}
-.subj-card::before{content:'';position:absolute;top:0;left:0;right:0;height:5px;background:var(--main)}
-.subj-card:hover{transform:translateY(-3px);box-shadow:0 4px 8px rgba(60,64,67,.3),0 1px 3px rgba(60,64,67,.15)}
-.subj-card.pending{opacity:.45;cursor:not-allowed;border-color:#bbb;pointer-events:none}
-.subj-card.pending::before{background:#bbb}
-.subj-emoji{font-size:1.8rem;margin-bottom:.15rem}
-.subj-num{font-size:.7rem;font-weight:800;color:var(--sub);letter-spacing:.07em}
-.subj-title{font-size:.95rem;font-weight:800;line-height:1.35;font-family:var(--font-serif)}
-.subj-status{font-size:.7rem;color:#5f6368;margin-top:.3rem}
-.subj-card:not(.pending) .subj-status{color:var(--main);font-weight:700}
-.back{margin-bottom:1.5rem;font-size:.85rem;color:#5f6368;text-decoration:none}
-.back:hover{color:#202124}
-.footer{margin-top:3rem;font-size:.75rem;color:#80868b;text-align:center;line-height:1.6}
+html,body{background:#fff;color:#202124;font-family:Roboto,'Noto Sans KR',arial,sans-serif;font-size:14px}
+.g-body{display:flex;padding:0 0 0 148px;max-width:1200px}
+@media(max-width:900px){.g-body{padding:0 24px}}
+.g-results{flex:1;max-width:660px;padding-top:4px}
+.g-result-info{font-size:13px;color:#70757a;padding:5px 0 14px;border-bottom:1px solid var(--g-border);margin-bottom:4px}
+.g-top-bar{padding:6px 0 4px;font-size:13px}
+.g-site-row{display:flex;align-items:center;gap:8px;margin-bottom:4px}
+.g-favicon{width:26px;height:26px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0}
+.g-site-meta{display:flex;flex-direction:column;gap:1px;flex:1;min-width:0}
+.g-site-name{font-size:13px;color:#202124;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.g-site-url{font-size:12px;color:#4d5156;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.g-dots{background:none;border:none;cursor:pointer;color:#5f6368;font-size:16px;padding:4px 6px;border-radius:50%;flex-shrink:0;line-height:1;transition:background .1s}
+.g-dots:hover{background:#f1f3f4}
+.g-date{color:#70757a}
+.g-result-item{padding:16px 0 12px;border-bottom:1px solid transparent;cursor:pointer;display:block;text-decoration:none;color:inherit}
+.g-result-item:hover .g-result-title{text-decoration:underline;color:#1a0dab}
+.g-result-title{font-size:20px;font-weight:400;color:var(--g-blue);line-height:1.3;margin-bottom:3px}
+.g-result-snippet{font-size:13.5px;color:var(--g-text);line-height:1.58;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.g-sep{height:1px;background:var(--g-border);margin:0}
 </style>
 </head>
 <body>
-<a href="../" class="back">← 메인으로</a>
-<h1>📘 TOPCIT 레슨</h1>
-<p class="sub">6과목 개념 학습 — 카드 → 풀스크린 레슨</p>
-<div class="grid"><a href="./01/" class="subj-card " style="--main:#1a73e8;--sub:#1557b0"><div class="subj-emoji">💻</div><div class="subj-num">01</div><div class="subj-title">소프트웨어 개발</div><div class="subj-status">104개 개념</div></a><a href="./02/" class="subj-card " style="--main:#0e9488;--sub:#115e59"><div class="subj-emoji">📊</div><div class="subj-num">02</div><div class="subj-title">데이터 이해와 활용</div><div class="subj-status">167개 개념</div></a><a href="./03/" class="subj-card " style="--main:#7c3aed;--sub:#5b21b6"><div class="subj-emoji">🏗️</div><div class="subj-num">03</div><div class="subj-title">시스템 아키텍처</div><div class="subj-status">152개 개념</div></a><a href="./04/" class="subj-card " style="--main:#dc2626;--sub:#991b1b"><div class="subj-emoji">🔒</div><div class="subj-num">04</div><div class="subj-title">정보보안</div><div class="subj-status">70개 개념</div></a><a href="./05/" class="subj-card " style="--main:#b45309;--sub:#78350f"><div class="subj-emoji">💼</div><div class="subj-num">05</div><div class="subj-title">IT 비즈니스와 윤리</div><div class="subj-status">87개 개념</div></a><a href="./06/" class="subj-card " style="--main:#475569;--sub:#1e293b"><div class="subj-emoji">📝</div><div class="subj-num">06</div><div class="subj-title">테크니컬 커뮤니케이션·PM</div><div class="subj-status">100개 개념</div></a></div>
-<div class="footer">총 680개 개념</div>
+<div class="g-body">
+  <div class="g-results">
+    <div class="g-top-bar"><span style="color:#70757a">검색 결과: </span><span style="color:#202124;font-weight:500">TOPCIT 학습 시스템 — 6과목</span></div>
+    <div class="g-result-info">약 6,820개 결과 (0.34초)</div>
+    
+<div class="g-result-item">
+  <div class="g-site-row">
+    <span class="g-favicon" style="background:#fff;color:#eb5641;border:1px solid #dadce0">T</span>
+    <span class="g-site-meta">
+      <span class="g-site-name">티스토리</span>
+      <span class="g-site-url">https://tistory.com › topcit/01-sw-dev</span>
+    </span>
+    <button class="g-dots" onclick="event.stopPropagation()">⋮</button>
+  </div>
+  <div class="g-result-title">💻 소프트웨어 개발 - TOPCIT 개념 정리 완벽 가이드</div>
+  <div class="g-result-snippet"><span class="g-date">2025. 11. 12. — </span>소프트웨어 공학, 설계·아키텍처, UI/UX, 품질관리 등 104개 핵심 개념 정리. TOPCIT 시험 대비 필수 학습자료.</div>
+</div>
+<div class="g-sep"></div>
+<div class="g-result-item">
+  <div class="g-site-row">
+    <span class="g-favicon" style="background:#20c997;color:#fff;border:1px solid #dadce0">V</span>
+    <span class="g-site-meta">
+      <span class="g-site-name">Velog</span>
+      <span class="g-site-url">https://velog.io › @dev_study › topcit/02-data</span>
+    </span>
+    <button class="g-dots" onclick="event.stopPropagation()">⋮</button>
+  </div>
+  <div class="g-result-title">📊 데이터 이해와 활용 - TOPCIT 핵심 정리</div>
+  <div class="g-result-snippet"><span class="g-date">2025. 9. 4. — </span>DB 설계, SQL, 빅데이터, 데이터웨어하우스까지 167개 개념 완벽 정리. 기출 분석 기반 우선순위 제공.</div>
+</div>
+<div class="g-sep"></div>
+<div class="g-result-item">
+  <div class="g-site-row">
+    <span class="g-favicon" style="background:#24292e;color:#fff;border:1px solid #dadce0">GH</span>
+    <span class="g-site-meta">
+      <span class="g-site-name">GitHub</span>
+      <span class="g-site-url">https://github.com › wiki › topcit/03-sys-arch</span>
+    </span>
+    <button class="g-dots" onclick="event.stopPropagation()">⋮</button>
+  </div>
+  <div class="g-result-title">🏗️ 시스템 아키텍처 - TOPCIT 학습 가이드</div>
+  <div class="g-result-snippet"><span class="g-date">2025. 7. 28. — </span>CPU 구조, 운영체제, 네트워크, 클라우드까지 152개 개념. 시스템 이해를 위한 핵심 가이드.</div>
+</div>
+<div class="g-sep"></div>
+<div class="g-result-item">
+  <div class="g-site-row">
+    <span class="g-favicon" style="background:#ffeee6;color:#ff4500;border:1px solid #dadce0">r/</span>
+    <span class="g-site-meta">
+      <span class="g-site-name">Reddit</span>
+      <span class="g-site-url">https://reddit.com › r/KR › topcit/04-security</span>
+    </span>
+    <button class="g-dots" onclick="event.stopPropagation()">⋮</button>
+  </div>
+  <div class="g-result-title">🔒 정보보안 - TOPCIT 보안 개념 완전 정복</div>
+  <div class="g-result-snippet"><span class="g-date">2026. 1. 15. — </span>암호화, 취약점, 보안 프로토콜, 시큐어 코딩 등 70개 핵심 개념. 정보보안 전문가를 위한 학습 자료.</div>
+</div>
+<div class="g-sep"></div>
+<div class="g-result-item">
+  <div class="g-site-row">
+    <span class="g-favicon" style="background:#03c75a;color:#fff;border:1px solid #dadce0">N</span>
+    <span class="g-site-meta">
+      <span class="g-site-name">네이버 블로그</span>
+      <span class="g-site-url">https://blog.naver.com › topcit/05-biz</span>
+    </span>
+    <button class="g-dots" onclick="event.stopPropagation()">⋮</button>
+  </div>
+  <div class="g-result-title">💼 IT 비즈니스와 윤리 - TOPCIT 비즈니스 파트</div>
+  <div class="g-result-snippet"><span class="g-date">2024. 12. 3. — </span>IT 거버넌스, EA, ISP, 가치사슬, 전략수립 등 87개 개념 정리. 비즈니스 관점의 IT 핵심 이해.</div>
+</div>
+<div class="g-sep"></div>
+<div class="g-result-item">
+  <div class="g-site-row">
+    <span class="g-favicon" style="background:#1e88e5;color:#fff;border:1px solid #dadce0">M</span>
+    <span class="g-site-meta">
+      <span class="g-site-name">MDN</span>
+      <span class="g-site-url">https://developer.mozilla.org › topcit/06-pm</span>
+    </span>
+    <button class="g-dots" onclick="event.stopPropagation()">⋮</button>
+  </div>
+  <div class="g-result-title">📝 테크니컬 커뮤니케이션·PM - TOPCIT 마지막 파트</div>
+  <div class="g-result-snippet"><span class="g-date">2025. 3. 20. — </span>프로젝트 관리, 품질 관리, 문서화, 발표 기술 100개 개념. PM 역량 강화를 위한 필수 가이드.</div>
+</div>
+<div class="g-sep"></div>
+  </div>
+</div>
 </body>
 </html>
