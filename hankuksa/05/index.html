@@ -208,9 +208,9 @@ body{font-family:var(--font-sans);background:#f8f4ee;color:#202124;min-height:10
   .fb-hero-sub,.fb-card-preview{font-size:.88rem}
   .fb-card{padding:.95rem .92rem .9rem 1rem}
   .l-head{padding:.72rem .78rem;gap:.55rem}
-  .l-search-shell{gap:.55rem}
+  .l-search-shell{gap:.55rem;min-width:0;flex:1}
   .l-google{display:none}
-  .l-title{height:2.35rem;font-size:.9rem;padding:0 .86rem}
+  .l-title{height:auto;min-height:2.35rem;max-width:none;font-size:.9rem;line-height:1.35;padding:.42rem .86rem;white-space:normal;overflow:visible;text-overflow:clip}
   .l-title::before{display:none}
   .l-page-ind{font-size:.74rem;padding:.24rem .56rem}
   .l-body{padding:.88rem .9rem 5.5rem}
@@ -222,8 +222,9 @@ body{font-family:var(--font-sans);background:#f8f4ee;color:#202124;min-height:10
   .sec-label{font-size:1.08rem}
   .sec p,.fact-note,.src-text,.mn-text{font-size:.96rem;line-height:1.68}
   .fact-term{font-size:.9rem}
-  .l-foot{padding:.65rem .9rem calc(.8rem + env(safe-area-inset-bottom));gap:.45rem}
-  .l-nav-btn{font-size:.9rem}
+  .ctable{display:block;overflow-x:auto;font-size:.82rem}
+  .l-foot{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);padding:.65rem .9rem calc(.8rem + env(safe-area-inset-bottom));gap:.45rem}
+  .l-nav-btn{min-width:0;width:100%;font-size:.9rem;padding:.72rem .45rem}
 }
 </style>
 </head>
@@ -275,10 +276,26 @@ body.google-results .g-date{color:#70757a}
   body.google-results #card-content > .g-body{padding:0 24px}
 }
 @media(max-width:560px){
-  body.google-results .g-list-back{padding:8px 16px 4px}
-  body.google-results #card-content > .g-body{padding:0 16px}
-  body.google-results .card-title{font-size:18px!important}
-  body.google-results .card-preview{font-size:13px!important}
+  body.google-results .g-list-back{padding:8px 14px 4px}
+  body.google-results #card-content > .g-body{display:block;padding:0 14px;max-width:none}
+  body.google-results #card-content .g-results{max-width:none;width:100%;padding-top:2px}
+  body.google-results .g-query-line{font-size:12.5px;line-height:1.4}
+  body.google-results .g-result-info{font-size:12.5px;padding:4px 0 12px;margin-bottom:2px}
+  body.google-results .card{padding:13px 0 3px!important;margin-bottom:8px!important}
+  body.google-results .card .g-site-row{gap:7px;align-items:flex-start;margin-bottom:3px}
+  body.google-results .card .g-favicon{width:24px;height:24px;font-size:10px;margin-top:1px}
+  body.google-results .card .g-site-meta{min-width:0;overflow:hidden}
+  body.google-results .card .g-site-name{font-size:12.5px;line-height:1.25}
+  body.google-results .card .g-site-url{font-size:11.5px;line-height:1.25;max-width:100%}
+  body.google-results .card .g-dots{font-size:15px;padding:1px 2px}
+  body.google-results .card-title{font-size:17px!important;line-height:1.32!important;margin-bottom:3px!important}
+  body.google-results .card-preview{font-size:12.8px!important;line-height:1.5!important;-webkit-line-clamp:3!important}
+}
+@media(max-width:380px){
+  body.google-results .g-list-back{padding-left:12px;padding-right:12px}
+  body.google-results #card-content > .g-body{padding-left:12px;padding-right:12px}
+  body.google-results .card .g-dots{display:none}
+  body.google-results .card-title{font-size:16px!important}
 }
 </style>
 <div class="g-list-back"><a class="g-back" href="../">
