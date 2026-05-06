@@ -757,7 +757,9 @@ function renderPage() {
 
   document.getElementById('l-page-ind').textContent = `${curPage + 1} / ${pages.length}`;
   document.getElementById('l-progress-bar').style.width = `${((curPage + 1) / pages.length) * 100}%`;
-  document.getElementById('l-prev').disabled = curPage === 0;
+  const _pb = document.getElementById('l-prev');
+  _pb.disabled = false;
+  _pb.textContent = curPage > 0 ? '← 이전' : (curLessonIdx > 0 ? '← 이전 개념' : '← 목록');
   const _nb = document.getElementById('l-next');
   if (pages[curPage].type === 'learn' && curPage === pages.length - 1 && !isLastInChapter(curLessonIdx)) {
     _nb.disabled = false;
@@ -791,7 +793,11 @@ function nextPage() {
     startLesson(curLessonIdx + 1);
   }
 }
-function prevPage() { if (curPage > 0) { curPage--; renderPage(); } }
+function prevPage() {
+  if (curPage > 0) { curPage--; renderPage(); return; }
+  if (curLessonIdx > 0) { startLesson(curLessonIdx - 1); return; }
+  exitLesson();
+}
 
 document.addEventListener('keydown', e => {
   if (curLessonIdx < 0) return;
