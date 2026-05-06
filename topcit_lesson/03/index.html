@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>TOPCIT 03 시스템 아키텍처</title>
+<title>TOPCIT 03 시스템 아키텍처 이해와 활용</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
@@ -25,38 +25,30 @@ html,body{background:#fff;color:#202124;font-family:Roboto,'Noto Sans KR',arial,
 .g-date{color:#70757a}
 .g-result-item{padding:16px 0 12px;border-bottom:1px solid transparent;cursor:pointer;display:block;text-decoration:none;color:inherit}
 .g-result-item:hover .g-result-title{text-decoration:underline;color:#1a0dab}
-.g-result-title{font-size:20px;font-weight:400;color:var(--g-blue);line-height:1.3;margin-bottom:3px}
-.g-result-snippet{font-size:13.5px;color:var(--g-text);line-height:1.58;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.g-result-title{font-size:20px;font-weight:400;color:var(--g-blue);line-height:1.3;margin-bottom:3px;word-break:keep-all;overflow-wrap:anywhere}
+.g-result-snippet{font-size:13.5px;color:var(--g-text);line-height:1.58;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;word-break:keep-all}
 .g-sep{height:1px;background:var(--g-border);margin:0}
+.g-back{display:inline-flex;align-items:center;gap:5px;padding:8px 0 2px;font-size:13px;color:#1558d6;text-decoration:none;cursor:pointer}
+.g-back:hover{text-decoration:underline}
 </style>
 </head>
 <body>
 <div class="g-body">
   <div class="g-results">
-    
-<style>
-.g-back{display:inline-flex;align-items:center;gap:5px;padding:8px 0 2px;font-size:13px;color:#1558d6;text-decoration:none;cursor:pointer}
-.g-back:hover{text-decoration:underline}
-.g-back svg{flex-shrink:0}
-</style>
-<a class="g-back" href="../">
-  <svg width="16" height="16" viewBox="0 0 24 24" fill="#1558d6"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
-  TOPCIT 레슨 목록
-</a>
-<div class="g-top-bar"><span style="color:#70757a">검색 결과: </span><span style="color:#202124;font-weight:500">TOPCIT 03 시스템 아키텍처</span></div>
-    <div class="g-result-info">약 1,587개 결과 (0.31초)</div>
-    
-<a class="g-result-item" href="./01/">
+    <a class="g-back" href="../">← TOPCIT 레슨 목록</a>
+    <div class="g-top-bar"><span style="color:#70757a">검색 결과: </span><span style="color:#202124;font-weight:500">TOPCIT 03 시스템 아키텍처 이해와 활용</span></div>
+    <div class="g-result-info">약 1,501개 결과 (0.31초)</div>
+    <a class="g-result-item" href="./01/">
   <div class="g-site-row">
     <span class="g-favicon" style="background:#fff;color:#eb5641;border:1px solid #dadce0">T</span>
     <span class="g-site-meta">
       <span class="g-site-name">티스토리</span>
-      <span class="g-site-url">https://tistory.com › 03/computer-arch</span>
+      <span class="g-site-url">https://tistory.com › 03/컴퓨터-하드웨어</span>
     </span>
     <span class="g-dots" aria-hidden="true">⋮</span>
   </div>
-  <div class="g-result-title">컴퓨터 구조 기초</div>
-  <div class="g-result-snippet"><span class="g-date">2025. 11. 12. — </span>CPU, 메모리 계층, 버스 구조, 입출력 장치 핵심 이해</div>
+  <div class="g-result-title">컴퓨터 하드웨어</div>
+  <div class="g-result-snippet"><span class="g-date">2026. 5. 6. — </span>CPU의 정의, CPU의 수행 동작, CPU의 구성요소, 컴퓨터 아키텍처의 종류 등 30개 개념 정리</div>
 </a>
 <div class="g-sep"></div>
 <a class="g-result-item" href="./02/">
@@ -64,12 +56,12 @@ html,body{background:#fff;color:#202124;font-family:Roboto,'Noto Sans KR',arial,
     <span class="g-favicon" style="background:#20c997;color:#fff;border:1px solid #dadce0">V</span>
     <span class="g-site-meta">
       <span class="g-site-name">Velog</span>
-      <span class="g-site-url">https://velog.io › @dev_study › 03/os-basics</span>
+      <span class="g-site-url">https://velog.io › 03/운영체제--프로세스</span>
     </span>
     <span class="g-dots" aria-hidden="true">⋮</span>
   </div>
-  <div class="g-result-title">운영체제 기초</div>
-  <div class="g-result-snippet"><span class="g-date">2025. 9. 4. — </span>프로세스, 스레드, 스케줄링, 동기화 메커니즘</div>
+  <div class="g-result-title">운영체제 &amp; 프로세스</div>
+  <div class="g-result-snippet"><span class="g-date">2026. 5. 6. — </span>운영체제의 개요, 운영체제의 주요 기능, 스레드(Thread), 프로세스의 이해 등 16개 개념 정리</div>
 </a>
 <div class="g-sep"></div>
 <a class="g-result-item" href="./03/">
@@ -77,12 +69,12 @@ html,body{background:#fff;color:#202124;font-family:Roboto,'Noto Sans KR',arial,
     <span class="g-favicon" style="background:#24292e;color:#fff;border:1px solid #dadce0">GH</span>
     <span class="g-site-meta">
       <span class="g-site-name">GitHub</span>
-      <span class="g-site-url">https://github.com › wiki › 03/network-protocol</span>
+      <span class="g-site-url">https://github.com › 03/임베디드-시스템</span>
     </span>
     <span class="g-dots" aria-hidden="true">⋮</span>
   </div>
-  <div class="g-result-title">네트워크 & 프로토콜</div>
-  <div class="g-result-snippet"><span class="g-date">2025. 7. 28. — </span>OSI 7계층, TCP/IP, HTTP, DNS, 라우팅 알고리즘</div>
+  <div class="g-result-title">임베디드 시스템</div>
+  <div class="g-result-snippet"><span class="g-date">2026. 5. 6. — </span>임베디드 시스템의 개발 과정, 임베디드 시스템의 특징, 임베디드 운영체제의 개념, 임베디드 운영체제의 구조 및 적용기술 등 8개 개념 정리</div>
 </a>
 <div class="g-sep"></div>
 <a class="g-result-item" href="./04/">
@@ -90,12 +82,12 @@ html,body{background:#fff;color:#202124;font-family:Roboto,'Noto Sans KR',arial,
     <span class="g-favicon" style="background:#ffeee6;color:#ff4500;border:1px solid #dadce0">r/</span>
     <span class="g-site-meta">
       <span class="g-site-name">Reddit</span>
-      <span class="g-site-url">https://reddit.com › r/KR › 03/sys-arch-design</span>
+      <span class="g-site-url">https://reddit.com › 03/시스템-아키텍처--고가용성</span>
     </span>
     <span class="g-dots" aria-hidden="true">⋮</span>
   </div>
-  <div class="g-result-title">시스템 아키텍처 설계</div>
-  <div class="g-result-snippet"><span class="g-date">2026. 1. 15. — </span>분산 시스템, 클라이언트-서버, 마이크로서비스 아키텍처</div>
+  <div class="g-result-title">시스템 아키텍처 &amp; 고가용성</div>
+  <div class="g-result-snippet"><span class="g-date">2026. 5. 6. — </span>시스템아키텍처의 이해, 정보시스템의 구성요소, 시스템아키텍처 유형, 시스템 배치 방식에 따른 시스템아키텍처 분류 등 18개 개념 정리</div>
 </a>
 <div class="g-sep"></div>
 <a class="g-result-item" href="./05/">
@@ -103,12 +95,12 @@ html,body{background:#fff;color:#202124;font-family:Roboto,'Noto Sans KR',arial,
     <span class="g-favicon" style="background:#03c75a;color:#fff;border:1px solid #dadce0">N</span>
     <span class="g-site-meta">
       <span class="g-site-name">네이버 블로그</span>
-      <span class="g-site-url">https://blog.naver.com › 03/cloud-virtualization</span>
+      <span class="g-site-url">https://blog.naver.com › 03/클라우드--가상화</span>
     </span>
     <span class="g-dots" aria-hidden="true">⋮</span>
   </div>
-  <div class="g-result-title">클라우드 & 가상화</div>
-  <div class="g-result-snippet"><span class="g-date">2024. 12. 3. — </span>IaaS, PaaS, SaaS, 컨테이너, 쿠버네티스 핵심 개념</div>
+  <div class="g-result-title">클라우드 &amp; 가상화</div>
+  <div class="g-result-snippet"><span class="g-date">2026. 5. 6. — </span>클라우드 운영 형태에 따른 분류, 히, 서버 가상화 방식의 유형, 스토리지 가상화 등 11개 개념 정리</div>
 </a>
 <div class="g-sep"></div>
 <a class="g-result-item" href="./06/">
@@ -116,12 +108,12 @@ html,body{background:#fff;color:#202124;font-family:Roboto,'Noto Sans KR',arial,
     <span class="g-favicon" style="background:#1e88e5;color:#fff;border:1px solid #dadce0">M</span>
     <span class="g-site-meta">
       <span class="g-site-name">MDN</span>
-      <span class="g-site-url">https://developer.mozilla.org › 03/storage-filesystem</span>
+      <span class="g-site-url">https://developer.mozilla.org › 03/빅데이터-시스템</span>
     </span>
     <span class="g-dots" aria-hidden="true">⋮</span>
   </div>
-  <div class="g-result-title">스토리지 & 파일시스템</div>
-  <div class="g-result-snippet"><span class="g-date">2025. 3. 20. — </span>HDD, SSD, RAID, 분산 파일시스템, 스토리지 관리</div>
+  <div class="g-result-title">빅데이터 시스템</div>
+  <div class="g-result-snippet"><span class="g-date">2026. 5. 6. — </span>Hadoop 생태계, Hadoop의 주요기술 요소, Hadoop 지원 프로그램, 빅데이터 시스템의 동향 4개 개념 정리</div>
 </a>
 <div class="g-sep"></div>
 <a class="g-result-item" href="./07/">
@@ -129,38 +121,38 @@ html,body{background:#fff;color:#202124;font-family:Roboto,'Noto Sans KR',arial,
     <span class="g-favicon" style="background:#fff;color:#f48024;border:1px solid #dadce0">S</span>
     <span class="g-site-meta">
       <span class="g-site-name">Stack Overflow</span>
-      <span class="g-site-url">https://stackoverflow.com › 03/network-security</span>
+      <span class="g-site-url">https://stackoverflow.com › 03/데이터-링크-계층</span>
     </span>
     <span class="g-dots" aria-hidden="true">⋮</span>
   </div>
-  <div class="g-result-title">네트워크 보안 인프라</div>
-  <div class="g-result-snippet"><span class="g-date">2025. 8. 7. — </span>방화벽, IDS/IPS, VPN, 제로트러스트 보안</div>
+  <div class="g-result-title">데이터 링크 계층</div>
+  <div class="g-result-snippet"><span class="g-date">2026. 5. 6. — </span>데이터 링크계층 부계층, 논리 링크 제어(LLC), 매체 접근 제어(MAC), IP 주소와 MAC 주소 변환 프로토콜 등 13개 개념 정리</div>
 </a>
 <div class="g-sep"></div>
 <a class="g-result-item" href="./08/">
   <div class="g-site-row">
-    <span class="g-favicon" style="background:#202124;color:#fff;border:1px solid #dadce0">N</span>
+    <span class="g-favicon" style="background:#fff;color:#eb5641;border:1px solid #dadce0">T</span>
     <span class="g-site-meta">
-      <span class="g-site-name">Notion</span>
-      <span class="g-site-url">https://notion.so › study › 03/embedded-iot</span>
+      <span class="g-site-name">티스토리</span>
+      <span class="g-site-url">https://tistory.com › 03/네트워크-계층--라우팅</span>
     </span>
     <span class="g-dots" aria-hidden="true">⋮</span>
   </div>
-  <div class="g-result-title">임베디드 & IoT</div>
-  <div class="g-result-snippet"><span class="g-date">2024. 10. 31. — </span>실시간 OS, MCU, IoT 프로토콜, 엣지 컴퓨팅</div>
+  <div class="g-result-title">네트워크 계층 &amp; 라우팅</div>
+  <div class="g-result-snippet"><span class="g-date">2026. 5. 6. — </span>네트워크 계층이란?, 인터네트워킹 장비, 네트워크 계층 프로토콜, 네트워크 계층 명령어 등 32개 개념 정리</div>
 </a>
 <div class="g-sep"></div>
 <a class="g-result-item" href="./09/">
   <div class="g-site-row">
-    <span class="g-favicon" style="background:#f8f9fa;color:#202124;border:1px solid #dadce0">W</span>
+    <span class="g-favicon" style="background:#20c997;color:#fff;border:1px solid #dadce0">V</span>
     <span class="g-site-meta">
-      <span class="g-site-name">위키백과</span>
-      <span class="g-site-url">https://ko.wikipedia.org › 03/capacity-planning</span>
+      <span class="g-site-name">Velog</span>
+      <span class="g-site-url">https://velog.io › 03/멀티미디어--응용-네트워크</span>
     </span>
     <span class="g-dots" aria-hidden="true">⋮</span>
   </div>
-  <div class="g-result-title">규모 산정 & 성능</div>
-  <div class="g-result-snippet"><span class="g-date">2026. 2. 9. — </span>TPC 벤치마크, 용량 계획, 성능 튜닝 방법론</div>
+  <div class="g-result-title">멀티미디어 &amp; 응용 네트워크</div>
+  <div class="g-result-snippet"><span class="g-date">2026. 5. 6. — </span>VoIP(Voice over Internet Protocol)란?, VoIP 호 신호 프로토콜, RTP 개념, RTP 표준화 동향 등 8개 개념 정리</div>
 </a>
 <div class="g-sep"></div>
   </div>
