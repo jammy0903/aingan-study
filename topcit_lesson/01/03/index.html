@@ -312,6 +312,24 @@ html,body{background:#fff;color:#202124;font-family:Roboto,'Noto Sans KR',arial,
 .card::before{display:none!important}
 
 
+/* ── Google result shell injected for detail pages ── */
+#card-content{width:100%}
+#card-content > .g-body{display:flex;padding:0 0 0 148px;max-width:1200px}
+#card-content .g-results{flex:1;max-width:660px;padding-top:4px}
+.g-search-head{padding:4px 0 0}
+.g-query-line{font-size:13px;color:#70757a;padding:2px 0 4px}
+.g-query-line strong{color:#202124;font-weight:500}
+.card .g-site-row{display:flex;align-items:center;gap:8px;margin-bottom:4px}
+.card .g-favicon{width:26px;height:26px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;border:1px solid #dadce0}
+.card .g-site-meta{display:flex;flex-direction:column;gap:1px;flex:1;min-width:0}
+.card .g-site-name{font-size:13px;color:#202124;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.card .g-site-url{font-size:12px;color:#4d5156;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.card .g-dots{margin-left:auto;color:#5f6368;font-size:16px;padding:4px 6px;line-height:1;flex-shrink:0}
+.card .g-date{color:#70757a}
+.card::before{display:none!important}
+@media(max-width:900px){#card-content > .g-body{padding:0 24px}}
+@media(max-width:560px){#card-content > .g-body{padding:0 16px}.card-title{font-size:18px!important}}
+
 .g-back{display:inline-flex;align-items:center;gap:5px;padding:8px 0 4px;font-size:13px;color:#1558d6;text-decoration:none;cursor:pointer}
 .g-back:hover{text-decoration:underline}
 
@@ -653,6 +671,75 @@ document.addEventListener('keydown', e => {
   if (e.key === 'ArrowRight') nextPage();
   if (e.key === 'Escape')     exitLesson();
 });
+
+function initGoogleResultTheme() {
+  const content = document.getElementById('card-content');
+  if (!content || content.dataset.googleResultReady === '1') return;
+  content.dataset.googleResultReady = '1';
+
+  const cards = Array.from(content.querySelectorAll('.card'));
+  const groups = Array.from(content.querySelectorAll(':scope > .section-group'));
+  const titleText = document.title || 'TOPCIT 레슨';
+  const cleanTitle = titleText.replace(/^TOPCIT\s*/, 'TOPCIT ');
+  const resultCount = cards.length.toLocaleString('ko-KR');
+
+  const shell = document.createElement('div');
+  shell.className = 'g-body';
+  const results = document.createElement('div');
+  results.className = 'g-results';
+  results.innerHTML = [
+    '<a class="g-back" href="../">← 상위 검색결과</a>',
+    '<div class="g-search-head">',
+    '  <div class="g-query-line">검색 결과: <strong>' + escHtml(cleanTitle) + '</strong></div>',
+    '  <div class="g-result-info">약 ' + resultCount + '개 결과 (0.29초)</div>',
+    '</div>'
+  ].join('');
+
+  groups.forEach(group => results.appendChild(group));
+  shell.appendChild(results);
+  content.replaceChildren(shell);
+
+  const sites = [
+    {name:'티스토리', mark:'T', bg:'#fff', fg:'#eb5641', host:'tistory.com'},
+    {name:'Velog', mark:'V', bg:'#20c997', fg:'#fff', host:'velog.io'},
+    {name:'GitHub', mark:'GH', bg:'#24292e', fg:'#fff', host:'github.com'},
+    {name:'Reddit', mark:'r/', bg:'#ffeee6', fg:'#ff4500', host:'reddit.com'},
+    {name:'네이버 블로그', mark:'N', bg:'#03c75a', fg:'#fff', host:'blog.naver.com'},
+    {name:'MDN', mark:'M', bg:'#1e88e5', fg:'#fff', host:'developer.mozilla.org'},
+    {name:'Stack Overflow', mark:'S', bg:'#fff', fg:'#f48024', host:'stackoverflow.com'}
+  ];
+  const pathParts = location.pathname.split('/').filter(Boolean).slice(-3, -1).join('/');
+
+  cards.forEach((card, i) => {
+    if (!card.querySelector('.g-site-row')) {
+      const site = sites[i % sites.length];
+      const title = (card.querySelector('.card-title')?.textContent || '개념 ' + (i + 1)).trim();
+      const slug = title.toLowerCase()
+        .replace(/\s+/g, '-')
+        .replace(/[^0-9a-z가-힣_-]/gi, '')
+        .slice(0, 60) || 'concept-' + (i + 1);
+      const row = document.createElement('div');
+      row.className = 'g-site-row';
+      row.innerHTML = [
+        '<span class="g-favicon" style="background:' + site.bg + ';color:' + site.fg + '">' + site.mark + '</span>',
+        '<span class="g-site-meta">',
+        '  <span class="g-site-name">' + site.name + '</span>',
+        '  <span class="g-site-url">https://' + site.host + ' › topcit › ' + escHtml(pathParts) + ' › ' + escHtml(slug) + '</span>',
+        '</span>',
+        '<span class="g-dots" aria-hidden="true">⋮</span>'
+      ].join('');
+      card.insertBefore(row, card.firstChild);
+    }
+
+    const preview = card.querySelector('.card-preview');
+    if (preview && !preview.querySelector('.g-date')) {
+      preview.innerHTML = '<span class="g-date">2026. 5. 6. — </span>' + preview.innerHTML.trim();
+    }
+  });
+}
+
+initGoogleResultTheme();
+
 </script>
 </body>
 </html>
