@@ -333,6 +333,67 @@ html,body{background:#fff;color:#202124;font-family:Roboto,'Noto Sans KR',arial,
 .g-back{display:inline-flex;align-items:center;gap:5px;padding:8px 0 4px;font-size:13px;color:#1558d6;text-decoration:none;cursor:pointer}
 .g-back:hover{text-decoration:underline}
 
+/* ── Google lesson viewer shell injected for detail pages ── */
+.lesson.show{background:#fff;color:#202124}
+.lesson .l-head{background:#fff;color:#202124;padding:10px 0 8px 148px;border-bottom:1px solid #dfe1e5;box-shadow:none;gap:10px;min-height:54px}
+.lesson .l-back{width:34px;height:34px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;color:#5f6368;background:transparent;border:none;font-size:20px;line-height:1}
+.lesson .l-back:hover{background:#f1f3f4;color:#202124}
+.lesson .l-title{flex:0 1 660px;color:#202124;font-size:15px;font-weight:400;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lesson .l-page-ind{background:#f1f3f4;color:#5f6368;border:1px solid #dadce0;border-radius:999px;font-size:12px;font-weight:500;padding:4px 10px;margin-left:8px}
+.lesson .l-progress{height:1px;background:#f8f9fa}
+.lesson .l-progress-bar{height:1px;background:#1a73e8}
+.lesson .l-body{align-items:flex-start;background:#fff;padding:18px 0 96px 148px;overflow-y:auto}
+.lesson .l-page{width:100%;max-width:660px;animation:none}
+.lesson .l-page-title{font-size:22px;font-weight:400;color:#202124;line-height:1.3;border:none;margin:0 0 4px;padding:0}
+.lesson .lesson-query-line{font-size:13px;color:#70757a;margin:0 0 4px}
+.lesson .lesson-query-line strong{font-weight:500;color:#202124}
+.lesson .lesson-result-info{font-size:13px;color:#70757a;padding:0 0 14px;border-bottom:1px solid #dfe1e5;margin-bottom:4px}
+.lesson .l-page-meta{display:flex;gap:6px;margin:8px 0 4px}
+.lesson .l-page-meta .chip{background:#f1f3f4!important;color:#5f6368!important;border:1px solid #dadce0;border-radius:999px;font-size:12px;font-weight:500;padding:3px 9px}
+.lesson .l-page-kw{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 10px}
+.lesson .l-page-kw span{background:transparent;color:#1558d6;border:1px solid #dadce0;border-radius:999px;font-size:12px;font-weight:400;padding:3px 9px}
+.lesson .lesson-result{background:transparent!important;border:none!important;border-radius:0!important;box-shadow:none!important;padding:16px 0 4px!important;margin:0 0 12px!important;color:#202124}
+.lesson .lesson-result::after{content:'';display:block;height:1px;background:#dfe1e5;margin-top:16px}
+.lesson .lesson-result .g-site-row{display:flex;align-items:center;gap:8px;margin-bottom:4px}
+.lesson .lesson-result .g-favicon{width:26px;height:26px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;border:1px solid #dadce0}
+.lesson .lesson-result .g-site-meta{display:flex;flex-direction:column;gap:1px;flex:1;min-width:0}
+.lesson .lesson-result .g-site-name{font-size:13px;color:#202124;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lesson .lesson-result .g-site-url{font-size:12px;color:#4d5156;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lesson .lesson-result .g-dots{margin-left:auto;color:#5f6368;font-size:16px;padding:4px 6px;line-height:1;flex-shrink:0}
+.lesson .lesson-result > .sec-label{display:block!important;color:#1558d6!important;font-size:20px!important;font-weight:400!important;line-height:1.3!important;letter-spacing:0!important;text-transform:none!important;opacity:1!important;margin:0 0 3px!important;padding:0!important}
+.lesson .lesson-result:hover > .sec-label{text-decoration:underline}
+.lesson .lesson-result p,.lesson .types-caption,.lesson .type-note,.lesson .fact-note,.lesson .mn-text,.lesson .src-text{font-size:13.5px!important;line-height:1.58!important;color:#4d5156!important;font-weight:400!important;word-break:keep-all}
+.lesson .types-list,.lesson .fact-list,.lesson .mn-list,.lesson .src-list{display:flex;flex-direction:column;gap:6px;margin-top:6px}
+.lesson .type-item,.lesson .fact-item,.lesson .mn-line,.lesson .src-link{background:transparent!important;border:none!important;border-radius:0!important;box-shadow:none!important;padding:3px 0!important;color:#4d5156!important;text-decoration:none!important}
+.lesson .type-item{display:block!important;counter-increment:none!important}
+.lesson .type-item::before{display:none!important}
+.lesson .type-head{display:flex;flex-wrap:wrap;gap:6px;align-items:baseline;margin-bottom:1px}
+.lesson .type-name,.lesson .fact-term{font-size:14px;font-weight:500;color:#202124}
+.lesson .type-en,.lesson .src-host,.lesson .fact-link-label{font-size:12px;color:#70757a;font-weight:400}
+.lesson .type-tier,.lesson .mn-tag{background:#f1f3f4!important;color:#5f6368!important;border:1px solid #dadce0;border-radius:999px;font-size:11px;font-weight:500;padding:2px 7px}
+.lesson .mn-picto,.lesson .src-bullet{display:none!important}
+.lesson .mn-main{display:block!important}
+.lesson .mn-text strong{color:#202124;font-weight:500}
+.lesson .types-scale{background:transparent;border-top:1px solid #dfe1e5;margin-top:10px;padding-top:8px;color:#70757a;font-size:12px}
+.lesson .ctable{border-collapse:collapse;width:100%;font-size:13px;margin-top:8px;border:none}
+.lesson .ctable th{background:#f8fafd;color:#202124;border-bottom:1px solid #dfe1e5;text-align:left;font-weight:500;padding:8px}
+.lesson .ctable td{border-bottom:1px solid #edf0f2;color:#4d5156;padding:8px;vertical-align:top}
+.lesson .done-page{max-width:660px;text-align:left;padding:32px 0}
+.lesson .done-emoji{display:none}
+.lesson .done-title{font-size:22px;font-weight:400;color:#1558d6;margin-bottom:4px}
+.lesson .done-sub{font-size:13.5px;color:#4d5156;margin-bottom:18px}
+.lesson .done-actions{display:flex;gap:8px;flex-wrap:wrap}
+.lesson .done-btn{border:1px solid #dadce0;background:#fff;color:#1558d6;border-radius:999px;padding:8px 16px;font-size:14px;font-weight:500;cursor:pointer}
+.lesson .done-btn-primary{background:#1a73e8;border-color:#1a73e8;color:#fff}
+.lesson .l-foot{background:#fff;border-top:1px solid #dfe1e5;box-shadow:none;padding:10px 0;display:flex;justify-content:center;gap:8px}
+.lesson .l-nav-btn{min-width:154px;border:1px solid #dadce0;background:#fff;color:#1558d6;border-radius:999px;padding:9px 18px;font-size:14px;font-weight:500;box-shadow:none}
+.lesson .l-nav-btn:hover:not(:disabled){background:#f8fafd;border-color:#c6dafc}
+.lesson .l-nav-btn.primary{background:#1a73e8;color:#fff;border-color:#1a73e8}
+.lesson .l-nav-btn.primary:hover:not(:disabled){background:#1557b0;border-color:#1557b0}
+.lesson .l-nav-btn:disabled{opacity:.42;color:#9aa0a6;background:#fff}
+@media(max-width:900px){.lesson .l-head{padding-left:24px;padding-right:24px}.lesson .l-body{padding-left:24px;padding-right:24px}.lesson .l-title{flex:1}.lesson .l-page-ind{margin-left:auto}}
+@media(max-width:560px){.lesson .l-head{padding-left:16px;padding-right:16px}.lesson .l-body{padding-left:16px;padding-right:16px;padding-bottom:108px}.lesson .l-page-title{font-size:20px}.lesson .lesson-result > .sec-label{font-size:18px!important}.lesson .l-foot{padding:8px 12px}.lesson .l-nav-btn{min-width:0;flex:1;padding:9px 10px}}
+
 </style>
 </head>
 <body>
@@ -557,6 +618,72 @@ function renderMnemonic(text) {
   return `<div class="sec sec-mn"><div class="sec-label">🧠 5초 암기</div><div class="mn-list">${html}</div></div>`;
 }
 
+
+function cleanLessonLabel(text) {
+  return (text || '').replace(/^[^0-9A-Za-z가-힣]+/g, '').trim() || '핵심 정보';
+}
+
+function applyLessonResultTheme(wrap, page) {
+  if (!wrap || !page || page.type !== 'learn') return;
+  const lessonTitle = (page.data?.title || document.getElementById('l-title')?.textContent || 'TOPCIT 레슨').trim();
+  const sections = Array.from(wrap.querySelectorAll('.sec'));
+  const existingHead = wrap.querySelector('.lesson-query-line');
+  if (!existingHead) {
+    const head = document.createElement('div');
+    head.className = 'lesson-query-line';
+    head.innerHTML = '검색 결과: <strong>' + escHtml(lessonTitle) + '</strong>';
+    const info = document.createElement('div');
+    info.className = 'lesson-result-info';
+    info.textContent = '약 ' + Math.max(sections.length, 1).toLocaleString('ko-KR') + '개 결과 (0.21초)';
+    const title = wrap.querySelector('.l-page-title');
+    if (title) title.insertAdjacentElement('afterend', info);
+    if (title) title.insertAdjacentElement('afterend', head);
+  }
+
+  const sites = [
+    {name:'티스토리', mark:'T', bg:'#fff', fg:'#eb5641', host:'tistory.com'},
+    {name:'Velog', mark:'V', bg:'#20c997', fg:'#fff', host:'velog.io'},
+    {name:'GitHub', mark:'GH', bg:'#24292e', fg:'#fff', host:'github.com'},
+    {name:'Reddit', mark:'r/', bg:'#ffeee6', fg:'#ff4500', host:'reddit.com'},
+    {name:'네이버 블로그', mark:'N', bg:'#03c75a', fg:'#fff', host:'blog.naver.com'},
+    {name:'MDN', mark:'M', bg:'#1e88e5', fg:'#fff', host:'developer.mozilla.org'}
+  ];
+  const pathParts = location.pathname.split('/').filter(Boolean).slice(-3, -1).join('/');
+  const lessonSlug = lessonTitle.toLowerCase()
+    .replace(/\s+/g, '-')
+    .replace(/[^0-9a-z가-힣_-]/gi, '')
+    .slice(0, 50) || 'lesson';
+
+  sections.forEach((sec, i) => {
+    sec.classList.add('lesson-result');
+    sec.removeAttribute('style');
+    const label = sec.querySelector(':scope > .sec-label');
+    const labelText = cleanLessonLabel(label?.textContent || '핵심 정보');
+    if (label) {
+      label.textContent = labelText;
+      label.removeAttribute('style');
+    }
+    if (!sec.querySelector(':scope > .g-site-row')) {
+      const site = sites[i % sites.length];
+      const sectionSlug = labelText.toLowerCase()
+        .replace(/\s+/g, '-')
+        .replace(/[^0-9a-z가-힣_-]/gi, '')
+        .slice(0, 50) || 'section-' + (i + 1);
+      const row = document.createElement('div');
+      row.className = 'g-site-row';
+      row.innerHTML = [
+        '<span class="g-favicon" style="background:' + site.bg + ';color:' + site.fg + '">' + site.mark + '</span>',
+        '<span class="g-site-meta">',
+        '  <span class="g-site-name">' + site.name + '</span>',
+        '  <span class="g-site-url">https://' + site.host + ' › topcit › ' + escHtml(pathParts) + ' › ' + escHtml(lessonSlug) + ' › ' + escHtml(sectionSlug) + '</span>',
+        '</span>',
+        '<span class="g-dots" aria-hidden="true">⋮</span>'
+      ].join('');
+      sec.insertBefore(row, sec.firstChild);
+    }
+  });
+}
+
 function buildPages(idx) {
   const lesson = LESSONS[idx];
   if (isLastInChapter(idx)) {
@@ -625,6 +752,7 @@ function renderPage() {
       </div>`;
   }
 
+  applyLessonResultTheme(wrap, page);
   body.appendChild(wrap);
 
   document.getElementById('l-page-ind').textContent = `${curPage + 1} / ${pages.length}`;
