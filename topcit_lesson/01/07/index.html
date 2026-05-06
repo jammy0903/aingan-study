@@ -1,45 +1,46 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <title>TOPCIT 01-07 재사용 & 자료구조</title>
 <style>
-:root{--font-sans:"Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",system-ui,sans-serif;--font-serif:"NanumMyeongjo","Nanum Myeongjo","Batang","Apple SD Gothic Neo",serif}
+:root{--font-sans:Roboto,'Noto Sans KR','Malgun Gothic',sans-serif;--font-serif:"NanumMyeongjo","Nanum Myeongjo","Batang","Apple SD Gothic Neo",serif}
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{overflow-x:hidden}
-body{font-family:var(--font-sans);background:#f7f8fb;color:#1f2937;min-height:100vh}
+body{font-family:var(--font-sans);background:#f1f3f4;color:#202124;min-height:100vh}
 
-.header{background:#2563eb;color:#fff;padding:.85rem 1.25rem;display:flex;align-items:center;gap:.75rem;position:sticky;top:0;z-index:20;box-shadow:0 2px 10px rgba(0,0,0,.15)}
+.header{background:#1a73e8;color:#fff;padding:.85rem 1.25rem;display:flex;align-items:center;gap:.75rem;position:sticky;top:0;z-index:20;box-shadow:0 2px 10px rgba(0,0,0,.15)}
 .header-back{color:#fff;text-decoration:none;font-size:1.2rem;opacity:.85}
 .header h1{font-size:1rem;font-weight:800;flex:1;font-family:var(--font-serif)}
 .header-cnt{font-size:.75rem;opacity:.8;white-space:nowrap}
 
 .search-wrap{padding:.7rem 1.25rem .3rem}
-.search{width:100%;padding:.6rem 1rem;border:2px solid #e2e8f0;border-radius:2rem;font-size:.88rem;outline:none;background:#fff;transition:border .2s}
-.search:focus{border-color:#2563eb}
+.search{width:100%;padding:.6rem 1rem;border:2px solid #dadce0;border-radius:2rem;font-size:.88rem;outline:none;background:#fff;transition:border .2s}
+.search:focus{border-color:#1a73e8}
 
 .tabs{display:flex;gap:.35rem;padding:.4rem 1.25rem .3rem;overflow-x:auto;scrollbar-width:none}
 .tabs::-webkit-scrollbar{display:none}
-.tab{flex-shrink:0;padding:.32rem .8rem;border-radius:2rem;border:1.5px solid #2563eb;background:#fff;color:#2563eb;font-size:.74rem;font-weight:700;cursor:pointer;white-space:nowrap;transition:all .15s;font-family:inherit}
-.tab.active,.tab:hover{background:#2563eb;color:#fff}
+.tab{flex-shrink:0;padding:.32rem .8rem;border-radius:2rem;border:1.5px solid #1a73e8;background:#fff;color:#1a73e8;font-size:.74rem;font-weight:700;cursor:pointer;white-space:nowrap;transition:all .15s;font-family:inherit}
+.tab.active,.tab:hover{background:#1a73e8;color:#fff}
 
 .prio-bar{display:flex;gap:.3rem;padding:.2rem 1.25rem .6rem;overflow-x:auto;scrollbar-width:none}
 .prio-bar::-webkit-scrollbar{display:none}
-.pchip{flex-shrink:0;padding:.28rem .7rem;border-radius:2rem;border:1.5px solid #e5e7eb;background:#fff;color:#475569;font-size:.72rem;font-weight:700;cursor:pointer;white-space:nowrap;transition:all .15s;font-family:inherit}
-.pchip:hover{border-color:var(--pc,#9ca3af);color:#111827}
-.pchip.active{background:var(--pc,#2563eb);border-color:var(--pc,#2563eb);color:#fff}
-.pchip[data-prio="all"].active{background:#2563eb;border-color:#2563eb;color:#fff}
+.pchip{flex-shrink:0;padding:.28rem .7rem;border-radius:2rem;border:1.5px solid #dadce0;background:#fff;color:#475569;font-size:.72rem;font-weight:700;cursor:pointer;white-space:nowrap;transition:all .15s;font-family:inherit}
+.pchip:hover{border-color:var(--pc,#80868b);color:#202124}
+.pchip.active{background:var(--pc,#1a73e8);border-color:var(--pc,#1a73e8);color:#fff}
+.pchip[data-prio="all"].active{background:#1a73e8;border-color:#1a73e8;color:#fff}
 
 .section-group{padding:.3rem 1.25rem .8rem}
 .section-group.hidden{display:none}
-.section-label{font-size:.72rem;font-weight:800;color:#1d4ed8;letter-spacing:.04em;padding:.4rem 0 .35rem;border-bottom:2px solid #2563eb33;margin-bottom:.55rem;font-family:var(--font-serif)}
+.section-label{font-size:.72rem;font-weight:800;color:#1557b0;letter-spacing:.04em;padding:.4rem 0 .35rem;border-bottom:2px solid #1a73e833;margin-bottom:.55rem;font-family:var(--font-serif)}
 .card-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:.55rem}
 @media(min-width:540px){.card-grid{grid-template-columns:repeat(3,1fr)}}
 @media(min-width:900px){.card-grid{grid-template-columns:repeat(4,1fr)}}
 @media(min-width:1200px){.card-grid{grid-template-columns:repeat(5,1fr)}}
-.card{background:#fff;border-radius:.7rem;padding:.85rem .8rem .65rem;cursor:pointer;border:1.5px solid #e5e7eb;transition:all .18s;box-shadow:0 1px 3px rgba(0,0,0,.04);position:relative;display:flex;flex-direction:column;gap:.35rem;min-height:9rem}
-.card:hover{border-color:#2563eb;box-shadow:0 4px 14px #2563eb33;transform:translateY(-2px)}
+.card{background:#fff;border-radius:.7rem;padding:.85rem .8rem .65rem;cursor:pointer;border:1.5px solid #dadce0;transition:all .18s;box-shadow:0 1px 3px rgba(0,0,0,.04);position:relative;display:flex;flex-direction:column;gap:.35rem;min-height:9rem}
+.card:hover{border-color:#1a73e8;box-shadow:0 4px 14px #1a73e833;transform:translateY(-2px)}
 .card-badges{position:absolute;top:.45rem;right:.5rem;display:flex;gap:.2rem;font-size:.64rem}
 .card-badges span{padding:.1rem .42rem;border-radius:.4rem;font-weight:700;line-height:1.4;white-space:nowrap}
 .b-prio-1{background:#fee2e2;color:#991b1b}
@@ -47,15 +48,15 @@ body{font-family:var(--font-sans);background:#f7f8fb;color:#1f2937;min-height:10
 .b-prio-3{background:#dcfce7;color:#166534}
 .b-prio-4{background:#f1f5f9;color:#475569}
 .b-mn{background:#ede9fe;color:#5b21b6}
-.card-title{font-size:.86rem;font-weight:700;color:#111827;line-height:1.35;padding-right:4.5rem;font-family:var(--font-serif)}
-.card-preview{font-size:.7rem;color:#6b7280;line-height:1.5;flex:1}
-.card-cta{font-size:.68rem;color:#2563eb;font-weight:700;text-align:right;margin-top:.25rem}
+.card-title{font-size:.86rem;font-weight:700;color:#202124;line-height:1.35;padding-right:4.5rem;font-family:var(--font-serif)}
+.card-preview{font-size:.7rem;color:#5f6368;line-height:1.5;flex:1}
+.card-cta{font-size:.68rem;color:#1a73e8;font-weight:700;text-align:right;margin-top:.25rem}
 .card.hidden-card{display:none!important}
 
 /* ───────── 레슨 모드 (풀스크린) ───────── */
-.lesson{display:none;position:fixed;inset:0;background:#f7f8fb;z-index:1000;flex-direction:column}
+.lesson{display:none;position:fixed;inset:0;background:#f1f3f4;z-index:100000;flex-direction:column}
 .lesson.show{display:flex}
-.l-head{background:#2563eb;color:#fff;padding:.7rem 1rem;display:flex;align-items:center;gap:.7rem;flex-shrink:0}
+.l-head{background:#1a73e8;color:#fff;padding:.7rem 1rem;display:flex;align-items:center;gap:.7rem;flex-shrink:0}
 .l-back{background:none;border:none;color:#fff;font-size:1.3rem;cursor:pointer;padding:0;line-height:1;opacity:.9}
 .l-title{flex:1;font-size:.92rem;font-weight:800;font-family:var(--font-serif);line-height:1.3;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .l-page-ind{font-size:.78rem;font-weight:700;background:rgba(0,0,0,.18);padding:.18rem .55rem;border-radius:1rem;flex-shrink:0}
@@ -65,7 +66,7 @@ body{font-family:var(--font-sans);background:#f7f8fb;color:#1f2937;min-height:10
 .l-page{width:100%;max-width:680px;animation:slideIn .25s ease}
 @keyframes slideIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
 
-.l-page-title{font-size:1.5rem;font-weight:800;color:#1d4ed8;margin-bottom:.5rem;font-family:var(--font-serif);line-height:1.3}
+.l-page-title{font-size:1.5rem;font-weight:800;color:#1557b0;margin-bottom:.5rem;font-family:var(--font-serif);line-height:1.3}
 .l-page-meta{display:flex;flex-wrap:wrap;gap:.35rem;margin-bottom:.85rem}
 .l-page-meta .chip{padding:.18rem .55rem;border-radius:1rem;font-size:.7rem;font-weight:700}
 .chip-prio-1{background:#fee2e2;color:#991b1b}
@@ -73,24 +74,24 @@ body{font-family:var(--font-sans);background:#f7f8fb;color:#1f2937;min-height:10
 .chip-prio-3{background:#dcfce7;color:#166534}
 .chip-prio-4{background:#f1f5f9;color:#475569}
 .l-page-kw{display:flex;flex-wrap:wrap;gap:.3rem;margin-bottom:1.2rem}
-.l-page-kw span{background:#2563eb22;color:#1d4ed8;border:1px solid #2563eb55;border-radius:1rem;padding:.18rem .65rem;font-size:.72rem;font-weight:700}
+.l-page-kw span{background:#1a73e822;color:#1557b0;border:1px solid #1a73e855;border-radius:1rem;padding:.18rem .65rem;font-size:.72rem;font-weight:700}
 
 .sec{border-radius:.7rem;padding:1rem 1.1rem;line-height:1.65;margin-bottom:.85rem}
-.sec-summary{background:#2563eb11;border-left:5px solid #2563eb;font-size:.95rem;color:#111827;font-weight:600}
+.sec-summary{background:#1a73e811;border-left:5px solid #1a73e8;font-size:.95rem;color:#202124;font-weight:600}
 .sec-bg{background:#fef7ec;border-left:5px solid #d97706}
 .sec-expl{background:#eef2ff;border-left:5px solid #4f46e5}
 .sec-why{background:#ecfdf5;border-left:5px solid #059669}
 .sec-term{background:#faf5ff;border-left:5px solid #7c3aed}
 .sec-link{background:#fff7ed;border-left:5px solid #c2410c}
-.sec-mn{background:linear-gradient(145deg,#fffef5 0%,#fff7d6 56%,#2563eb20 100%);color:#1f2937;font-weight:600;border:1.5px solid #2563eb33;border-left:5px solid #2563eb;box-shadow:0 10px 26px #2563eb14}
+.sec-mn{background:linear-gradient(145deg,#fffef5 0%,#fff7d6 56%,#1a73e820 100%);color:#202124;font-weight:600;border:1.5px solid #1a73e833;border-left:5px solid #1a73e8;box-shadow:0 10px 26px #1a73e814}
 .sec-trap{background:#fff1f2;border:1.5px solid #fda4af;border-left:5px solid #e11d48;color:#881337}
-.sec-src{background:#fff;border:1.5px solid #e5e7eb;border-left:5px solid #475569}
+.sec-src{background:#fff;border:1.5px solid #dadce0;border-left:5px solid #475569}
 .sec-types{background:#f0f9ff;border:1.5px solid #bae6fd;border-left:5px solid #0284c7}
 .sec-types .sec-label{color:#075985}
 .types-caption{font-size:.8rem;color:#334155;margin-bottom:.6rem;line-height:1.55}
 .types-list{display:flex;flex-direction:column;gap:.55rem;counter-reset:tc}
 .type-item{display:grid;grid-template-columns:2rem 1fr;gap:.55rem;align-items:start;background:#fff;border:1px solid #e0f2fe;border-radius:.7rem;padding:.7rem .78rem;counter-increment:tc;position:relative}
-.type-item::before{content:counter(tc);display:inline-flex;align-items:center;justify-content:center;width:1.7rem;height:1.7rem;border-radius:.5rem;background:#2563eb16;color:#1d4ed8;font-size:.8rem;font-weight:800;line-height:1}
+.type-item::before{content:counter(tc);display:inline-flex;align-items:center;justify-content:center;width:1.7rem;height:1.7rem;border-radius:.5rem;background:#1a73e816;color:#1557b0;font-size:.8rem;font-weight:800;line-height:1}
 .type-body{min-width:0}
 .type-head{display:flex;flex-wrap:wrap;gap:.35rem;align-items:center;margin-bottom:.2rem}
 .type-name{font-size:.92rem;font-weight:800;color:#0f172a;font-family:var(--font-serif)}
@@ -109,55 +110,56 @@ body{font-family:var(--font-sans);background:#f7f8fb;color:#1f2937;min-height:10
 .sec-why .sec-label{color:#065f46}
 .sec-term .sec-label{color:#5b21b6}
 .sec-link .sec-label{color:#9a3412}
-.sec-mn .sec-label{color:#1d4ed8}
+.sec-mn .sec-label{color:#1557b0}
 .sec-trap .sec-label{color:#9f1239}
-.sec-summary .sec-label{color:#2563eb}
+.sec-summary .sec-label{color:#1a73e8}
 .sec-src .sec-label{color:#334155}
 .sec p{font-size:.92rem;line-height:1.7}
 .sec-mn p{font-size:.98rem}
 .fact-list{display:flex;flex-direction:column;gap:.65rem}
 .fact-item{background:rgba(255,255,255,.85);border:1px solid rgba(0,0,0,.06);border-radius:.85rem;padding:.78rem .85rem}
-.fact-term{font-size:.86rem;font-weight:800;color:#111827;margin-bottom:.22rem}
-.fact-note{font-size:.9rem;line-height:1.72;color:#374151;word-break:keep-all}
-.fact-link-label{display:inline-flex;align-items:center;padding:.12rem .45rem;border-radius:999px;background:#2563eb14;color:#1d4ed8;font-size:.64rem;font-weight:800;letter-spacing:.04em;margin-bottom:.38rem}
+.fact-term{font-size:.86rem;font-weight:800;color:#202124;margin-bottom:.22rem}
+.fact-note{font-size:.9rem;line-height:1.72;color:#3c4043;word-break:keep-all}
+.fact-link-label{display:inline-flex;align-items:center;padding:.12rem .45rem;border-radius:999px;background:#1a73e814;color:#1557b0;font-size:.64rem;font-weight:800;letter-spacing:.04em;margin-bottom:.38rem}
 .src-list{display:flex;flex-direction:column;gap:.5rem}
-.src-link{display:flex;align-items:flex-start;gap:.45rem;text-decoration:none;color:#111827;background:#f9fafb;border:1px solid #e5e7eb;border-radius:.8rem;padding:.72rem .82rem;transition:border-color .15s,transform .15s}
-.src-link:hover{border-color:#2563eb;transform:translateY(-1px)}
-.src-bullet{flex-shrink:0;color:#2563eb;font-weight:800}
+.src-link{display:flex;align-items:flex-start;gap:.45rem;text-decoration:none;color:#202124;background:#f8f9fa;border:1px solid #dadce0;border-radius:.8rem;padding:.72rem .82rem;transition:border-color .15s,transform .15s}
+.src-link:hover{border-color:#1a73e8;transform:translateY(-1px)}
+.src-bullet{flex-shrink:0;color:#1a73e8;font-weight:800}
 .src-text{font-size:.85rem;line-height:1.55}
-.src-host{display:block;font-size:.72rem;color:#6b7280;margin-top:.1rem}
+.src-host{display:block;font-size:.72rem;color:#5f6368;margin-top:.1rem}
 .mn-list{display:flex;flex-direction:column;gap:.55rem}
-.mn-line{display:flex;align-items:flex-start;gap:.72rem;background:rgba(255,255,255,.82);border:1px solid #2563eb22;border-radius:.9rem;padding:.72rem .8rem .68rem;box-shadow:0 4px 12px rgba(0,0,0,.04)}
-.mn-picto{flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;width:1.6rem;height:1.6rem;border-radius:.45rem;background:#2563eb16;border:1px solid #2563eb26;font-size:.76rem;font-weight:800;line-height:1;color:#1d4ed8}
+.mn-line{display:flex;align-items:flex-start;gap:.72rem;background:rgba(255,255,255,.82);border:1px solid #1a73e822;border-radius:.9rem;padding:.72rem .8rem .68rem;box-shadow:0 4px 12px rgba(0,0,0,.04)}
+.mn-picto{flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;width:1.6rem;height:1.6rem;border-radius:.45rem;background:#1a73e816;border:1px solid #1a73e826;font-size:.76rem;font-weight:800;line-height:1;color:#1557b0}
 .mn-main{display:flex;flex-direction:column;gap:.28rem;min-width:0}
-.mn-tag{display:inline-flex;align-items:center;width:fit-content;padding:.12rem .45rem;border-radius:999px;background:#2563eb18;color:#1d4ed8;font-size:.64rem;font-weight:800;letter-spacing:.05em}
-.mn-text{font-size:.95rem;line-height:1.76;color:#1f2937;word-break:keep-all}
-.mn-text strong{color:#2563eb;font-weight:800}
+.mn-tag{display:inline-flex;align-items:center;width:fit-content;padding:.12rem .45rem;border-radius:999px;background:#1a73e818;color:#1557b0;font-size:.64rem;font-weight:800;letter-spacing:.05em}
+.mn-text{font-size:.95rem;line-height:1.76;color:#202124;word-break:keep-all}
+.mn-text strong{color:#1a73e8;font-weight:800}
 
 .ctable{width:100%;border-collapse:collapse;font-size:.82rem;background:#fff;border-radius:.5rem;overflow:hidden;margin-top:.4rem}
-.ctable th{background:#2563eb;color:#fff;padding:.55rem .65rem;text-align:left;font-weight:700;font-size:.78rem}
-.ctable td{padding:.55rem .65rem;border-top:1px solid #e5e7eb;vertical-align:top;line-height:1.55}
-.ctable tr:nth-child(even) td{background:#f9fafb}
+.ctable th{background:#1a73e8;color:#fff;padding:.55rem .65rem;text-align:left;font-weight:700;font-size:.78rem}
+.ctable td{padding:.55rem .65rem;border-top:1px solid #dadce0;vertical-align:top;line-height:1.55}
+.ctable tr:nth-child(even) td{background:#f8f9fa}
 
 .done-page{text-align:center;padding:2.5rem 1rem}
 .done-emoji{font-size:4.5rem;margin-bottom:1rem;animation:pop .4s ease}
 @keyframes pop{from{transform:scale(0)}80%{transform:scale(1.2)}to{transform:scale(1)}}
-.done-title{font-size:1.5rem;font-weight:800;color:#1d4ed8;margin-bottom:.5rem;font-family:var(--font-serif)}
-.done-sub{font-size:.95rem;color:#6b7280;margin-bottom:2rem}
+.done-title{font-size:1.5rem;font-weight:800;color:#1557b0;margin-bottom:.5rem;font-family:var(--font-serif)}
+.done-sub{font-size:.95rem;color:#5f6368;margin-bottom:2rem}
 .done-actions{display:flex;flex-direction:column;gap:.6rem;max-width:300px;margin:0 auto}
 .done-btn{padding:.85rem 1.4rem;border-radius:.7rem;font-size:.95rem;font-weight:700;cursor:pointer;border:none;font-family:inherit;transition:all .15s}
-.done-btn-primary{background:#2563eb;color:#fff}
-.done-btn-primary:hover{transform:translateY(-2px);box-shadow:0 4px 14px #2563eb55}
-.done-btn-sub{background:#fff;color:#2563eb;border:1.5px solid #2563eb}
-.done-btn-sub:hover{background:#2563eb11}
+.done-btn-primary{background:#1a73e8;color:#fff}
+.done-btn-primary:hover{transform:translateY(-2px);box-shadow:0 4px 14px #1a73e855}
+.done-btn-sub{background:#fff;color:#1a73e8;border:1.5px solid #1a73e8}
+.done-btn-sub:hover{background:#1a73e811}
 
-.l-foot{position:fixed;bottom:0;left:0;right:0;background:#fff;padding:.7rem 1rem;display:flex;gap:.5rem;border-top:1px solid #e5e7eb;z-index:1010}
-.l-nav-btn{flex:1;padding:.7rem;border-radius:.55rem;border:1.5px solid #2563eb;background:#fff;color:#2563eb;font-size:.88rem;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s}
-.l-nav-btn:hover:not(:disabled){background:#2563eb11}
+.l-foot{position:fixed;bottom:0;left:0;right:0;background:#fff;padding:.7rem 1rem;display:flex;gap:.5rem;border-top:1px solid #dadce0;z-index:1010}
+.l-nav-btn{flex:1;padding:.7rem;border-radius:.55rem;border:1.5px solid #1a73e8;background:#fff;color:#1a73e8;font-size:.88rem;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s}
+.l-nav-btn:hover:not(:disabled){background:#1a73e811}
 .l-nav-btn:disabled{opacity:.35;cursor:not-allowed}
-.l-nav-btn.primary{background:#2563eb;color:#fff;border-color:#2563eb}
-.l-nav-btn.primary:hover:not(:disabled){background:#1d4ed8;border-color:#1d4ed8}
+.l-nav-btn.primary{background:#1a73e8;color:#fff;border-color:#1a73e8}
+.l-nav-btn.primary:hover:not(:disabled){background:#1557b0;border-color:#1557b0}
 </style>
+<script src="../../../chrome-frame.js"></script>
 </head>
 <body>
 
@@ -173,7 +175,7 @@ body{font-family:var(--font-sans);background:#f7f8fb;color:#1f2937;min-height:10
 </div>
 
 <div class="tabs" id="tab-bar"><button class="tab active" onclick="filterTab(this,'all')">전체</button><button class="tab" onclick="filterTab(this,'0')">소프트웨어 재사용</button><button class="tab" onclick="filterTab(this,'1')">자료구조(Data Structure)</button></div>
-<div class="prio-bar"><button class="pchip active" data-prio="all" onclick="filterPrio(this)">전체</button><button class="pchip" data-prio="1" onclick="filterPrio(this)" style="--pc:#dc2626">🔴 P1 최우선</button><button class="pchip" data-prio="2" onclick="filterPrio(this)" style="--pc:#d97706">🟡 P2 중요</button><button class="pchip" data-prio="3" onclick="filterPrio(this)" style="--pc:#16a34a">🟢 P3 보통</button><button class="pchip" data-prio="4" onclick="filterPrio(this)" style="--pc:#9ca3af">⚪ P4 보조</button></div>
+<div class="prio-bar"><button class="pchip active" data-prio="all" onclick="filterPrio(this)">전체</button><button class="pchip" data-prio="1" onclick="filterPrio(this)" style="--pc:#dc2626">🔴 P1 최우선</button><button class="pchip" data-prio="2" onclick="filterPrio(this)" style="--pc:#d97706">🟡 P2 중요</button><button class="pchip" data-prio="3" onclick="filterPrio(this)" style="--pc:#16a34a">🟢 P3 보통</button><button class="pchip" data-prio="4" onclick="filterPrio(this)" style="--pc:#80868b">⚪ P4 보조</button></div>
 
 <div id="card-content"><div class="section-group" data-chapter="0"><div class="section-label">소프트웨어 재사용</div><div class="card-grid"><div class="card" data-prio="3" onclick="startLesson(0)"><div class="card-badges"><span class="b-prio b-prio-3" title="보통">🟢 P3</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">소프트웨어 재사용(Reuse) 개요</div><div class="card-preview">옛날에 개발자들이 비슷한 기능을 만들 때마다 매번 처음부터 다시 코드를 짜야 해서 시간이랑…</div><div class="card-cta">레슨 시작 →</div></div><div class="card" data-prio="3" onclick="startLesson(1)"><div class="card-badges"><span class="b-prio b-prio-3" title="보통">🟢 P3</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">소프트웨어 재사용의 대상</div><div class="card-preview">옛날에는 프로그램 만들 때마다 처음부터 다 새로 짰는데, 그러다 보니 시간도 엄청 걸리고 …</div><div class="card-cta">레슨 시작 →</div></div><div class="card" data-prio="3" onclick="startLesson(2)"><div class="card-badges"><span class="b-prio b-prio-3" title="보통">🟢 P3</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">소프트웨어 재사용의 원칙</div><div class="card-preview">옛날에는 프로그램을 만들 때마다 같은 기능을 처음부터 새로 만들었어. 그러다 보니 시간도 …</div><div class="card-cta">레슨 시작 →</div></div><div class="card" data-prio="4" onclick="startLesson(3)"><div class="card-badges"><span class="b-prio b-prio-4" title="보조">⚪ P4</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">실무에서 재사용 구현의 문제점</div><div class="card-preview">옛날에 개발자들이 &#x27;이미 만든 코드 또 쓰면 되지!&#x27;라고 생각했는데, 막상 현장에서 가져다…</div><div class="card-cta">레슨 시작 →</div></div><div class="card" data-prio="4" onclick="startLesson(4)"><div class="card-badges"><span class="b-prio b-prio-4" title="보조">⚪ P4</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">소프트웨어 재사용의 효과</div><div class="card-preview">옛날에 개발자들이 프로그램을 만들 때마다 처음부터 모든 코드를 새로 짜야 했는데, 이게 너…</div><div class="card-cta">레슨 시작 →</div></div><div class="card" data-prio="3" onclick="startLesson(5)"><div class="card-badges"><span class="b-prio b-prio-3" title="보통">🟢 P3</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">역공학의 장점</div><div class="card-preview">옛날에 만들어진 프로그램들은 설계 문서가 없거나 잃어버린 경우가 많았어. 그래서 이미 완성…</div><div class="card-cta">레슨 시작 →</div></div></div></div><div class="section-group" data-chapter="1"><div class="section-label">자료구조(Data Structure)</div><div class="card-grid"><div class="card" data-prio="2" onclick="startLesson(6)"><div class="card-badges"><span class="b-prio b-prio-2" title="중요">🟡 P2</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">자료구조의 종류</div><div class="card-preview">컴퓨터가 데이터를 효율적으로 저장·처리하려면 용도에 맞는 자료구조를 선택해야 한다. 자료구…</div><div class="card-cta">레슨 시작 →</div></div><div class="card" data-prio="3" onclick="startLesson(7)"><div class="card-badges"><span class="b-prio b-prio-3" title="보통">🟢 P3</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">정의</div><div class="card-preview">컴퓨터가 엄청난 양의 데이터를 다루게 되면서, 그냥 막 쌓아두면 나중에 찾거나 쓸 때 너무…</div><div class="card-cta">레슨 시작 →</div></div><div class="card" data-prio="2" onclick="startLesson(8)"><div class="card-badges"><span class="b-prio b-prio-2" title="중요">🟡 P2</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">스택과 큐</div><div class="card-preview">옛날에 프로그램이 데이터를 저장하고 꺼낼 때 순서를 어떻게 관리할지 고민이 많았어. 그래서…</div><div class="card-cta">레슨 시작 →</div></div><div class="card" data-prio="2" onclick="startLesson(9)"><div class="card-badges"><span class="b-prio b-prio-2" title="중요">🟡 P2</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">트리와 그래프</div><div class="card-preview">컴퓨터가 데이터를 저장할 때 단순히 줄 세우는 것만으로는 &#x27;부모-자식 관계&#x27;나 &#x27;친구 관계…</div><div class="card-cta">레슨 시작 →</div></div><div class="card" data-prio="3" onclick="startLesson(10)"><div class="card-badges"><span class="b-prio b-prio-3" title="보통">🟢 P3</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">자료구조의 선택 기준</div><div class="card-preview">옛날에 개발자들이 데이터를 막 아무렇게나 저장했더니 찾는 데 너무 오래 걸리고 메모리도 낭…</div><div class="card-cta">레슨 시작 →</div></div><div class="card" data-prio="3" onclick="startLesson(11)"><div class="card-badges"><span class="b-prio b-prio-3" title="보통">🟢 P3</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">알고리즘 개요</div><div class="card-preview">옛날에 복잡한 수학 문제나 반복 작업을 사람마다 제각각 다른 방식으로 풀다 보니 결과가 달…</div><div class="card-cta">레슨 시작 →</div></div><div class="card" data-prio="3" onclick="startLesson(12)"><div class="card-badges"><span class="b-prio b-prio-3" title="보통">🟢 P3</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">알고리즘 분석 기준</div><div class="card-preview">옛날에 프로그래머들이 코드를 짜고 나서 &#x27;이 코드가 과연 좋은 코드인가?&#x27;를 판단할 기준이…</div><div class="card-cta">레슨 시작 →</div></div><div class="card" data-prio="3" onclick="startLesson(13)"><div class="card-badges"><span class="b-prio b-prio-3" title="보통">🟢 P3</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">검색 알고리즘</div><div class="card-preview">옛날에 컴퓨터에 데이터가 많아지면서 &#x27;내가 원하는 정보를 어떻게 빠르게 찾지?&#x27;라는 문제가…</div><div class="card-cta">레슨 시작 →</div></div><div class="card" data-prio="3" onclick="startLesson(14)"><div class="card-badges"><span class="b-prio b-prio-3" title="보통">🟢 P3</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">그래프 탐색 알고리즘</div><div class="card-preview">옛날에 지도나 회로도처럼 복잡하게 연결된 것들을 컴퓨터로 탐색해야 할 일이 많아졌어. 그런…</div><div class="card-cta">레슨 시작 →</div></div><div class="card" data-prio="3" onclick="startLesson(15)"><div class="card-badges"><span class="b-prio b-prio-3" title="보통">🟢 P3</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">최소 신장 트리</div><div class="card-preview">옛날에 여러 도시를 전선이나 도로로 연결할 때, 모든 곳을 이으면서도 공사 비용을 최대한 …</div><div class="card-cta">레슨 시작 →</div></div></div></div></div>
 
@@ -193,13 +195,28 @@ body{font-family:var(--font-sans);background:#f7f8fb;color:#1f2937;min-height:10
 </div>
 
 <script>
-const LESSONS = [{"title": "소프트웨어 재사용(Reuse) 개요", "keywords": ["관리자와", "프로토타입[7005068)", "재사용을", "기본설계(3/96607", "변경으로", "생산성의", "지속적인", "소프트웨어", "상용화되거나", "현존하는", "시스템", "파일"], "summary": "", "background": "옛날에 개발자들이 비슷한 기능을 만들 때마다 매번 처음부터 다시 코드를 짜야 해서 시간이랑 돈이 엄청 낭비됐어. 그래서 '이미 잘 만들어놓은 코드, 그냥 다시 쓰면 안 되나?' 라는 생각에서 재사용 개념이 나왔어.", "explanation": "레고 블록 생각해봐! 집 만들 때 쓴 블록을 나중에 자동차 만들 때도 또 쓸 수 있잖아. 소프트웨어 재사용도 똑같아 — 이미 잘 만들어서 검증된 코드 블록을 새 프로그램 만들 때 그대로 가져다 쓰는 거야. 이러면 처음부터 만드는 것보다 훨씬 빠르고, 이미 검증된 거라 오류도 적어!", "why": "", "term_focus": [], "connections": [], "types": null, "mnemonic": "재사용의 3대 목표 → '신확생' 🔁 (신뢰성 - 이미 검증됨 / 확장성 - 검증된 기능으로 늘리기 쉬움 / 생산성 - 비용·시간 절약)", "trap": "", "table": [], "sources": [], "priority": 3}, {"title": "소프트웨어 재사용의 대상", "keywords": ["관리자와", "프로토타입[7005068)", "재사용을", "기본설계(3/96607", "변경으로", "생산성의", "지속적인", "소프트웨어", "상용화되거나", "현존하는", "시스템", "파일"], "summary": "", "background": "옛날에는 프로그램 만들 때마다 처음부터 다 새로 짰는데, 그러다 보니 시간도 엄청 걸리고 비용도 낭비됐어. 그래서 '이미 잘 만들어진 걸 다시 쓰면 어떨까?' 하는 생각에서 재사용 개념이 생겼어.", "explanation": "소프트웨어 재사용이란 레고 블록처럼 이미 만들어진 부품을 다시 활용하는 거야. 재사용할 수 있는 대상은 크게 세 가지인데, 설계 정보(어떻게 만들지 계획한 것), 프로그램 코드(실제로 짠 코딩), 그리고 기타(사용 설명서나 조사 결과 같은 문서들)야. 즉, 코드뿐만 아니라 계획서, 설명서까지 전부 재사용 대상이 될 수 있어!", "why": "", "term_focus": [], "connections": [], "types": null, "mnemonic": "재사용 대상 = '설·코·기' 👉 설계정보, 코드, 기타문서 — '설코기 먹듯 재사용한다!' 🍖", "trap": "", "table": [], "sources": [], "priority": 3}, {"title": "소프트웨어 재사용의 원칙", "keywords": ["관리자와", "프로토타입[7005068)", "재사용을", "기본설계(3/96607", "변경으로", "생산성의", "지속적인", "소프트웨어", "상용화되거나", "현존하는", "시스템", "파일"], "summary": "", "background": "옛날에는 프로그램을 만들 때마다 같은 기능을 처음부터 새로 만들었어. 그러다 보니 시간도 엄청 걸리고 오류도 계속 생기니까, '한번 잘 만든 코드는 다시 쓸 수 있게 하자!'는 원칙이 생겼어.", "explanation": "레고 블록을 생각해봐! 블록 하나하나가 어떤 세트에서도 끼워 맞출 수 있고, 설명서도 잘 붙어 있고, 튼튼하잖아. 소프트웨어 재사용도 똑같이, 만든 코드 조각이 어떤 컴퓨터나 프로그램에서도 잘 붙고(하드웨어·소프트웨어 독립), 기능 설명이 친절하게 적혀 있고(자기문서화), 많은 사람들이 믿고 쓸 수 있어야(신뢰성) 진짜 재사용 가능한 코드야.", "why": "", "term_focus": [], "connections": [], "types": null, "mnemonic": "🔑 '일모하소자일신' → 일반성, 모듈성, 하드웨어독립성, 소프트웨어독립성, 자기문서화, 일반성(공통성), 신뢰성! '일모하소자일신' = '일하소자, 일신(날마다 새롭게)' 처럼 외워봐!", "trap": "", "table": [], "sources": [], "priority": 3}, {"title": "실무에서 재사용 구현의 문제점", "keywords": ["관리자와", "프로토타입[7005068)", "재사용을", "기본설계(3/96607", "변경으로", "생산성의", "지속적인", "소프트웨어", "상용화되거나", "현존하는", "시스템", "파일"], "summary": "", "background": "옛날에 개발자들이 '이미 만든 코드 또 쓰면 되지!'라고 생각했는데, 막상 현장에서 가져다 쓰려니 서로 맞지 않거나 찾기도 어렵고 믿을 수 없는 코드들이 넘쳐났어. 그래서 그냥 재사용하면 된다는 생각 자체는 맞는데, 현실에서 잘 안 되는 이유들을 정리하고 해결책을 마련할 필요가 생겼어.", "explanation": "레고 부품을 재활용한다고 생각해봐. 근데 부품이 어디 있는지 목록도 없고, 크기가 제각각이고, 어느 세트 거랑 호환되는지도 모른다면 그냥 새로 만드는 게 낫겠지? 소프트웨어도 똑같아서 재사용하려면 '잘 정리된 부품 창고(라이브러리)', '맞는 크기 규격(Granularity)', '자동으로 찾아주는 도구'가 필요해. 결국 기술만이 아니라 조직 문화랑 경영진 지원까지 다 갖춰져야 진짜 재사용이 가능해.", "why": "", "term_focus": [], "connections": [], "types": null, "mnemonic": "장애요인 해결책은 '새라자능조' — 새로운 방법론, 라이브러리 구축, 자동화 도구, 능동적 경영, 조직 변화! '새 라면 자동으로 능숙한 조리사가 끓여준다'고 외워봐!", "trap": "", "table": [], "sources": [], "priority": 4}, {"title": "소프트웨어 재사용의 효과", "keywords": ["관리자와", "프로토타입[7005068)", "재사용을", "기본설계(3/96607", "변경으로", "생산성의", "지속적인", "소프트웨어", "상용화되거나", "현존하는", "시스템", "파일"], "summary": "", "background": "옛날에 개발자들이 프로그램을 만들 때마다 처음부터 모든 코드를 새로 짜야 했는데, 이게 너무 시간도 오래 걸리고 돈도 많이 들었어. 그래서 '이미 잘 만들어진 코드를 다시 활용하면 어떨까?' 하는 생각에서 소프트웨어 재사용 개념이 생겨났어.", "explanation": "레고 블록을 생각해봐! 집을 만들 때 쓴 레고 블록을 분해해서 자동차 만들 때 또 쓸 수 있잖아. 소프트웨어 재사용도 똑같아 — 예전에 만든 로그인 기능, 결제 기능 같은 코드 조각들을 새 프로그램에 가져다 쓰는 거야. 이렇게 하면 개발 시간이 줄고, 이미 검증된 코드를 쓰니까 오류도 적어지고, 비용도 절약되는 효과가 있어!", "why": "", "term_focus": [], "connections": [], "types": null, "mnemonic": "재사용 효과 = '시오비' 3총사! 🎯 **시**간 단축 + **오**류 감소 + **비**용 절약 — '시오비, 시오비!' 하고 외쳐봐!", "trap": "", "table": [], "sources": [], "priority": 4}, {"title": "역공학의 장점", "keywords": ["관리자와", "프로토타입[7005068)", "재사용을", "기본설계(3/96607", "변경으로", "생산성의", "지속적인", "소프트웨어", "상용화되거나", "현존하는", "시스템", "파일"], "summary": "", "background": "옛날에 만들어진 프로그램들은 설계 문서가 없거나 잃어버린 경우가 많았어. 그래서 이미 완성된 프로그램을 뜯어보면서 '이게 어떻게 만들어진 거지?'를 역으로 파악하는 방법이 필요해졌어.", "explanation": "역공학은 완성된 레고 작품을 보고 '어떤 블록을 어떻게 조립했는지' 설명서를 새로 만드는 것과 같아. 기존 프로그램 코드를 분석해서 설계도를 다시 뽑아내고, 그걸 창고(Repository)에 잘 보관해두면 나중에 수정하거나 업그레이드할 때 훨씬 편해져. 특히 오래된 데이터베이스를 새 시스템으로 옮길 때도 이 방법으로 구조를 파악해서 안전하게 이전할 수 있어.", "why": "", "term_focus": [], "connections": [], "types": null, "mnemonic": "역공학 = '완성품 → 설명서' / 레고 완성작 보고 조립 설명서 역으로 만들기! '역(逆)으로 공(工)부해서 학(學)습한다' — 거꾸로 분석해서 설계도 복원!", "trap": "", "table": [], "sources": [], "priority": 3}, {"title": "자료구조의 종류", "keywords": ["자료구조", "선형", "비선형", "스택", "큐", "트리", "그래프"], "summary": "", "background": "컴퓨터가 데이터를 효율적으로 저장·처리하려면 용도에 맞는 자료구조를 선택해야 한다. 자료구조는 데이터 요소들의 배열 방식에 따라 선형/비선형으로 크게 나뉜다.", "explanation": "자료구조는 데이터가 순서대로 나열되는 선형 자료구조(배열/리스트/스택/큐/데크)와 계층·네트워크 형태로 확장되는 비선형 자료구조(트리/그래프)로 분류된다. 각 구조별 상세 학습은 이 section의 개별 카드를 참고.", "why": "", "term_focus": [], "connections": [], "types": {"caption": "자료구조는 데이터 배열 방식에 따라 선형과 비선형 2가지로 대분류된다. 각 sub-type의 상세는 개별 카드 참고.", "items": [{"name": "배열/리스트", "en": "Array / List (선형)", "note": "선형 자료구조. 데이터를 일렬로 나열. 배열은 고정 크기·인덱스 기반 O(1) 접근, 리스트는 가변 크기·포인터 연결. DBMS 인덱스, 탐색·정렬 문제에 활용."}, {"name": "스택", "en": "Stack (선형, LIFO)", "note": "선형 자료구조. 후입선출(LIFO). 인터럽트 처리, 재귀 프로그램의 순서 제어, 서브루틴의 복귀 번지 저장, 후위 표기법 연산, 텍스트 에디터 Undo 기능 등에 활용."}, {"name": "큐", "en": "Queue (선형, FIFO)", "note": "선형 자료구조. 선입선출(FIFO). 운영체제의 작업 스케줄링, 대기 행렬 처리, 비동기 데이터 교환(파일I/O, Pipes, Sockets), 키보드 버퍼, 스풀 운용에 활용."}, {"name": "데크", "en": "Deque (선형)", "note": "선형 자료구조. 양쪽 끝에서 삽입·삭제가 가능한 '양방향 큐'. 스택과 큐의 장점을 모두 활용하여 스택/큐 관련 분야에서 쓰인다."}, {"name": "트리", "en": "Tree (비선형)", "note": "비선형 자료구조. 계층적 구조로 부모-자식 노드 관계. 탐색이나 정렬과 같은 문제, 문법의 파싱, 허프만 코드, 결정 트리, 게임 등에 활용."}, {"name": "그래프", "en": "Graph (비선형)", "note": "비선형 자료구조. 노드들이 에지로 자유롭게 연결. 컴퓨터 네트워크(근거리 통신망·인터넷·웹 등), 전기회로 분석, 이항 관계, 연립 방정식 등에 활용."}]}, "mnemonic": "【분류】선형 = 일렬(스택·큐·배열) / 비선형 = 가지(트리·그래프).", "trap": "", "table": [], "sources": [{"title": "TOPCIT ESSENCE ver.3 — 소프트웨어 개발", "note": "정보통신산업진흥원(NIPA) 공식 교재"}], "priority": 2}, {"title": "정의", "keywords": ["컴파일시간:", "프로그램", "외부정렬:"], "summary": "", "background": "컴퓨터가 엄청난 양의 데이터를 다루게 되면서, 그냥 막 쌓아두면 나중에 찾거나 쓸 때 너무 느리고 힘들었어. 그래서 데이터를 용도에 맞게 잘 정리해서 저장하는 방법이 필요해졌고, 그게 바로 자료구조야!", "explanation": "자료구조는 컴퓨터가 데이터를 저장하는 '정리 방식'이야. 예를 들어 책을 그냥 방바닥에 던져두면 찾기 힘들지만, 책장에 종류별로 꽂아두면 쉽게 찾잖아? 자료구조도 똑같이 데이터를 줄 세우거나(선형구조), 나무처럼 가지를 뻗거나(비선형구조) 하는 방식으로 체계적으로 정리하는 거야.", "why": "", "term_focus": [], "connections": [], "types": null, "mnemonic": "자료구조 = '선(선형) 비(비선형)' → '선배한테 잘 보여라!' 선형은 일렬로 줄 선 것, 비선형은 삐뚤빼뚤 나무처럼 퍼진 것!", "trap": "", "table": [], "sources": [], "priority": 3}, {"title": "스택과 큐", "keywords": ["컴파일시간:", "프로그램", "외부정렬:"], "summary": "", "background": "옛날에 프로그램이 데이터를 저장하고 꺼낼 때 순서를 어떻게 관리할지 고민이 많았어. 그래서 '어떤 순서로 넣고 꺼낼 것인가'에 따라 스택과 큐라는 두 가지 방식을 만들게 됐어.", "explanation": "스택은 접시 쌓기야 — 밑에서부터 쌓고 꺼낼 땐 맨 위부터 꺼내지(나중에 넣은 게 먼저 나와, LIFO). 큐는 편의점 계산대 줄 서기야 — 먼저 줄 선 사람이 먼저 계산하고 나가지(먼저 넣은 게 먼저 나와, FIFO). 즉, 스택은 '뒤로가기 버튼'처럼 가장 최근 것을 되돌릴 때 쓰고, 큐는 '순서대로 처리'할 때 써.", "why": "", "term_focus": [], "connections": [], "types": null, "mnemonic": "스택 = 접시 스택(Stack) → 'S'는 쌓는다! 나중에 올린 접시 먼저 뺀다 (LIFO: Last In First Out) / 큐 = Queue(줄) → 편의점 줄처럼 먼저 온 사람이 먼저 나간다 (FIFO: First In First Out) ✨ 기억법: '스택=접시, 큐=줄서기'", "trap": "", "table": [], "sources": [], "priority": 2}, {"title": "트리와 그래프", "keywords": ["컴파일시간:", "프로그램", "외부정렬:"], "summary": "", "background": "컴퓨터가 데이터를 저장할 때 단순히 줄 세우는 것만으로는 '부모-자식 관계'나 '친구 관계'처럼 복잡한 연결을 표현하기 어려웠어. 그래서 계층 관계는 트리로, 복잡한 다대다 관계는 그래프로 표현하는 방법이 생겨났어.", "explanation": "트리는 회사 조직도처럼 사장 밑에 부장, 부장 밑에 과장이 있는 '위아래 계층 구조'야. 반면 그래프는 카카오톡 친구 목록처럼 나와 친구, 친구와 친구가 서로 얽혀 있는 '거미줄 구조'인데, 지하철 노선도나 내비게이션 최단경로 찾기가 딱 그래프를 이용한 거야.", "why": "", "term_focus": [], "connections": [], "types": null, "mnemonic": "트리는 '족보(위→아래)', 그래프는 '친구관계(나↔너↔걔)' — 족보는 위에서 아래로만 내려가지만, 친구는 서로서로 연결되잖아!", "trap": "", "table": [], "sources": [], "priority": 2}, {"title": "자료구조의 선택 기준", "keywords": ["컴파일시간:", "프로그램", "외부정렬:"], "summary": "", "background": "옛날에 개발자들이 데이터를 막 아무렇게나 저장했더니 찾는 데 너무 오래 걸리고 메모리도 낭비되는 문제가 생겼어. 그래서 '어떤 상황에 어떤 방식으로 데이터를 담을지' 기준을 딱 정하게 된 거야.", "explanation": "자료구조 선택은 마치 물건을 어디에 보관할지 고르는 것과 같아. 옷은 서랍에, 책은 책장에, 신발은 신발장에 넣듯이 — 빠르게 꺼내야 하면 배열, 줄 서서 차례로 처리해야 하면 큐, 뒤로 돌아가야 하면 스택, 연결 관계를 표현해야 하면 그래프를 쓰는 거야. 처리 속도, 데이터 크기, 활용 목적 이 3가지를 따져서 딱 맞는 자료구조를 골라야 해.", "why": "", "term_focus": [], "connections": [], "types": {"caption": "자료구조를 선택할 때 고려하는 기본 기준. 원본 교재 '마) 자료구조의 선택 기준'의 나열.", "items": [{"name": "자료의 처리 시간", "note": "연산(삽입·삭제·탐색 등)을 수행하는 데 걸리는 시간. 자료구조별로 시간 복잡도가 다르므로 처리 빈도가 높은 연산에 유리한 구조를 선택해야 한다."}, {"name": "자료의 크기", "note": "저장할 자료의 양. 크기에 따라 배열·연결리스트·트리·해시 등 메모리 효율이 적합한 구조를 선택한다."}, {"name": "자료의 활용 빈도", "note": "자료에 대한 접근·변경·검색 빈도. 활용 패턴에 맞는 자료구조(예: 정렬·검색·인덱스에 맞는 구조)를 선택한다."}]}, "mnemonic": "🧠 '리스배큐데그' 로 외워! → 리스트(DB인덱스), 스택(뒤로가기/Undo), 배열(정렬탐색), 큐(줄서기/프린터), 데크(스택+큐 합체), 그래프(네트워크지도) — 순서대로 '리스배큐데그~' 한 번만 읊으면 끝!", "trap": "", "table": [], "sources": [{"title": "TOPCIT ESSENCE ver.3 — 소프트웨어 개발", "note": "정보통신산업진흥원(NIPA) 공식 교재"}], "priority": 3}, {"title": "알고리즘 개요", "keywords": ["컴파일시간:", "프로그램", "외부정렬:"], "summary": "", "background": "옛날에 복잡한 수학 문제나 반복 작업을 사람마다 제각각 다른 방식으로 풀다 보니 결과가 달라지고 효율도 엉망이었어. 그래서 '누가 해도 같은 결과가 나오는 명확한 풀이 순서'를 정리할 필요가 생겼어!", "explanation": "알고리즘은 요리 레시피랑 똑같아. 재료(입력)를 넣고, 순서대로 조리 단계를 따라가면(처리), 완성된 요리(출력)가 나오는 거야. 단, 좋은 레시피는 '적당히'가 아니라 '3분 볶는다'처럼 누가 봐도 명확하고, 끝없이 반복되지 않고 반드시 완성 단계에서 끝나야 해.", "why": "", "term_focus": [], "connections": [], "types": null, "mnemonic": "알고리즘 5조건 → '입출명유효' 로 외워! (입력 - 출력 - 명확성 - 유한성 - 효과성) '입출명유효' = '입 출이는 명품 유한한 효자다' 🍱", "trap": "", "table": [], "sources": [], "priority": 3}, {"title": "알고리즘 분석 기준", "keywords": ["컴파일시간:", "프로그램", "외부정렬:"], "summary": "", "background": "옛날에 프로그래머들이 코드를 짜고 나서 '이 코드가 과연 좋은 코드인가?'를 판단할 기준이 없어서 혼란스러웠어. 그래서 알고리즘을 평가하는 공통 기준들을 딱 정해두게 됐지!", "explanation": "알고리즘을 평가하는 기준은 크게 5가지야. 정확성(답이 맞냐), 명확성(단계가 헷갈리지 않냐), 효율성(빠르고 메모리 적게 쓰냐), 입출력(재료 넣으면 결과 나오냐), 유한성(언젠간 끝나냐)으로 볼 수 있어. 예를 들어 라면 레시피도 '재료가 명확하고, 순서가 헷갈리지 않고, 빠르게 끝나고, 맛있게 완성되면' 좋은 레시피인 것처럼 알고리즘도 똑같이 평가해!", "why": "", "term_focus": [], "connections": [], "types": {"caption": "알고리즘의 좋고 나쁨을 평가하는 5가지 기준. 교재 '나) 알고리즘 분석 기준'의 나열.", "items": [{"name": "정확성", "en": "Correctness", "note": "알고리즘이 타당한 입력에 대해서 유한 시간 내에 올바른 결과를 산출하는가."}, {"name": "작업량", "en": "Work / Time Complexity", "note": "알고리즘을 수행하는 데 필요한 연산(작업)의 양. 시간 복잡도와 직결된다."}, {"name": "기억장소 사용량", "en": "Space Complexity", "note": "알고리즘이 수행 중 사용하는 메모리 공간의 양."}, {"name": "단순성", "en": "Simplicity", "note": "알고리즘이 명확하고 이해하기 쉬운가. 단순한 알고리즘은 유지보수와 검증이 쉽다."}, {"name": "최적성", "en": "Optimality", "note": "주어진 문제에 대해 자원(시간·공간) 사용이 더 이상 개선되기 어려운가."}]}, "mnemonic": "**'정명효입유'** → 정확히 명확하게 효율적으로 입출력하고 유한하게 끝내자! (정·명·효·입·유 다섯 글자만 기억해!)", "trap": "", "table": [], "sources": [{"title": "TOPCIT ESSENCE ver.3 — 소프트웨어 개발", "note": "정보통신산업진흥원(NIPA) 공식 교재"}], "priority": 3}, {"title": "검색 알고리즘", "keywords": ["컴파일시간:", "프로그램", "외부정렬:"], "summary": "", "background": "옛날에 컴퓨터에 데이터가 많아지면서 '내가 원하는 정보를 어떻게 빠르게 찾지?'라는 문제가 생겼어. 그래서 데이터를 효율적으로 찾는 다양한 방법들을 연구하게 됐는데, 그게 바로 검색 알고리즘이야.", "explanation": "도서관에서 책을 찾는다고 상상해봐. 선형 검색은 첫 번째 책부터 한 권씩 순서대로 훑어보는 방법이고, 제어 검색은 책이 가나다순으로 정렬되어 있을 때 중간부터 찾아서 범위를 좁혀가는 똑똑한 방법이야. 데이터가 정렬되어 있느냐 없느냐에 따라 어떤 방법을 쓸지 선택하는 거지!", "why": "", "term_focus": [], "connections": [], "types": null, "mnemonic": "📚 '정렬 없으면 처음부터 줄 세워 찾고(선형), 정렬 있으면 반 잘라 찾아라(제어)' — 정렬 유무가 핵심!", "trap": "", "table": [], "sources": [], "priority": 3}, {"title": "그래프 탐색 알고리즘", "keywords": ["컴파일시간:", "프로그램", "외부정렬:"], "summary": "", "background": "옛날에 지도나 회로도처럼 복잡하게 연결된 것들을 컴퓨터로 탐색해야 할 일이 많아졌어. 그런데 아무 순서 없이 뒤지면 같은 곳을 계속 다시 방문하거나 빠뜨리는 문제가 생겨서 체계적인 방법이 필요했어.", "explanation": "그래프 탐색은 지하철 노선도에서 출발역부터 모든 역을 빠짐없이 한 번씩 방문하는 것과 같아. 그 중 깊이 우선 탐색(DFS)은 미로 찾기할 때 한 방향으로 막힐 때까지 쭉 들어가다가 막히면 갈림길로 되돌아와서 다른 길을 시도하는 방식이야. 마치 실타래를 풀며 들어가다가 막히면 실을 따라 되돌아오는 것처럼 동작해.", "why": "", "term_focus": [], "connections": [], "types": null, "mnemonic": "DFS = '막히면 되돌아!' - 깊이(Depth) 파고들다 막히면(F=Fail) 되돌아서(S=Step back) 다시 시도!", "trap": "", "table": [], "sources": [], "priority": 3}, {"title": "최소 신장 트리", "keywords": ["컴파일시간:", "프로그램", "외부정렬:"], "summary": "", "background": "옛날에 여러 도시를 전선이나 도로로 연결할 때, 모든 곳을 이으면서도 공사 비용을 최대한 아끼고 싶었어. 그래서 '어떻게 하면 모든 곳을 연결하되 가장 적은 비용으로 할 수 있을까?'라는 문제를 풀기 위해 이 개념이 생겼어.", "explanation": "친구 10명이 모두 카톡으로 연결되려면 케이블을 최소 몇 개 깔아야 할까? 최소 신장 트리는 모든 친구를 연결하되, 가장 싼 케이블들만 골라서 연결하는 방법이야. 단, 빙글빙글 도는 루프(사이클)가 생기면 낭비니까 그건 절대 만들지 않아.", "why": "", "term_focus": [], "connections": [], "types": null, "mnemonic": "🌳 '최소 비용으로 모두 연결, 단 돌아가는 길은 NO!' → 크루스칼은 '싼 것부터 줍기', 프림은 '가까운 곳부터 뻗기'", "trap": "", "table": [], "sources": [], "priority": 3}];
+const LESSONS = [{"title":"소프트웨어 재사용(Reuse) 개요","keywords":["관리자와","프로토타입","재사용을","기본설계","변경으로","생산성의","지속적인","소프트웨어","상용화되거나","현존하는","시스템","파일"],"summary":"","background":"옛날에 개발자들이 비슷한 기능을 만들 때마다 매번 처음부터 다시 코드를 짜야 해서 시간이랑 돈이 엄청 낭비됐어. 그래서 '이미 잘 만들어놓은 코드, 그냥 다시 쓰면 안 되나?' 라는 생각에서 재사용 개념이 나왔어.","explanation":"레고 블록 생각해봐! 집 만들 때 쓴 블록을 나중에 자동차 만들 때도 또 쓸 수 있잖아. 소프트웨어 재사용도 똑같아 — 이미 잘 만들어서 검증된 코드 블록을 새 프로그램 만들 때 그대로 가져다 쓰는 거야. 이러면 처음부터 만드는 것보다 훨씬 빠르고, 이미 검증된 거라 오류도 적어!","why":"","term_focus":[],"connections":[],"types":null,"mnemonic":"재사용의 3대 목표 → '신확생' 🔁 (신뢰성 - 이미 검증됨 / 확장성 - 검증된 기능으로 늘리기 쉬움 / 생산성 - 비용·시간 절약)","trap":"","table":[],"sources":[],"priority":3},{"title":"소프트웨어 재사용의 대상","keywords":["관리자와","프로토타입","재사용을","기본설계","변경으로","생산성의","지속적인","소프트웨어","상용화되거나","현존하는","시스템","파일"],"summary":"","background":"옛날에는 프로그램 만들 때마다 처음부터 다 새로 짰는데, 그러다 보니 시간도 엄청 걸리고 비용도 낭비됐어. 그래서 '이미 잘 만들어진 걸 다시 쓰면 어떨까?' 하는 생각에서 재사용 개념이 생겼어.","explanation":"소프트웨어 재사용이란 레고 블록처럼 이미 만들어진 부품을 다시 활용하는 거야. 재사용할 수 있는 대상은 크게 세 가지인데, 설계 정보(어떻게 만들지 계획한 것), 프로그램 코드(실제로 짠 코딩), 그리고 기타(사용 설명서나 조사 결과 같은 문서들)야. 즉, 코드뿐만 아니라 계획서, 설명서까지 전부 재사용 대상이 될 수 있어!","why":"","term_focus":[],"connections":[],"types":null,"mnemonic":"재사용 대상 = '설·코·기' 👉 설계정보, 코드, 기타문서 — '설코기 먹듯 재사용한다!' 🍖","trap":"","table":[],"sources":[],"priority":3},{"title":"소프트웨어 재사용의 원칙","keywords":["관리자와","프로토타입","재사용을","기본설계","변경으로","생산성의","지속적인","소프트웨어","상용화되거나","현존하는","시스템","파일"],"summary":"","background":"옛날에는 프로그램을 만들 때마다 같은 기능을 처음부터 새로 만들었어. 그러다 보니 시간도 엄청 걸리고 오류도 계속 생기니까, '한번 잘 만든 코드는 다시 쓸 수 있게 하자!'는 원칙이 생겼어.","explanation":"레고 블록을 생각해봐! 블록 하나하나가 어떤 세트에서도 끼워 맞출 수 있고, 설명서도 잘 붙어 있고, 튼튼하잖아. 소프트웨어 재사용도 똑같이, 만든 코드 조각이 어떤 컴퓨터나 프로그램에서도 잘 붙고(하드웨어·소프트웨어 독립), 기능 설명이 친절하게 적혀 있고(자기문서화), 많은 사람들이 믿고 쓸 수 있어야(신뢰성) 진짜 재사용 가능한 코드야.","why":"","term_focus":[],"connections":[],"types":null,"mnemonic":"🔑 '일모하소자일신' → 일반성, 모듈성, 하드웨어독립성, 소프트웨어독립성, 자기문서화, 일반성(공통성), 신뢰성! '일모하소자일신' = '일하소자, 일신(날마다 새롭게)' 처럼 외워봐!","trap":"","table":[],"sources":[],"priority":3},{"title":"실무에서 재사용 구현의 문제점","keywords":["관리자와","프로토타입","재사용을","기본설계","변경으로","생산성의","지속적인","소프트웨어","상용화되거나","현존하는","시스템","파일"],"summary":"","background":"옛날에 개발자들이 '이미 만든 코드 또 쓰면 되지!'라고 생각했는데, 막상 현장에서 가져다 쓰려니 서로 맞지 않거나 찾기도 어렵고 믿을 수 없는 코드들이 넘쳐났어. 그래서 그냥 재사용하면 된다는 생각 자체는 맞는데, 현실에서 잘 안 되는 이유들을 정리하고 해결책을 마련할 필요가 생겼어.","explanation":"레고 부품을 재활용한다고 생각해봐. 근데 부품이 어디 있는지 목록도 없고, 크기가 제각각이고, 어느 세트 거랑 호환되는지도 모른다면 그냥 새로 만드는 게 낫겠지? 소프트웨어도 똑같아서 재사용하려면 '잘 정리된 부품 창고(라이브러리)', '맞는 크기 규격(Granularity)', '자동으로 찾아주는 도구'가 필요해. 결국 기술만이 아니라 조직 문화랑 경영진 지원까지 다 갖춰져야 진짜 재사용이 가능해.","why":"","term_focus":[],"connections":[],"types":null,"mnemonic":"장애요인 해결책은 '새라자능조' — 새로운 방법론, 라이브러리 구축, 자동화 도구, 능동적 경영, 조직 변화! '새 라면 자동으로 능숙한 조리사가 끓여준다'고 외워봐!","trap":"","table":[],"sources":[],"priority":4},{"title":"소프트웨어 재사용의 효과","keywords":["관리자와","프로토타입","재사용을","기본설계","변경으로","생산성의","지속적인","소프트웨어","상용화되거나","현존하는","시스템","파일"],"summary":"","background":"옛날에 개발자들이 프로그램을 만들 때마다 처음부터 모든 코드를 새로 짜야 했는데, 이게 너무 시간도 오래 걸리고 돈도 많이 들었어. 그래서 '이미 잘 만들어진 코드를 다시 활용하면 어떨까?' 하는 생각에서 소프트웨어 재사용 개념이 생겨났어.","explanation":"레고 블록을 생각해봐! 집을 만들 때 쓴 레고 블록을 분해해서 자동차 만들 때 또 쓸 수 있잖아. 소프트웨어 재사용도 똑같아 — 예전에 만든 로그인 기능, 결제 기능 같은 코드 조각들을 새 프로그램에 가져다 쓰는 거야. 이렇게 하면 개발 시간이 줄고, 이미 검증된 코드를 쓰니까 오류도 적어지고, 비용도 절약되는 효과가 있어!","why":"","term_focus":[],"connections":[],"types":null,"mnemonic":"재사용 효과 = '시오비' 3총사! 🎯 **시**간 단축 + **오**류 감소 + **비**용 절약 — '시오비, 시오비!' 하고 외쳐봐!","trap":"","table":[],"sources":[],"priority":4},{"title":"역공학의 장점","keywords":["관리자와","프로토타입","재사용을","기본설계","변경으로","생산성의","지속적인","소프트웨어","상용화되거나","현존하는","시스템","파일"],"summary":"","background":"옛날에 만들어진 프로그램들은 설계 문서가 없거나 잃어버린 경우가 많았어. 그래서 이미 완성된 프로그램을 뜯어보면서 '이게 어떻게 만들어진 거지?'를 역으로 파악하는 방법이 필요해졌어.","explanation":"역공학은 완성된 레고 작품을 보고 '어떤 블록을 어떻게 조립했는지' 설명서를 새로 만드는 것과 같아. 기존 프로그램 코드를 분석해서 설계도를 다시 뽑아내고, 그걸 창고(Repository)에 잘 보관해두면 나중에 수정하거나 업그레이드할 때 훨씬 편해져. 특히 오래된 데이터베이스를 새 시스템으로 옮길 때도 이 방법으로 구조를 파악해서 안전하게 이전할 수 있어.","why":"","term_focus":[],"connections":[],"types":null,"mnemonic":"역공학 = '완성품 → 설명서' / 레고 완성작 보고 조립 설명서 역으로 만들기! '역(逆)으로 공(工)부해서 학(學)습한다' — 거꾸로 분석해서 설계도 복원!","trap":"","table":[],"sources":[],"priority":3},{"title":"자료구조의 종류","keywords":["자료구조","선형","비선형","스택","큐","트리","그래프"],"summary":"","background":"컴퓨터가 데이터를 효율적으로 저장·처리하려면 용도에 맞는 자료구조를 선택해야 한다. 자료구조는 데이터 요소들의 배열 방식에 따라 선형/비선형으로 크게 나뉜다.","explanation":"자료구조는 데이터가 순서대로 나열되는 선형 자료구조(배열/리스트/스택/큐/데크)와 계층·네트워크 형태로 확장되는 비선형 자료구조(트리/그래프)로 분류된다. 각 구조별 상세 학습은 이 section의 개별 카드를 참고.","why":"","term_focus":[],"connections":[],"types":{"caption":"자료구조는 데이터 배열 방식에 따라 선형과 비선형 2가지로 대분류된다. 각 sub-type의 상세는 개별 카드 참고.","items":[{"name":"배열/리스트","en":"Array / List (선형)","note":"선형 자료구조. 데이터를 일렬로 나열. 배열은 고정 크기·인덱스 기반 O(1) 접근, 리스트는 가변 크기·포인터 연결. DBMS 인덱스, 탐색·정렬 문제에 활용."},{"name":"스택","en":"Stack (선형, LIFO)","note":"선형 자료구조. 후입선출(LIFO). 인터럽트 처리, 재귀 프로그램의 순서 제어, 서브루틴의 복귀 번지 저장, 후위 표기법 연산, 텍스트 에디터 Undo 기능 등에 활용."},{"name":"큐","en":"Queue (선형, FIFO)","note":"선형 자료구조. 선입선출(FIFO). 운영체제의 작업 스케줄링, 대기 행렬 처리, 비동기 데이터 교환(파일I/O, Pipes, Sockets), 키보드 버퍼, 스풀 운용에 활용."},{"name":"데크","en":"Deque (선형)","note":"선형 자료구조. 양쪽 끝에서 삽입·삭제가 가능한 '양방향 큐'. 스택과 큐의 장점을 모두 활용하여 스택/큐 관련 분야에서 쓰인다."},{"name":"트리","en":"Tree (비선형)","note":"비선형 자료구조. 계층적 구조로 부모-자식 노드 관계. 탐색이나 정렬과 같은 문제, 문법의 파싱, 허프만 코드, 결정 트리, 게임 등에 활용."},{"name":"그래프","en":"Graph (비선형)","note":"비선형 자료구조. 노드들이 에지로 자유롭게 연결. 컴퓨터 네트워크(근거리 통신망·인터넷·웹 등), 전기회로 분석, 이항 관계, 연립 방정식 등에 활용."}]},"mnemonic":"【분류】선형 = 일렬(스택·큐·배열) / 비선형 = 가지(트리·그래프).","trap":"","table":[],"sources":[{"title":"TOPCIT ESSENCE ver.3 — 소프트웨어 개발","note":"정보통신산업진흥원(NIPA) 공식 교재"}],"priority":2},{"title":"정의","keywords":["컴파일시간","프로그램","외부정렬"],"summary":"","background":"컴퓨터가 엄청난 양의 데이터를 다루게 되면서, 그냥 막 쌓아두면 나중에 찾거나 쓸 때 너무 느리고 힘들었어. 그래서 데이터를 용도에 맞게 잘 정리해서 저장하는 방법이 필요해졌고, 그게 바로 자료구조야!","explanation":"자료구조는 컴퓨터가 데이터를 저장하는 '정리 방식'이야. 예를 들어 책을 그냥 방바닥에 던져두면 찾기 힘들지만, 책장에 종류별로 꽂아두면 쉽게 찾잖아? 자료구조도 똑같이 데이터를 줄 세우거나(선형구조), 나무처럼 가지를 뻗거나(비선형구조) 하는 방식으로 체계적으로 정리하는 거야.","why":"","term_focus":[],"connections":[],"types":null,"mnemonic":"자료구조 = '선(선형) 비(비선형)' → '선배한테 잘 보여라!' 선형은 일렬로 줄 선 것, 비선형은 삐뚤빼뚤 나무처럼 퍼진 것!","trap":"","table":[],"sources":[],"priority":3},{"title":"스택과 큐","keywords":["컴파일시간","프로그램","외부정렬"],"summary":"","background":"옛날에 프로그램이 데이터를 저장하고 꺼낼 때 순서를 어떻게 관리할지 고민이 많았어. 그래서 '어떤 순서로 넣고 꺼낼 것인가'에 따라 스택과 큐라는 두 가지 방식을 만들게 됐어.","explanation":"스택은 접시 쌓기야 — 밑에서부터 쌓고 꺼낼 땐 맨 위부터 꺼내지(나중에 넣은 게 먼저 나와, LIFO). 큐는 편의점 계산대 줄 서기야 — 먼저 줄 선 사람이 먼저 계산하고 나가지(먼저 넣은 게 먼저 나와, FIFO). 즉, 스택은 '뒤로가기 버튼'처럼 가장 최근 것을 되돌릴 때 쓰고, 큐는 '순서대로 처리'할 때 써.","why":"","term_focus":[],"connections":[],"types":null,"mnemonic":"스택 = 접시 스택(Stack) → 'S'는 쌓는다! 나중에 올린 접시 먼저 뺀다 (LIFO: Last In First Out) / 큐 = Queue(줄) → 편의점 줄처럼 먼저 온 사람이 먼저 나간다 (FIFO: First In First Out) ✨ 기억법: '스택=접시, 큐=줄서기'","trap":"","table":[],"sources":[],"priority":2},{"title":"트리와 그래프","keywords":["컴파일시간","프로그램","외부정렬"],"summary":"","background":"컴퓨터가 데이터를 저장할 때 단순히 줄 세우는 것만으로는 '부모-자식 관계'나 '친구 관계'처럼 복잡한 연결을 표현하기 어려웠어. 그래서 계층 관계는 트리로, 복잡한 다대다 관계는 그래프로 표현하는 방법이 생겨났어.","explanation":"트리는 회사 조직도처럼 사장 밑에 부장, 부장 밑에 과장이 있는 '위아래 계층 구조'야. 반면 그래프는 카카오톡 친구 목록처럼 나와 친구, 친구와 친구가 서로 얽혀 있는 '거미줄 구조'인데, 지하철 노선도나 내비게이션 최단경로 찾기가 딱 그래프를 이용한 거야.","why":"","term_focus":[],"connections":[],"types":null,"mnemonic":"트리는 '족보(위→아래)', 그래프는 '친구관계(나↔너↔걔)' — 족보는 위에서 아래로만 내려가지만, 친구는 서로서로 연결되잖아!","trap":"","table":[],"sources":[],"priority":2},{"title":"자료구조의 선택 기준","keywords":["컴파일시간","프로그램","외부정렬"],"summary":"","background":"옛날에 개발자들이 데이터를 막 아무렇게나 저장했더니 찾는 데 너무 오래 걸리고 메모리도 낭비되는 문제가 생겼어. 그래서 '어떤 상황에 어떤 방식으로 데이터를 담을지' 기준을 딱 정하게 된 거야.","explanation":"자료구조 선택은 마치 물건을 어디에 보관할지 고르는 것과 같아. 옷은 서랍에, 책은 책장에, 신발은 신발장에 넣듯이 — 빠르게 꺼내야 하면 배열, 줄 서서 차례로 처리해야 하면 큐, 뒤로 돌아가야 하면 스택, 연결 관계를 표현해야 하면 그래프를 쓰는 거야. 처리 속도, 데이터 크기, 활용 목적 이 3가지를 따져서 딱 맞는 자료구조를 골라야 해.","why":"","term_focus":[],"connections":[],"types":{"caption":"자료구조를 선택할 때 고려하는 기본 기준. 원본 교재 '마) 자료구조의 선택 기준'의 나열.","items":[{"name":"자료의 처리 시간","note":"연산(삽입·삭제·탐색 등)을 수행하는 데 걸리는 시간. 자료구조별로 시간 복잡도가 다르므로 처리 빈도가 높은 연산에 유리한 구조를 선택해야 한다."},{"name":"자료의 크기","note":"저장할 자료의 양. 크기에 따라 배열·연결리스트·트리·해시 등 메모리 효율이 적합한 구조를 선택한다."},{"name":"자료의 활용 빈도","note":"자료에 대한 접근·변경·검색 빈도. 활용 패턴에 맞는 자료구조(예: 정렬·검색·인덱스에 맞는 구조)를 선택한다."}]},"mnemonic":"🧠 '리스배큐데그' 로 외워! → 리스트(DB인덱스), 스택(뒤로가기/Undo), 배열(정렬탐색), 큐(줄서기/프린터), 데크(스택+큐 합체), 그래프(네트워크지도) — 순서대로 '리스배큐데그~' 한 번만 읊으면 끝!","trap":"","table":[],"sources":[{"title":"TOPCIT ESSENCE ver.3 — 소프트웨어 개발","note":"정보통신산업진흥원(NIPA) 공식 교재"}],"priority":3},{"title":"알고리즘 개요","keywords":["컴파일시간","프로그램","외부정렬"],"summary":"","background":"옛날에 복잡한 수학 문제나 반복 작업을 사람마다 제각각 다른 방식으로 풀다 보니 결과가 달라지고 효율도 엉망이었어. 그래서 '누가 해도 같은 결과가 나오는 명확한 풀이 순서'를 정리할 필요가 생겼어!","explanation":"알고리즘은 요리 레시피랑 똑같아. 재료(입력)를 넣고, 순서대로 조리 단계를 따라가면(처리), 완성된 요리(출력)가 나오는 거야. 단, 좋은 레시피는 '적당히'가 아니라 '3분 볶는다'처럼 누가 봐도 명확하고, 끝없이 반복되지 않고 반드시 완성 단계에서 끝나야 해.","why":"","term_focus":[],"connections":[],"types":null,"mnemonic":"알고리즘 5조건 → '입출명유효' 로 외워! (입력 - 출력 - 명확성 - 유한성 - 효과성) '입출명유효' = '입 출이는 명품 유한한 효자다' 🍱","trap":"","table":[],"sources":[],"priority":3},{"title":"알고리즘 분석 기준","keywords":["컴파일시간","프로그램","외부정렬"],"summary":"","background":"옛날에 프로그래머들이 코드를 짜고 나서 '이 코드가 과연 좋은 코드인가?'를 판단할 기준이 없어서 혼란스러웠어. 그래서 알고리즘을 평가하는 공통 기준들을 딱 정해두게 됐지!","explanation":"알고리즘을 평가하는 기준은 크게 5가지야. 정확성(답이 맞냐), 명확성(단계가 헷갈리지 않냐), 효율성(빠르고 메모리 적게 쓰냐), 입출력(재료 넣으면 결과 나오냐), 유한성(언젠간 끝나냐)으로 볼 수 있어. 예를 들어 라면 레시피도 '재료가 명확하고, 순서가 헷갈리지 않고, 빠르게 끝나고, 맛있게 완성되면' 좋은 레시피인 것처럼 알고리즘도 똑같이 평가해!","why":"","term_focus":[],"connections":[],"types":{"caption":"알고리즘의 좋고 나쁨을 평가하는 5가지 기준. 교재 '나) 알고리즘 분석 기준'의 나열.","items":[{"name":"정확성","en":"Correctness","note":"알고리즘이 타당한 입력에 대해서 유한 시간 내에 올바른 결과를 산출하는가."},{"name":"작업량","en":"Work / Time Complexity","note":"알고리즘을 수행하는 데 필요한 연산(작업)의 양. 시간 복잡도와 직결된다."},{"name":"기억장소 사용량","en":"Space Complexity","note":"알고리즘이 수행 중 사용하는 메모리 공간의 양."},{"name":"단순성","en":"Simplicity","note":"알고리즘이 명확하고 이해하기 쉬운가. 단순한 알고리즘은 유지보수와 검증이 쉽다."},{"name":"최적성","en":"Optimality","note":"주어진 문제에 대해 자원(시간·공간) 사용이 더 이상 개선되기 어려운가."}]},"mnemonic":"**'정명효입유'** → 정확히 명확하게 효율적으로 입출력하고 유한하게 끝내자! (정·명·효·입·유 다섯 글자만 기억해!)","trap":"","table":[],"sources":[{"title":"TOPCIT ESSENCE ver.3 — 소프트웨어 개발","note":"정보통신산업진흥원(NIPA) 공식 교재"}],"priority":3},{"title":"검색 알고리즘","keywords":["컴파일시간","프로그램","외부정렬"],"summary":"","background":"옛날에 컴퓨터에 데이터가 많아지면서 '내가 원하는 정보를 어떻게 빠르게 찾지?'라는 문제가 생겼어. 그래서 데이터를 효율적으로 찾는 다양한 방법들을 연구하게 됐는데, 그게 바로 검색 알고리즘이야.","explanation":"도서관에서 책을 찾는다고 상상해봐. 선형 검색은 첫 번째 책부터 한 권씩 순서대로 훑어보는 방법이고, 제어 검색은 책이 가나다순으로 정렬되어 있을 때 중간부터 찾아서 범위를 좁혀가는 똑똑한 방법이야. 데이터가 정렬되어 있느냐 없느냐에 따라 어떤 방법을 쓸지 선택하는 거지!","why":"","term_focus":[],"connections":[],"types":null,"mnemonic":"📚 '정렬 없으면 처음부터 줄 세워 찾고(선형), 정렬 있으면 반 잘라 찾아라(제어)' — 정렬 유무가 핵심!","trap":"","table":[],"sources":[],"priority":3},{"title":"그래프 탐색 알고리즘","keywords":["컴파일시간","프로그램","외부정렬"],"summary":"","background":"옛날에 지도나 회로도처럼 복잡하게 연결된 것들을 컴퓨터로 탐색해야 할 일이 많아졌어. 그런데 아무 순서 없이 뒤지면 같은 곳을 계속 다시 방문하거나 빠뜨리는 문제가 생겨서 체계적인 방법이 필요했어.","explanation":"그래프 탐색은 지하철 노선도에서 출발역부터 모든 역을 빠짐없이 한 번씩 방문하는 것과 같아. 그 중 깊이 우선 탐색(DFS)은 미로 찾기할 때 한 방향으로 막힐 때까지 쭉 들어가다가 막히면 갈림길로 되돌아와서 다른 길을 시도하는 방식이야. 마치 실타래를 풀며 들어가다가 막히면 실을 따라 되돌아오는 것처럼 동작해.","why":"","term_focus":[],"connections":[],"types":null,"mnemonic":"DFS = '막히면 되돌아!' - 깊이(Depth) 파고들다 막히면(F=Fail) 되돌아서(S=Step back) 다시 시도!","trap":"","table":[],"sources":[],"priority":3},{"title":"최소 신장 트리","keywords":["컴파일시간","프로그램","외부정렬"],"summary":"","background":"옛날에 여러 도시를 전선이나 도로로 연결할 때, 모든 곳을 이으면서도 공사 비용을 최대한 아끼고 싶었어. 그래서 '어떻게 하면 모든 곳을 연결하되 가장 적은 비용으로 할 수 있을까?'라는 문제를 풀기 위해 이 개념이 생겼어.","explanation":"친구 10명이 모두 카톡으로 연결되려면 케이블을 최소 몇 개 깔아야 할까? 최소 신장 트리는 모든 친구를 연결하되, 가장 싼 케이블들만 골라서 연결하는 방법이야. 단, 빙글빙글 도는 루프(사이클)가 생기면 낭비니까 그건 절대 만들지 않아.","why":"","term_focus":[],"connections":[],"types":null,"mnemonic":"🌳 '최소 비용으로 모두 연결, 단 돌아가는 길은 NO!' → 크루스칼은 '싼 것부터 줍기', 프림은 '가까운 곳부터 뻗기'","trap":"","table":[],"sources":[],"priority":3}];
 const PRIO_LABEL = {1:'최우선', 2:'중요', 3:'보통', 4:'보조'};
 let curTab = 'all';
 let curPrio = 'all';
 let curLessonIdx = -1;
 let curPage = 0;
 let pages = [];
+const CHAPTER_MAP = {};
+const CHAPTER_NAMES = {};
+document.querySelectorAll('.section-group').forEach(grp => {
+  const ch = parseInt(grp.dataset.chapter);
+  const lbl = grp.querySelector('.section-label');
+  if (lbl) CHAPTER_NAMES[ch] = lbl.textContent.trim();
+  grp.querySelectorAll('.card').forEach(card => {
+    const m = (card.getAttribute('onclick') || '').match(/startLesson\((\d+)\)/);
+    if (m) CHAPTER_MAP[parseInt(m[1])] = ch;
+  });
+});
+function isLastInChapter(idx) {
+  const ch = CHAPTER_MAP[idx];
+  return CHAPTER_MAP[idx + 1] !== ch || idx + 1 >= LESSONS.length;
+}
 
 function filterTab(btn, ch) {
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
@@ -366,11 +383,15 @@ function renderMnemonic(text) {
   return `<div class="sec sec-mn"><div class="sec-label">🧠 5초 암기</div><div class="mn-list">${html}</div></div>`;
 }
 
-function buildPages(lesson) {
-  return [
-    { type: 'learn', data: lesson },
-    { type: 'done',  data: lesson },
-  ];
+function buildPages(idx) {
+  const lesson = LESSONS[idx];
+  if (isLastInChapter(idx)) {
+    return [
+      { type: 'learn', data: lesson },
+      { type: 'done',  data: lesson },
+    ];
+  }
+  return [{ type: 'learn', data: lesson }];
 }
 
 function renderPage() {
@@ -408,7 +429,7 @@ function renderPage() {
       const head = cols.map(c => `<th>${escHtml(c)}</th>`).join('');
       const rows = d.table.map(r => '<tr>' + cols.map(c => `<td>${escHtml(r[c] || '')}</td>`).join('') + '</tr>').join('');
       h += `<div class="sec sec-summary" style="padding:0;background:transparent;border:none">
-        <div class="sec-label" style="padding-left:.3rem;color:#6b7280;margin-bottom:.5rem">📊 정리표</div>
+        <div class="sec-label" style="padding-left:.3rem;color:#5f6368;margin-bottom:.5rem">📊 정리표</div>
         <table class="ctable"><thead><tr>${head}</tr></thead><tbody>${rows}</tbody></table>
       </div>`;
     }
@@ -421,8 +442,8 @@ function renderPage() {
     wrap.innerHTML = `
       <div class="done-page">
         <div class="done-emoji">🎉</div>
-        <div class="done-title">레슨 완료!</div>
-        <div class="done-sub">${escHtml(d.title)}</div>
+        <div class="done-title">주제 완료!</div>
+        <div class="done-sub">${escHtml(CHAPTER_NAMES[CHAPTER_MAP[curLessonIdx]] || d.title)}</div>
         <div class="done-actions">
           ${hasNext ? '<button class="done-btn done-btn-primary" onclick="startLesson(' + (curLessonIdx + 1) + ')">다음 개념 →</button>' : ''}
           <button class="done-btn done-btn-sub" onclick="exitLesson()">목록으로 돌아가기</button>
@@ -435,15 +456,21 @@ function renderPage() {
   document.getElementById('l-page-ind').textContent = `${curPage + 1} / ${pages.length}`;
   document.getElementById('l-progress-bar').style.width = `${((curPage + 1) / pages.length) * 100}%`;
   document.getElementById('l-prev').disabled = curPage === 0;
-  document.getElementById('l-next').disabled = curPage === pages.length - 1;
-  document.getElementById('l-next').textContent = curPage === pages.length - 2 ? '완료 🎉' : '다음 →';
+  const _nb = document.getElementById('l-next');
+  if (pages[curPage].type === 'learn' && curPage === pages.length - 1 && !isLastInChapter(curLessonIdx)) {
+    _nb.disabled = false;
+    _nb.textContent = '다음 개념 →';
+  } else {
+    _nb.disabled = curPage === pages.length - 1;
+    _nb.textContent = curPage === pages.length - 2 ? '완료 🎉' : '다음 →';
+  }
 }
 
 function startLesson(idx) {
   if (idx < 0 || idx >= LESSONS.length) return;
   curLessonIdx = idx;
   curPage = 0;
-  pages = buildPages(LESSONS[idx]);
+  pages = buildPages(idx);
   document.getElementById('l-title').textContent = LESSONS[idx].title;
   document.getElementById('lesson').classList.add('show');
   document.body.style.overflow = 'hidden';
@@ -456,7 +483,12 @@ function exitLesson() {
   curLessonIdx = -1;
 }
 
-function nextPage() { if (curPage < pages.length - 1) { curPage++; renderPage(); } }
+function nextPage() {
+  if (curPage < pages.length - 1) { curPage++; renderPage(); return; }
+  if (pages[curPage].type === 'learn' && !isLastInChapter(curLessonIdx) && curLessonIdx + 1 < LESSONS.length) {
+    startLesson(curLessonIdx + 1);
+  }
+}
 function prevPage() { if (curPage > 0) { curPage--; renderPage(); } }
 
 document.addEventListener('keydown', e => {

@@ -1,14 +1,15 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <title>한능검 02 고대 (삼국·남북국)</title>
 <style>
-:root{--font-sans:"Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",system-ui,sans-serif;--font-serif:"NanumMyeongjo","Nanum Myeongjo","Batang","Apple SD Gothic Neo",serif}
+:root{--font-sans:Roboto,'Noto Sans KR','Malgun Gothic',sans-serif;--font-serif:"NanumMyeongjo","Nanum Myeongjo","Batang","Apple SD Gothic Neo",serif}
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{overflow-x:hidden}
-body{font-family:var(--font-sans);background:#f8f4ee;color:#2c2416;min-height:100vh}
+body{font-family:var(--font-sans);background:#f8f4ee;color:#202124;min-height:100vh}
 
 .header{background:#c9a14d;color:#fff;padding:.9rem 1.25rem;display:flex;align-items:center;gap:.75rem;position:sticky;top:0;z-index:20;box-shadow:0 2px 10px rgba(0,0,0,.15)}
 .header-back{color:#fff;text-decoration:none;font-size:1.2rem;opacity:.85}
@@ -46,7 +47,7 @@ body{font-family:var(--font-sans);background:#f8f4ee;color:#2c2416;min-height:10
 .card-badges span{padding:.12rem .44rem;border-radius:.5rem;font-weight:700;line-height:1.35}
 .b-table{background:#e8e0f0;color:#5a4a78}
 .b-trap{background:#fff0d8;color:#a65f00}
-.card-title{font-size:1rem;font-weight:700;color:#2c2416;line-height:1.42;padding-right:3.6rem;font-family:var(--font-serif)}
+.card-title{font-size:1rem;font-weight:700;color:#202124;line-height:1.42;padding-right:3.6rem;font-family:var(--font-serif)}
 .card-preview{font-size:.95rem;color:#584a3b;line-height:1.68;flex:1}
 .card-cta{font-size:.8rem;color:#c9a14d;font-weight:800;text-align:right;margin-top:.3rem}
 .card.hidden-card{display:none!important}
@@ -122,7 +123,7 @@ body{font-family:var(--font-sans);background:#f8f4ee;color:#2c2416;min-height:10
 .l-page-kw span{background:#c9a14d14;color:#7a5e2a;border:1px solid #c9a14d36;border-radius:1rem;padding:.24rem .72rem;font-size:.8rem;font-weight:700}
 
 .sec{border-radius:.95rem;padding:1.12rem 1.15rem 1.08rem;line-height:1.72;margin-bottom:1rem;background:#fff;border:1.5px solid #e4dbcf;border-left:5px solid #d2c1ad;box-shadow:0 6px 16px rgba(62,41,18,.04)}
-.sec-summary{border-left-color:#c9a14d;font-size:1.02rem;color:#2c2416;font-weight:600}
+.sec-summary{border-left-color:#c9a14d;font-size:1.02rem;color:#202124;font-weight:600}
 .sec-bg{border-left-color:#9c7a4a}
 .sec-expl{border-left-color:#5a7d8c}
 .sec-why{border-left-color:#4f8a4f}
@@ -145,7 +146,7 @@ body{font-family:var(--font-sans);background:#f8f4ee;color:#2c2416;min-height:10
 .sec-mn p{font-size:1.03rem}
 .fact-list{display:flex;flex-direction:column;gap:.65rem}
 .fact-item{background:#fff;border:1px solid rgba(62,41,18,.08);border-radius:.9rem;padding:.88rem .95rem}
-.fact-term{font-size:.95rem;font-weight:800;color:#2c2416;margin-bottom:.28rem}
+.fact-term{font-size:.95rem;font-weight:800;color:#202124;margin-bottom:.28rem}
 .fact-note{font-size:1rem;line-height:1.78;color:#352e24;word-break:keep-all;max-inline-size:66ch}
 .tf-row{display:flex;align-items:baseline;gap:.35rem;padding:.18rem 0;flex-wrap:wrap}
 .tf-char{font-size:1.25rem;font-weight:800;color:#7656a8;min-width:2.2rem}
@@ -157,7 +158,7 @@ body{font-family:var(--font-sans);background:#f8f4ee;color:#2c2416;min-height:10
 .tf-pul-text{font-size:.93rem;line-height:1.75;color:#352e24;word-break:keep-all}
 .fact-link-label{display:inline-flex;align-items:center;padding:.14rem .48rem;border-radius:999px;background:#c9a14d14;color:#7a5e2a;font-size:.72rem;font-weight:800;letter-spacing:.02em;margin-bottom:.42rem}
 .src-list{display:flex;flex-direction:column;gap:.5rem}
-.src-link{display:flex;align-items:flex-start;gap:.5rem;text-decoration:none;color:#2c2416;background:#fdfaf6;border:1px solid #eadfce;border-radius:.85rem;padding:.8rem .88rem;transition:border-color .15s,transform .15s}
+.src-link{display:flex;align-items:flex-start;gap:.5rem;text-decoration:none;color:#202124;background:#fdfaf6;border:1px solid #eadfce;border-radius:.85rem;padding:.8rem .88rem;transition:border-color .15s,transform .15s}
 .src-link:hover{border-color:#c9a14d;transform:translateY(-1px)}
 .src-bullet{flex-shrink:0;color:#c9a14d;font-weight:800}
 .src-text{font-size:.96rem;line-height:1.68;max-inline-size:66ch;color:#352d22}
@@ -180,7 +181,7 @@ body{font-family:var(--font-sans);background:#f8f4ee;color:#2c2416;min-height:10
 .done-emoji{font-size:4.5rem;margin-bottom:1rem;animation:pop .4s ease}
 @keyframes pop{from{transform:scale(0)}80%{transform:scale(1.2)}to{transform:scale(1)}}
 .done-title{font-size:1.5rem;font-weight:800;color:#7a5e2a;margin-bottom:.5rem;font-family:var(--font-serif)}
-.done-sub{font-size:.95rem;color:#888;margin-bottom:2rem}
+.done-sub{font-size:.95rem;color:#9aa0a6;margin-bottom:2rem}
 .done-actions{display:flex;flex-direction:column;gap:.6rem;max-width:300px;margin:0 auto}
 .done-btn{padding:.85rem 1.4rem;border-radius:.7rem;font-size:.95rem;font-weight:700;cursor:pointer;border:none;font-family:inherit;transition:all .15s}
 .done-btn-primary{background:#c9a14d;color:#fff}
@@ -223,6 +224,7 @@ body{font-family:var(--font-sans);background:#f8f4ee;color:#2c2416;min-height:10
   .l-nav-btn{font-size:.9rem}
 }
 </style>
+<script src="../../chrome-frame.js"></script>
 </head>
 <body>
 
@@ -505,7 +507,7 @@ function renderPage() {
       const head = cols.map(c => `<th>${c}</th>`).join('');
       const rows = d.table.map(r => '<tr>' + cols.map(c => `<td>${r[c] || ''}</td>`).join('') + '</tr>').join('');
       h += `<div class="sec sec-summary" style="padding:0;background:transparent;border:none">
-        <div class="sec-label" style="padding-left:.3rem;color:#888;margin-bottom:.5rem">📊 정리표</div>
+        <div class="sec-label" style="padding-left:.3rem;color:#9aa0a6;margin-bottom:.5rem">📊 정리표</div>
         <table class="ctable"><thead><tr>${head}</tr></thead><tbody>${rows}</tbody></table>
       </div>`;
     }

@@ -1,22 +1,23 @@
 <!doctype html>
 <html lang="ko">
 <head>
-  <meta charset="utf-8">
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+<meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>TOPCIT 기출 퀴즈</title>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --bg: #f7f4ee;
+      --bg: #f1f3f4;
       --surface: #ffffff;
       --text: #1a1a1a;
-      --muted: #6b7280;
+      --muted: #5f6368;
       --border: rgba(0,0,0,0.08);
       --radius: 16px;
       --shadow: 0 2px 12px rgba(0,0,0,0.07), 0 1px 3px rgba(0,0,0,0.05);
       --hdr: 60px;
-      --font: 'Pretendard Variable', 'Noto Sans KR', -apple-system, sans-serif;
+      --font: Roboto,'Noto Sans KR','Malgun Gothic',sans-serif;
     }
 
     html { scroll-behavior: smooth; }
@@ -25,12 +26,12 @@
       background: var(--bg);
       color: var(--text);
       min-height: 100vh;
-      padding-top: var(--hdr);
+      padding-top: calc(var(--hdr) + 116px);
     }
 
     /* ── Header ── */
     #hdr {
-      position: fixed; top: 0; left: 0; right: 0;
+      position: fixed; top: 116px; left: 0; right: 0;
       height: var(--hdr);
       background: rgba(255,255,255,0.96);
       backdrop-filter: blur(14px);
@@ -60,7 +61,7 @@
     }
     .pb-fill {
       height: 100%;
-      background: linear-gradient(90deg, #2563eb, #7c3aed);
+      background: linear-gradient(90deg, #1a73e8, #7c3aed);
       border-radius: 3px; transition: width .4s ease; width: 0%;
     }
     .pb-label { font-size: 12px; font-weight: 700; color: var(--muted); white-space: nowrap; }
@@ -80,7 +81,7 @@
       font-size: 12px; font-weight: 700; cursor: pointer;
       color: var(--muted); transition: all .15s; font-family: inherit;
     }
-    .src-btn.active { background: linear-gradient(90deg, #2563eb, #7c3aed); color: white; border-color: transparent; }
+    .src-btn.active { background: linear-gradient(90deg, #1a73e8, #7c3aed); color: white; border-color: transparent; }
     .src-btn:hover:not(.active) { background: rgba(0,0,0,0.05); }
     .src-group { display: flex; gap: 4px; flex-shrink: 0; }
     .reset-btn {
@@ -189,7 +190,7 @@
     .choices { display: flex; flex-direction: column; gap: 7px; margin-bottom: 16px; }
     .choice-btn {
       padding: 9px 13px; border: 1.5px solid var(--border);
-      border-radius: 10px; background: #fafafa;
+      border-radius: 10px; background: #f8f9fa;
       text-align: left; font-size: 14px; line-height: 1.5;
       cursor: pointer; transition: all .18s;
       font-family: inherit; color: var(--text);
@@ -202,7 +203,7 @@
     /* Reveal */
     .reveal-btn {
       padding: 9px 18px; border: 1.5px solid var(--border);
-      border-radius: 10px; background: #fafafa;
+      border-radius: 10px; background: #f8f9fa;
       font-size: 13px; font-weight: 600; cursor: pointer;
       font-family: inherit; color: var(--muted);
       transition: all .15s;
@@ -228,17 +229,17 @@
       border: 1.5px solid var(--border); border-radius: 10px;
       font-size: 14px; font-family: inherit; line-height: 1.5;
       resize: vertical; outline: none; transition: border .15s;
-      background: #fafafa; color: var(--text);
+      background: #f8f9fa; color: var(--text);
     }
-    .answer-input:focus { border-color: #2563eb; background: white; }
+    .answer-input:focus { border-color: #1a73e8; background: white; }
     .check-btn {
       align-self: flex-start;
-      padding: 8px 18px; border: 1.5px solid #2563eb;
-      border-radius: 10px; background: #2563eb;
+      padding: 8px 18px; border: 1.5px solid #1a73e8;
+      border-radius: 10px; background: #1a73e8;
       font-size: 13px; font-weight: 700; cursor: pointer;
       color: white; transition: all .15s; font-family: inherit;
     }
-    .check-btn:hover { background: #1d4ed8; border-color: #1d4ed8; }
+    .check-btn:hover { background: #1557b0; border-color: #1557b0; }
 
     /* Answer feedback */
     .fb-result {
@@ -260,7 +261,7 @@
     .exp-label { font-size: 10px; font-weight: 800; letter-spacing: .06em; color: var(--muted); margin-bottom: 5px; text-transform: uppercase; }
     .exp-text {
       font-size: 13px; line-height: 1.7; white-space: pre-wrap;
-      color: var(--muted); background: #f9fafb;
+      color: var(--muted); background: #f8f9fa;
       border: 1px solid var(--border); border-radius: 8px;
       padding: 11px 13px;
     }
@@ -277,7 +278,7 @@
       cursor: pointer; transition: background .12s;
       user-select: none;
     }
-    .lg-head:hover { background: #f9fafb; }
+    .lg-head:hover { background: #f8f9fa; }
     .lg-arrow { font-size: 11px; color: var(--muted); transition: transform .2s; flex-shrink: 0; }
     .lg-arrow.open { transform: rotate(90deg); }
     .lg-name { font-size: 14px; font-weight: 700; }
@@ -294,7 +295,7 @@
       padding: 11px 17px; cursor: pointer;
       transition: background .1s;
     }
-    .lq-row:hover { background: #f9fafb; }
+    .lq-row:hover { background: #f8f9fa; }
     .lq-dot {
       width: 18px; height: 18px; border-radius: 50%;
       border: 2px solid var(--border); flex-shrink: 0;
@@ -343,6 +344,7 @@
       .q-text { font-size: 14px; }
     }
   </style>
+<script src="chrome-frame.js"></script>
 </head>
 <body>
 
@@ -380,7 +382,7 @@
    Constants
 ───────────────────────────────────────────────────── */
 const GC = [
-  { label: '프로젝트 관리',         color: '#2563eb', bg: '#eff6ff' },
+  { label: '프로젝트 관리',         color: '#1a73e8', bg: '#eff6ff' },
   { label: 'IT 비즈니스',           color: '#16a34a', bg: '#f0fdf4' },
   { label: '시스템 아키텍처',        color: '#7c3aed', bg: '#f5f3ff' },
   { label: '데이터베이스',           color: '#d97706', bg: '#fffbeb' },

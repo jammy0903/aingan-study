@@ -1,83 +1,85 @@
 <!doctype html>
 <html lang="ko">
 <head>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>TOPCIT 개념집</title>
 <style>
 *{box-sizing:border-box}
-body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Noto Sans KR",sans-serif;background:#f5f6fa;color:#1f2937;line-height:1.55}
-header{position:sticky;top:0;background:#fff;border-bottom:1px solid #e5e7eb;z-index:50;padding:10px 16px 0}
+body{margin:0;font-family:Roboto,'Noto Sans KR','Malgun Gothic',sans-serif;background:#f1f3f4;color:#202124;line-height:1.55}
+header{position:sticky;top:0;background:#fff;border-bottom:1px solid #dadce0;z-index:50;padding:10px 16px 0}
 h1{margin:0 0 8px;font-size:17px;display:flex;align-items:center;gap:8px}
-.sub-tabs{display:flex;gap:4px;overflow-x:auto;padding-bottom:8px;border-bottom:1px solid #e5e7eb}
-.sub-tab{flex-shrink:0;padding:7px 12px;border:1px solid #e5e7eb;border-radius:8px;background:#fff;cursor:pointer;font-size:13px;font-weight:500;color:#374151}
-.sub-tab:hover{background:#f9fafb}
-.sub-tab.active{background:#1f2937;color:#fff;border-color:#1f2937}
+.sub-tabs{display:flex;gap:4px;overflow-x:auto;padding-bottom:8px;border-bottom:1px solid #dadce0}
+.sub-tab{flex-shrink:0;padding:7px 12px;border:1px solid #dadce0;border-radius:8px;background:#fff;cursor:pointer;font-size:13px;font-weight:500;color:#3c4043}
+.sub-tab:hover{background:#f8f9fa}
+.sub-tab.active{background:#202124;color:#fff;border-color:#202124}
 .sub-tab .cnt{font-size:11px;opacity:.75;margin-left:4px}
 .ctrls{display:flex;flex-wrap:wrap;gap:10px;align-items:center;padding:10px 0 12px;font-size:13px}
-.mode-tog{display:inline-flex;border:1px solid #d1d5db;border-radius:8px;overflow:hidden;background:#fff}
-.mode-tog button{border:none;background:transparent;padding:6px 12px;font-size:13px;cursor:pointer;color:#6b7280;font-weight:500}
-.mode-tog button.on{background:#111827;color:#fff}
+.mode-tog{display:inline-flex;border:1px solid #dadce0;border-radius:8px;overflow:hidden;background:#fff}
+.mode-tog button{border:none;background:transparent;padding:6px 12px;font-size:13px;cursor:pointer;color:#5f6368;font-weight:500}
+.mode-tog button.on{background:#202124;color:#fff}
 .filt{display:flex;gap:6px;flex-wrap:wrap}
-.filt label{display:inline-flex;align-items:center;gap:4px;padding:4px 9px;border:1px solid #e5e7eb;border-radius:999px;background:#fff;cursor:pointer;font-size:12px;user-select:none}
-.filt label.on-1{background:#fef2f2;border-color:#fecaca}
-.filt label.on-2{background:#fffbeb;border-color:#fde68a}
-.filt label.on-3{background:#f0fdf4;border-color:#bbf7d0}
-.filt label.on-4{background:#f3f4f6;border-color:#d1d5db}
+.filt label{display:inline-flex;align-items:center;gap:4px;padding:4px 9px;border:1px solid #dadce0;border-radius:999px;background:#fff;cursor:pointer;font-size:12px;user-select:none}
+.filt label.on-1{background:#fef2f2;border-color:#ffcdd2}
+.filt label.on-2{background:#fffbeb;border-color:#fff9c4}
+.filt label.on-3{background:#f0fdf4;border-color:#c8e6c9}
+.filt label.on-4{background:#f1f3f4;border-color:#dadce0}
 .filt input{margin:0}
 .srch{flex:1;min-width:180px}
-.srch input{width:100%;padding:6px 10px;border:1px solid #d1d5db;border-radius:6px;font-size:13px}
-.stat{font-size:12px;color:#6b7280;white-space:nowrap}
+.srch input{width:100%;padding:6px 10px;border:1px solid #dadce0;border-radius:6px;font-size:13px}
+.stat{font-size:12px;color:#5f6368;white-space:nowrap}
 main{max-width:900px;margin:0 auto;padding:16px}
 /* priority group (mode B) */
-.p-grp{margin-bottom:16px;border-radius:10px;overflow:hidden;border:1px solid #e5e7eb;background:#fff}
-.p-grp.p1{border-color:#fecaca}
-.p-grp.p2{border-color:#fde68a}
-.p-grp.p3{border-color:#bbf7d0}
-.p-grp.p4{border-color:#d1d5db}
-.p-hd{padding:10px 14px;background:#fafafa;border-bottom:1px solid #e5e7eb;cursor:pointer;display:flex;align-items:center;justify-content:space-between;font-weight:600;font-size:14px}
-.p-hd.p1{background:#fef2f2;border-bottom-color:#fecaca}
-.p-hd.p2{background:#fffbeb;border-bottom-color:#fde68a}
-.p-hd.p3{background:#f0fdf4;border-bottom-color:#bbf7d0}
-.p-hd.p4{background:#f3f4f6;border-bottom-color:#d1d5db}
-.p-hd .arrow{transition:transform .2s;color:#6b7280;font-size:12px}
+.p-grp{margin-bottom:16px;border-radius:10px;overflow:hidden;border:1px solid #dadce0;background:#fff}
+.p-grp.p1{border-color:#ffcdd2}
+.p-grp.p2{border-color:#fff9c4}
+.p-grp.p3{border-color:#c8e6c9}
+.p-grp.p4{border-color:#dadce0}
+.p-hd{padding:10px 14px;background:#f8f9fa;border-bottom:1px solid #dadce0;cursor:pointer;display:flex;align-items:center;justify-content:space-between;font-weight:600;font-size:14px}
+.p-hd.p1{background:#fef2f2;border-bottom-color:#ffcdd2}
+.p-hd.p2{background:#fffbeb;border-bottom-color:#fff9c4}
+.p-hd.p3{background:#f0fdf4;border-bottom-color:#c8e6c9}
+.p-hd.p4{background:#f1f3f4;border-bottom-color:#dadce0}
+.p-hd .arrow{transition:transform .2s;color:#5f6368;font-size:12px}
 .p-grp.collapsed .arrow{transform:rotate(-90deg)}
 .p-grp.collapsed .p-bd{display:none}
 .p-bd{padding:10px 12px;display:flex;flex-direction:column;gap:8px}
 /* curriculum mode */
 .ch{margin-bottom:18px}
-.ch-hd{font-size:15px;font-weight:700;margin:0 0 8px;color:#111827;padding-bottom:4px;border-bottom:2px solid #e5e7eb}
+.ch-hd{font-size:15px;font-weight:700;margin:0 0 8px;color:#202124;padding-bottom:4px;border-bottom:2px solid #dadce0}
 .sec{margin:0 0 14px 0}
-.sec-hd{font-size:13px;font-weight:600;color:#4b5563;margin:10px 0 6px}
+.sec-hd{font-size:13px;font-weight:600;color:#5f6368;margin:10px 0 6px}
 .sec-bd{display:flex;flex-direction:column;gap:8px}
 /* concept card */
-.c{border:1px solid #e5e7eb;border-radius:8px;background:#fff;padding:10px 12px;transition:background .15s}
-.c.done{background:#f9fafb;opacity:.7}
+.c{border:1px solid #dadce0;border-radius:8px;background:#fff;padding:10px 12px;transition:background .15s}
+.c.done{background:#f8f9fa;opacity:.7}
 .c .top{display:flex;align-items:flex-start;gap:8px}
-.c .ttl{flex:1;display:flex;align-items:center;gap:8px;cursor:pointer;font-weight:600;font-size:14px;color:#111827}
-.c.done .ttl{text-decoration:line-through;color:#6b7280}
+.c .ttl{flex:1;display:flex;align-items:center;gap:8px;cursor:pointer;font-weight:600;font-size:14px;color:#202124}
+.c.done .ttl{text-decoration:line-through;color:#5f6368}
 .badge{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:6px;font-size:11px;font-weight:700;flex-shrink:0}
-.b1{background:#fef2f2;color:#dc2626;border:1px solid #fecaca}
-.b2{background:#fffbeb;color:#d97706;border:1px solid #fde68a}
-.b3{background:#f0fdf4;color:#16a34a;border:1px solid #bbf7d0}
-.b4{background:#f3f4f6;color:#6b7280;border:1px solid #d1d5db}
+.b1{background:#fef2f2;color:#dc2626;border:1px solid #ffcdd2}
+.b2{background:#fffbeb;color:#d97706;border:1px solid #fff9c4}
+.b3{background:#f0fdf4;color:#16a34a;border:1px solid #c8e6c9}
+.b4{background:#f1f3f4;color:#5f6368;border:1px solid #dadce0}
 .c .chk{width:18px;height:18px;cursor:pointer;margin-top:2px}
-.c .expand{color:#9ca3af;font-size:10px;margin-left:auto;user-select:none}
-.meta{font-size:11px;color:#6b7280;margin-top:4px;display:flex;flex-wrap:wrap;gap:6px;padding-left:30px}
-.meta .crumb{background:#f3f4f6;padding:1px 6px;border-radius:4px}
-.meta .ev{font-style:italic;color:#9ca3af}
-.body{margin-top:10px;padding:10px;border-top:1px dashed #e5e7eb;display:none;font-size:13px;color:#374151}
+.c .expand{color:#80868b;font-size:10px;margin-left:auto;user-select:none}
+.meta{font-size:11px;color:#5f6368;margin-top:4px;display:flex;flex-wrap:wrap;gap:6px;padding-left:30px}
+.meta .crumb{background:#f1f3f4;padding:1px 6px;border-radius:4px}
+.meta .ev{font-style:italic;color:#80868b}
+.body{margin-top:10px;padding:10px;border-top:1px dashed #dadce0;display:none;font-size:13px;color:#3c4043}
 .c.open .body{display:block}
 .body .sect{margin-bottom:8px}
 .body .sect:last-child{margin-bottom:0}
-.body .lbl{font-size:11px;font-weight:700;color:#6b7280;text-transform:uppercase;margin-bottom:3px;letter-spacing:.03em}
+.body .lbl{font-size:11px;font-weight:700;color:#5f6368;text-transform:uppercase;margin-bottom:3px;letter-spacing:.03em}
 .body .kw{display:inline-block;background:#eef2ff;color:#4338ca;padding:1px 7px;border-radius:4px;margin:2px 4px 2px 0;font-size:11px}
-.empty{text-align:center;color:#9ca3af;padding:40px;font-size:14px}
+.empty{text-align:center;color:#80868b;padding:40px;font-size:14px}
 </style>
+<script src="chrome-frame.js"></script>
 </head>
 <body>
 <header>
-  <h1>📚 TOPCIT 개념집 <span style="font-weight:400;color:#6b7280;font-size:13px">기출 기반 우선순위 학습</span></h1>
+  <h1>📚 TOPCIT 개념집 <span style="font-weight:400;color:#5f6368;font-size:13px">기출 기반 우선순위 학습</span></h1>
   <div class="sub-tabs" id="subTabs"></div>
   <div class="ctrls">
     <div class="mode-tog" id="modeTog">
@@ -199,7 +201,7 @@ function renderPriority(list){
     const collapsed = (lvl >= 3) ? 'collapsed' : '';
     parts.push(`<section class="p-grp p${lvl} ${collapsed}" data-lvl="${lvl}">
       <div class="p-hd p${lvl}" data-act="grp">
-        <span>${PRIO[lvl].emoji} ${lvl}순위 · ${PRIO[lvl].label} <span style="font-weight:400;color:#6b7280">(${done}/${items.length})</span></span>
+        <span>${PRIO[lvl].emoji} ${lvl}순위 · ${PRIO[lvl].label} <span style="font-weight:400;color:#5f6368">(${done}/${items.length})</span></span>
         <span class="arrow">▼</span>
       </div>
       <div class="p-bd">
@@ -227,7 +229,7 @@ function renderCurriculum(list){
     for(const [, sec] of ch.secs){
       if(!sec.items.length) continue;
       secParts.push(`<div class="sec">
-        <div class="sec-hd">§ ${esc(sec.title)} <span style="font-weight:400;color:#9ca3af;font-size:11px">(${sec.items.length})</span></div>
+        <div class="sec-hd">§ ${esc(sec.title)} <span style="font-weight:400;color:#80868b;font-size:11px">(${sec.items.length})</span></div>
         <div class="sec-bd">${sec.items.map(cardHTML).join('')}</div>
       </div>`);
     }

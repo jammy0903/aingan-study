@@ -1,14 +1,15 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <title>TOPCIT 05-05 IT 비즈니스 혁신</title>
 <style>
-:root{--font-sans:"Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",system-ui,sans-serif;--font-serif:"NanumMyeongjo","Nanum Myeongjo","Batang","Apple SD Gothic Neo",serif}
+:root{--font-sans:Roboto,'Noto Sans KR','Malgun Gothic',sans-serif;--font-serif:"NanumMyeongjo","Nanum Myeongjo","Batang","Apple SD Gothic Neo",serif}
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{overflow-x:hidden}
-body{font-family:var(--font-sans);background:#f7f8fb;color:#1f2937;min-height:100vh}
+body{font-family:var(--font-sans);background:#f1f3f4;color:#202124;min-height:100vh}
 
 .header{background:#b45309;color:#fff;padding:.85rem 1.25rem;display:flex;align-items:center;gap:.75rem;position:sticky;top:0;z-index:20;box-shadow:0 2px 10px rgba(0,0,0,.15)}
 .header-back{color:#fff;text-decoration:none;font-size:1.2rem;opacity:.85}
@@ -16,7 +17,7 @@ body{font-family:var(--font-sans);background:#f7f8fb;color:#1f2937;min-height:10
 .header-cnt{font-size:.75rem;opacity:.8;white-space:nowrap}
 
 .search-wrap{padding:.7rem 1.25rem .3rem}
-.search{width:100%;padding:.6rem 1rem;border:2px solid #e2e8f0;border-radius:2rem;font-size:.88rem;outline:none;background:#fff;transition:border .2s}
+.search{width:100%;padding:.6rem 1rem;border:2px solid #dadce0;border-radius:2rem;font-size:.88rem;outline:none;background:#fff;transition:border .2s}
 .search:focus{border-color:#b45309}
 
 .tabs{display:flex;gap:.35rem;padding:.4rem 1.25rem .3rem;overflow-x:auto;scrollbar-width:none}
@@ -26,8 +27,8 @@ body{font-family:var(--font-sans);background:#f7f8fb;color:#1f2937;min-height:10
 
 .prio-bar{display:flex;gap:.3rem;padding:.2rem 1.25rem .6rem;overflow-x:auto;scrollbar-width:none}
 .prio-bar::-webkit-scrollbar{display:none}
-.pchip{flex-shrink:0;padding:.28rem .7rem;border-radius:2rem;border:1.5px solid #e5e7eb;background:#fff;color:#475569;font-size:.72rem;font-weight:700;cursor:pointer;white-space:nowrap;transition:all .15s;font-family:inherit}
-.pchip:hover{border-color:var(--pc,#9ca3af);color:#111827}
+.pchip{flex-shrink:0;padding:.28rem .7rem;border-radius:2rem;border:1.5px solid #dadce0;background:#fff;color:#475569;font-size:.72rem;font-weight:700;cursor:pointer;white-space:nowrap;transition:all .15s;font-family:inherit}
+.pchip:hover{border-color:var(--pc,#80868b);color:#202124}
 .pchip.active{background:var(--pc,#b45309);border-color:var(--pc,#b45309);color:#fff}
 .pchip[data-prio="all"].active{background:#b45309;border-color:#b45309;color:#fff}
 
@@ -38,7 +39,7 @@ body{font-family:var(--font-sans);background:#f7f8fb;color:#1f2937;min-height:10
 @media(min-width:540px){.card-grid{grid-template-columns:repeat(3,1fr)}}
 @media(min-width:900px){.card-grid{grid-template-columns:repeat(4,1fr)}}
 @media(min-width:1200px){.card-grid{grid-template-columns:repeat(5,1fr)}}
-.card{background:#fff;border-radius:.7rem;padding:.85rem .8rem .65rem;cursor:pointer;border:1.5px solid #e5e7eb;transition:all .18s;box-shadow:0 1px 3px rgba(0,0,0,.04);position:relative;display:flex;flex-direction:column;gap:.35rem;min-height:9rem}
+.card{background:#fff;border-radius:.7rem;padding:.85rem .8rem .65rem;cursor:pointer;border:1.5px solid #dadce0;transition:all .18s;box-shadow:0 1px 3px rgba(0,0,0,.04);position:relative;display:flex;flex-direction:column;gap:.35rem;min-height:9rem}
 .card:hover{border-color:#b45309;box-shadow:0 4px 14px #b4530933;transform:translateY(-2px)}
 .card-badges{position:absolute;top:.45rem;right:.5rem;display:flex;gap:.2rem;font-size:.64rem}
 .card-badges span{padding:.1rem .42rem;border-radius:.4rem;font-weight:700;line-height:1.4;white-space:nowrap}
@@ -47,13 +48,13 @@ body{font-family:var(--font-sans);background:#f7f8fb;color:#1f2937;min-height:10
 .b-prio-3{background:#dcfce7;color:#166534}
 .b-prio-4{background:#f1f5f9;color:#475569}
 .b-mn{background:#ede9fe;color:#5b21b6}
-.card-title{font-size:.86rem;font-weight:700;color:#111827;line-height:1.35;padding-right:4.5rem;font-family:var(--font-serif)}
-.card-preview{font-size:.7rem;color:#6b7280;line-height:1.5;flex:1}
+.card-title{font-size:.86rem;font-weight:700;color:#202124;line-height:1.35;padding-right:4.5rem;font-family:var(--font-serif)}
+.card-preview{font-size:.7rem;color:#5f6368;line-height:1.5;flex:1}
 .card-cta{font-size:.68rem;color:#b45309;font-weight:700;text-align:right;margin-top:.25rem}
 .card.hidden-card{display:none!important}
 
 /* ───────── 레슨 모드 (풀스크린) ───────── */
-.lesson{display:none;position:fixed;inset:0;background:#f7f8fb;z-index:1000;flex-direction:column}
+.lesson{display:none;position:fixed;inset:0;background:#f1f3f4;z-index:100000;flex-direction:column}
 .lesson.show{display:flex}
 .l-head{background:#b45309;color:#fff;padding:.7rem 1rem;display:flex;align-items:center;gap:.7rem;flex-shrink:0}
 .l-back{background:none;border:none;color:#fff;font-size:1.3rem;cursor:pointer;padding:0;line-height:1;opacity:.9}
@@ -76,15 +77,15 @@ body{font-family:var(--font-sans);background:#f7f8fb;color:#1f2937;min-height:10
 .l-page-kw span{background:#b4530922;color:#78350f;border:1px solid #b4530955;border-radius:1rem;padding:.18rem .65rem;font-size:.72rem;font-weight:700}
 
 .sec{border-radius:.7rem;padding:1rem 1.1rem;line-height:1.65;margin-bottom:.85rem}
-.sec-summary{background:#b4530911;border-left:5px solid #b45309;font-size:.95rem;color:#111827;font-weight:600}
+.sec-summary{background:#b4530911;border-left:5px solid #b45309;font-size:.95rem;color:#202124;font-weight:600}
 .sec-bg{background:#fef7ec;border-left:5px solid #d97706}
 .sec-expl{background:#eef2ff;border-left:5px solid #4f46e5}
 .sec-why{background:#ecfdf5;border-left:5px solid #059669}
 .sec-term{background:#faf5ff;border-left:5px solid #7c3aed}
 .sec-link{background:#fff7ed;border-left:5px solid #c2410c}
-.sec-mn{background:linear-gradient(145deg,#fffef5 0%,#fff7d6 56%,#b4530920 100%);color:#1f2937;font-weight:600;border:1.5px solid #b4530933;border-left:5px solid #b45309;box-shadow:0 10px 26px #b4530914}
+.sec-mn{background:linear-gradient(145deg,#fffef5 0%,#fff7d6 56%,#b4530920 100%);color:#202124;font-weight:600;border:1.5px solid #b4530933;border-left:5px solid #b45309;box-shadow:0 10px 26px #b4530914}
 .sec-trap{background:#fff1f2;border:1.5px solid #fda4af;border-left:5px solid #e11d48;color:#881337}
-.sec-src{background:#fff;border:1.5px solid #e5e7eb;border-left:5px solid #475569}
+.sec-src{background:#fff;border:1.5px solid #dadce0;border-left:5px solid #475569}
 .sec-types{background:#f0f9ff;border:1.5px solid #bae6fd;border-left:5px solid #0284c7}
 .sec-types .sec-label{color:#075985}
 .types-caption{font-size:.8rem;color:#334155;margin-bottom:.6rem;line-height:1.55}
@@ -117,33 +118,33 @@ body{font-family:var(--font-sans);background:#f7f8fb;color:#1f2937;min-height:10
 .sec-mn p{font-size:.98rem}
 .fact-list{display:flex;flex-direction:column;gap:.65rem}
 .fact-item{background:rgba(255,255,255,.85);border:1px solid rgba(0,0,0,.06);border-radius:.85rem;padding:.78rem .85rem}
-.fact-term{font-size:.86rem;font-weight:800;color:#111827;margin-bottom:.22rem}
-.fact-note{font-size:.9rem;line-height:1.72;color:#374151;word-break:keep-all}
+.fact-term{font-size:.86rem;font-weight:800;color:#202124;margin-bottom:.22rem}
+.fact-note{font-size:.9rem;line-height:1.72;color:#3c4043;word-break:keep-all}
 .fact-link-label{display:inline-flex;align-items:center;padding:.12rem .45rem;border-radius:999px;background:#b4530914;color:#78350f;font-size:.64rem;font-weight:800;letter-spacing:.04em;margin-bottom:.38rem}
 .src-list{display:flex;flex-direction:column;gap:.5rem}
-.src-link{display:flex;align-items:flex-start;gap:.45rem;text-decoration:none;color:#111827;background:#f9fafb;border:1px solid #e5e7eb;border-radius:.8rem;padding:.72rem .82rem;transition:border-color .15s,transform .15s}
+.src-link{display:flex;align-items:flex-start;gap:.45rem;text-decoration:none;color:#202124;background:#f8f9fa;border:1px solid #dadce0;border-radius:.8rem;padding:.72rem .82rem;transition:border-color .15s,transform .15s}
 .src-link:hover{border-color:#b45309;transform:translateY(-1px)}
 .src-bullet{flex-shrink:0;color:#b45309;font-weight:800}
 .src-text{font-size:.85rem;line-height:1.55}
-.src-host{display:block;font-size:.72rem;color:#6b7280;margin-top:.1rem}
+.src-host{display:block;font-size:.72rem;color:#5f6368;margin-top:.1rem}
 .mn-list{display:flex;flex-direction:column;gap:.55rem}
 .mn-line{display:flex;align-items:flex-start;gap:.72rem;background:rgba(255,255,255,.82);border:1px solid #b4530922;border-radius:.9rem;padding:.72rem .8rem .68rem;box-shadow:0 4px 12px rgba(0,0,0,.04)}
 .mn-picto{flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;width:1.6rem;height:1.6rem;border-radius:.45rem;background:#b4530916;border:1px solid #b4530926;font-size:.76rem;font-weight:800;line-height:1;color:#78350f}
 .mn-main{display:flex;flex-direction:column;gap:.28rem;min-width:0}
 .mn-tag{display:inline-flex;align-items:center;width:fit-content;padding:.12rem .45rem;border-radius:999px;background:#b4530918;color:#78350f;font-size:.64rem;font-weight:800;letter-spacing:.05em}
-.mn-text{font-size:.95rem;line-height:1.76;color:#1f2937;word-break:keep-all}
+.mn-text{font-size:.95rem;line-height:1.76;color:#202124;word-break:keep-all}
 .mn-text strong{color:#b45309;font-weight:800}
 
 .ctable{width:100%;border-collapse:collapse;font-size:.82rem;background:#fff;border-radius:.5rem;overflow:hidden;margin-top:.4rem}
 .ctable th{background:#b45309;color:#fff;padding:.55rem .65rem;text-align:left;font-weight:700;font-size:.78rem}
-.ctable td{padding:.55rem .65rem;border-top:1px solid #e5e7eb;vertical-align:top;line-height:1.55}
-.ctable tr:nth-child(even) td{background:#f9fafb}
+.ctable td{padding:.55rem .65rem;border-top:1px solid #dadce0;vertical-align:top;line-height:1.55}
+.ctable tr:nth-child(even) td{background:#f8f9fa}
 
 .done-page{text-align:center;padding:2.5rem 1rem}
 .done-emoji{font-size:4.5rem;margin-bottom:1rem;animation:pop .4s ease}
 @keyframes pop{from{transform:scale(0)}80%{transform:scale(1.2)}to{transform:scale(1)}}
 .done-title{font-size:1.5rem;font-weight:800;color:#78350f;margin-bottom:.5rem;font-family:var(--font-serif)}
-.done-sub{font-size:.95rem;color:#6b7280;margin-bottom:2rem}
+.done-sub{font-size:.95rem;color:#5f6368;margin-bottom:2rem}
 .done-actions{display:flex;flex-direction:column;gap:.6rem;max-width:300px;margin:0 auto}
 .done-btn{padding:.85rem 1.4rem;border-radius:.7rem;font-size:.95rem;font-weight:700;cursor:pointer;border:none;font-family:inherit;transition:all .15s}
 .done-btn-primary{background:#b45309;color:#fff}
@@ -151,13 +152,14 @@ body{font-family:var(--font-sans);background:#f7f8fb;color:#1f2937;min-height:10
 .done-btn-sub{background:#fff;color:#b45309;border:1.5px solid #b45309}
 .done-btn-sub:hover{background:#b4530911}
 
-.l-foot{position:fixed;bottom:0;left:0;right:0;background:#fff;padding:.7rem 1rem;display:flex;gap:.5rem;border-top:1px solid #e5e7eb;z-index:1010}
+.l-foot{position:fixed;bottom:0;left:0;right:0;background:#fff;padding:.7rem 1rem;display:flex;gap:.5rem;border-top:1px solid #dadce0;z-index:1010}
 .l-nav-btn{flex:1;padding:.7rem;border-radius:.55rem;border:1.5px solid #b45309;background:#fff;color:#b45309;font-size:.88rem;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s}
 .l-nav-btn:hover:not(:disabled){background:#b4530911}
 .l-nav-btn:disabled{opacity:.35;cursor:not-allowed}
 .l-nav-btn.primary{background:#b45309;color:#fff;border-color:#b45309}
 .l-nav-btn.primary:hover:not(:disabled){background:#78350f;border-color:#78350f}
 </style>
+<script src="../../../chrome-frame.js"></script>
 </head>
 <body>
 
@@ -173,7 +175,7 @@ body{font-family:var(--font-sans);background:#f7f8fb;color:#1f2937;min-height:10
 </div>
 
 <div class="tabs" id="tab-bar"><button class="tab active" onclick="filterTab(this,'all')">전체</button><button class="tab" onclick="filterTab(this,'0')">학습내용 요약</button></div>
-<div class="prio-bar"><button class="pchip active" data-prio="all" onclick="filterPrio(this)">전체</button><button class="pchip" data-prio="1" onclick="filterPrio(this)" style="--pc:#dc2626">🔴 P1 최우선</button><button class="pchip" data-prio="2" onclick="filterPrio(this)" style="--pc:#d97706">🟡 P2 중요</button><button class="pchip" data-prio="3" onclick="filterPrio(this)" style="--pc:#16a34a">🟢 P3 보통</button><button class="pchip" data-prio="4" onclick="filterPrio(this)" style="--pc:#9ca3af">⚪ P4 보조</button></div>
+<div class="prio-bar"><button class="pchip active" data-prio="all" onclick="filterPrio(this)">전체</button><button class="pchip" data-prio="1" onclick="filterPrio(this)" style="--pc:#dc2626">🔴 P1 최우선</button><button class="pchip" data-prio="2" onclick="filterPrio(this)" style="--pc:#d97706">🟡 P2 중요</button><button class="pchip" data-prio="3" onclick="filterPrio(this)" style="--pc:#16a34a">🟢 P3 보통</button><button class="pchip" data-prio="4" onclick="filterPrio(this)" style="--pc:#80868b">⚪ P4 보조</button></div>
 
 <div id="card-content"><div class="section-group" data-chapter="0"><div class="section-label">학습내용 요약</div><div class="card-grid"><div class="card" data-prio="2" onclick="startLesson(0)"><div class="card-badges"><span class="b-prio b-prio-2" title="중요">🟡 P2</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">IT 비즈니스 발주프로세스</div><div class="card-preview">옛날에 회사가 새로운 IT 시스템을 도입할 때 어디서부터 시작해야 할지 몰라서 돈만 쏟아붓…</div><div class="card-cta">레슨 시작 →</div></div><div class="card" data-prio="2" onclick="startLesson(1)"><div class="card-badges"><span class="b-prio b-prio-2" title="중요">🟡 P2</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">소프트웨어 도입 프로세스, ISO/IEC 12207</div><div class="card-preview">소프트웨어를 만들거나 살 때 회사마다 방식이 제각각이라 나중에 합치거나 비교하면 완전 엉망…</div><div class="card-cta">레슨 시작 →</div></div><div class="card" data-prio="3" onclick="startLesson(2)"><div class="card-badges"><span class="b-prio b-prio-3" title="보통">🟢 P3</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">테일러링 프로세스</div><div class="card-preview">소프트웨어 개발 방법론은 원래 모든 상황에 맞게 만들어진 &#x27;완벽한 표준 레시피&#x27;처럼 존재했…</div><div class="card-cta">레슨 시작 →</div></div><div class="card" data-prio="2" onclick="startLesson(3)"><div class="card-badges"><span class="b-prio b-prio-2" title="중요">🟡 P2</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">비즈니스 아웃소싱의 개요</div><div class="card-preview">옛날에 기업들은 모든 걸 혼자 다 하려고 했는데, 잘 못하는 것까지 직접 하다 보니 돈도 …</div><div class="card-cta">레슨 시작 →</div></div><div class="card" data-prio="3" onclick="startLesson(4)"><div class="card-badges"><span class="b-prio b-prio-3" title="보통">🟢 P3</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">도입 프로세스</div><div class="card-preview">옛날에 회사들이 IT 관련 일을 전부 직접 하려다 보니 돈도 너무 많이 들고 전문성도 부족…</div><div class="card-cta">레슨 시작 →</div></div><div class="card" data-prio="2" onclick="startLesson(5)"><div class="card-badges"><span class="b-prio b-prio-2" title="중요">🟡 P2</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">아웃소싱의 형태</div><div class="card-preview">옛날에 회사들이 IT 업무까지 직접 다 하려다 보니 비용도 너무 많이 들고 전문성도 떨어지…</div><div class="card-cta">레슨 시작 →</div></div><div class="card" data-prio="2" onclick="startLesson(6)"><div class="card-badges"><span class="b-prio b-prio-2" title="중요">🟡 P2</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">아웃소싱의 효과</div><div class="card-preview">옛날에 회사들이 IT 시스템을 전부 혼자 관리하려다 보니 비용도 너무 많이 들고 전문 인력…</div><div class="card-cta">레슨 시작 →</div></div><div class="card" data-prio="3" onclick="startLesson(7)"><div class="card-badges"><span class="b-prio b-prio-3" title="보통">🟢 P3</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">업무 프로세스</div><div class="card-preview">옛날에 회사들이 커지면서 &#x27;누가, 언제, 어떤 순서로 일해야 하는지&#x27; 정해놓지 않으면 엄청…</div><div class="card-cta">레슨 시작 →</div></div><div class="card" data-prio="3" onclick="startLesson(8)"><div class="card-badges"><span class="b-prio b-prio-3" title="보통">🟢 P3</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">IT 비즈니스 프로세스 관리</div><div class="card-preview">옛날에 회사에서 일할 때 각 부서가 따로따로 움직이다 보니 업무가 중복되거나 중간에 막히는…</div><div class="card-cta">레슨 시작 →</div></div><div class="card" data-prio="3" onclick="startLesson(9)"><div class="card-badges"><span class="b-prio b-prio-3" title="보통">🟢 P3</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">IT 비즈니스 프로세스 정보관리</div><div class="card-preview">회사가 커지면서 매일 엄청난 양의 데이터가 쌓이는데, 오래된 데이터까지 전부 비싼 저장소에…</div><div class="card-cta">레슨 시작 →</div></div><div class="card" data-prio="2" onclick="startLesson(10)"><div class="card-badges"><span class="b-prio b-prio-2" title="중요">🟡 P2</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">BPR의 이해</div><div class="card-preview">옛날에 일본이나 한국, 대만 제품이 미국 시장에 쏟아지면서 미국 기업들이 &#x27;왜 우리가 지고…</div><div class="card-cta">레슨 시작 →</div></div><div class="card" data-prio="2" onclick="startLesson(11)"><div class="card-badges"><span class="b-prio b-prio-2" title="중요">🟡 P2</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">BI의 이해</div><div class="card-preview">옛날에 회사들은 엄청난 양의 데이터를 쌓아두고도 어디에 써야 할지 몰라서 그냥 창고에 처박…</div><div class="card-cta">레슨 시작 →</div></div><div class="card" data-prio="2" onclick="startLesson(12)"><div class="card-badges"><span class="b-prio b-prio-2" title="중요">🟡 P2</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">6시그마의 이해</div><div class="card-preview">옛날에 공장에서 물건을 만들다 보면 불량품이 너무 많이 나와서 회사가 손해를 엄청 봤어. …</div><div class="card-cta">레슨 시작 →</div></div><div class="card" data-prio="3" onclick="startLesson(13)"><div class="card-badges"><span class="b-prio b-prio-3" title="보통">🟢 P3</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">트리즈의 이해</div><div class="card-preview">옛날에 발명가들은 새로운 아이디어를 그냥 &#x27;운&#x27;이나 &#x27;천재성&#x27;에 의존해서 만들었는데, 러시…</div><div class="card-cta">레슨 시작 →</div></div><div class="card" data-prio="4" onclick="startLesson(14)"><div class="card-badges"><span class="b-prio b-prio-4" title="보조">⚪ P4</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">MBO의 이해</div><div class="card-preview">옛날에 기업들이 서비스를 제공할 때 &#x27;우리는 잘하고 있다&#x27;고 생각하는데 손님들은 &#x27;별로야&#x27;…</div><div class="card-cta">레슨 시작 →</div></div><div class="card" data-prio="3" onclick="startLesson(15)"><div class="card-badges"><span class="b-prio b-prio-3" title="보통">🟢 P3</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">엔터프라이즈 4=A(Enterprise Solution)</div><div class="card-preview">옛날에 기업들은 각 부서마다 따로따로 일을 처리해서 소통이 안 되고 업무가 중복되는 문제가…</div><div class="card-cta">레슨 시작 →</div></div><div class="card" data-prio="2" onclick="startLesson(16)"><div class="card-badges"><span class="b-prio b-prio-2" title="중요">🟡 P2</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">엔터프라이즈 솔루션의 종류</div><div class="card-preview">옛날에 회사가 커지면서 영업팀, 회계팀, 창고팀이 각자 따로 엑셀 파일 쓰다 보니 정보가 …</div><div class="card-cta">레슨 시작 →</div></div><div class="card" data-prio="3" onclick="startLesson(17)"><div class="card-badges"><span class="b-prio b-prio-3" title="보통">🟢 P3</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">비즈니스 전략과 엔터프라이즈 솔루션</div><div class="card-preview">옛날에 회사가 커지면 영업팀, 재고팀, 회계팀이 각자 따로 노는 바람에 정보가 뒤죽박죽 섞…</div><div class="card-cta">레슨 시작 →</div></div><div class="card" data-prio="3" onclick="startLesson(18)"><div class="card-badges"><span class="b-prio b-prio-3" title="보통">🟢 P3</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">ERP의 이해</div><div class="card-preview">옛날에 회사들은 회계팀, 인사팀, 생산팀이 각자 따로따로 다른 프로그램을 쓰고 있어서 정보…</div><div class="card-cta">레슨 시작 →</div></div><div class="card" data-prio="2" onclick="startLesson(19)"><div class="card-badges"><span class="b-prio b-prio-2" title="중요">🟡 P2</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">SCM의 이해</div><div class="card-preview">옛날에 물건을 만들어서 팔기까지 원자재 구매, 공장 생산, 창고 보관, 배송 등 수많은 단…</div><div class="card-cta">레슨 시작 →</div></div><div class="card" data-prio="2" onclick="startLesson(20)"><div class="card-badges"><span class="b-prio b-prio-2" title="중요">🟡 P2</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">PLM의 이해</div><div class="card-preview">옛날에 회사들은 제품을 만들 때 설계 팀, 생산 팀, 판매 팀이 각자 따로 정보를 관리해서…</div><div class="card-cta">레슨 시작 →</div></div><div class="card" data-prio="2" onclick="startLesson(21)"><div class="card-badges"><span class="b-prio b-prio-2" title="중요">🟡 P2</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">EDW의 이해</div><div class="card-preview">옛날에 기업들은 부서마다 각자 따로 데이터를 관리했어. 그러다 보니 영업팀 숫자랑 재무팀 …</div><div class="card-cta">레슨 시작 →</div></div><div class="card" data-prio="4" onclick="startLesson(22)"><div class="card-badges"><span class="b-prio b-prio-4" title="보조">⚪ P4</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">BI의 이해</div><div class="card-preview">옛날에 회사들은 엄청난 양의 데이터를 쌓아두고도 어디에 써야 할지 몰라서 그냥 창고에 처박…</div><div class="card-cta">레슨 시작 →</div></div><div class="card" data-prio="2" onclick="startLesson(23)"><div class="card-badges"><span class="b-prio b-prio-2" title="중요">🟡 P2</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">IT 서비스관리의 개요</div><div class="card-preview">옛날에 IT 부서가 그냥 &#x27;컴퓨터 고쳐주는 곳&#x27; 취급 받던 시절이 있었어. 그런데 회사가 …</div><div class="card-cta">레슨 시작 →</div></div><div class="card" data-prio="2" onclick="startLesson(24)"><div class="card-badges"><span class="b-prio b-prio-2" title="중요">🟡 P2</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">ITIL의 이해</div><div class="card-preview">1980년대 영국 정부는 IT 서비스가 제각각 엉망으로 운영되는 문제를 겪었어. 그래서 &#x27;…</div><div class="card-cta">레슨 시작 →</div></div><div class="card" data-prio="2" onclick="startLesson(25)"><div class="card-badges"><span class="b-prio b-prio-2" title="중요">🟡 P2</span><span class="b-mn" title="암기 포인트">🧠</span></div><div class="card-title">SLA의 이해</div><div class="card-preview">옛날에 인터넷 서비스나 클라우드를 쓸 때 &#x27;서버가 얼마나 자주 꺼져도 되는지&#x27;, &#x27;속도가 …</div><div class="card-cta">레슨 시작 →</div></div></div></div></div>
 
@@ -200,6 +202,21 @@ let curPrio = 'all';
 let curLessonIdx = -1;
 let curPage = 0;
 let pages = [];
+const CHAPTER_MAP = {};
+const CHAPTER_NAMES = {};
+document.querySelectorAll('.section-group').forEach(grp => {
+  const ch = parseInt(grp.dataset.chapter);
+  const lbl = grp.querySelector('.section-label');
+  if (lbl) CHAPTER_NAMES[ch] = lbl.textContent.trim();
+  grp.querySelectorAll('.card').forEach(card => {
+    const m = (card.getAttribute('onclick') || '').match(/startLesson\((\d+)\)/);
+    if (m) CHAPTER_MAP[parseInt(m[1])] = ch;
+  });
+});
+function isLastInChapter(idx) {
+  const ch = CHAPTER_MAP[idx];
+  return CHAPTER_MAP[idx + 1] !== ch || idx + 1 >= LESSONS.length;
+}
 
 function filterTab(btn, ch) {
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
@@ -366,11 +383,15 @@ function renderMnemonic(text) {
   return `<div class="sec sec-mn"><div class="sec-label">🧠 5초 암기</div><div class="mn-list">${html}</div></div>`;
 }
 
-function buildPages(lesson) {
-  return [
-    { type: 'learn', data: lesson },
-    { type: 'done',  data: lesson },
-  ];
+function buildPages(idx) {
+  const lesson = LESSONS[idx];
+  if (isLastInChapter(idx)) {
+    return [
+      { type: 'learn', data: lesson },
+      { type: 'done',  data: lesson },
+    ];
+  }
+  return [{ type: 'learn', data: lesson }];
 }
 
 function renderPage() {
@@ -408,7 +429,7 @@ function renderPage() {
       const head = cols.map(c => `<th>${escHtml(c)}</th>`).join('');
       const rows = d.table.map(r => '<tr>' + cols.map(c => `<td>${escHtml(r[c] || '')}</td>`).join('') + '</tr>').join('');
       h += `<div class="sec sec-summary" style="padding:0;background:transparent;border:none">
-        <div class="sec-label" style="padding-left:.3rem;color:#6b7280;margin-bottom:.5rem">📊 정리표</div>
+        <div class="sec-label" style="padding-left:.3rem;color:#5f6368;margin-bottom:.5rem">📊 정리표</div>
         <table class="ctable"><thead><tr>${head}</tr></thead><tbody>${rows}</tbody></table>
       </div>`;
     }
@@ -421,8 +442,8 @@ function renderPage() {
     wrap.innerHTML = `
       <div class="done-page">
         <div class="done-emoji">🎉</div>
-        <div class="done-title">레슨 완료!</div>
-        <div class="done-sub">${escHtml(d.title)}</div>
+        <div class="done-title">주제 완료!</div>
+        <div class="done-sub">${escHtml(CHAPTER_NAMES[CHAPTER_MAP[curLessonIdx]] || d.title)}</div>
         <div class="done-actions">
           ${hasNext ? '<button class="done-btn done-btn-primary" onclick="startLesson(' + (curLessonIdx + 1) + ')">다음 개념 →</button>' : ''}
           <button class="done-btn done-btn-sub" onclick="exitLesson()">목록으로 돌아가기</button>
@@ -435,15 +456,21 @@ function renderPage() {
   document.getElementById('l-page-ind').textContent = `${curPage + 1} / ${pages.length}`;
   document.getElementById('l-progress-bar').style.width = `${((curPage + 1) / pages.length) * 100}%`;
   document.getElementById('l-prev').disabled = curPage === 0;
-  document.getElementById('l-next').disabled = curPage === pages.length - 1;
-  document.getElementById('l-next').textContent = curPage === pages.length - 2 ? '완료 🎉' : '다음 →';
+  const _nb = document.getElementById('l-next');
+  if (pages[curPage].type === 'learn' && curPage === pages.length - 1 && !isLastInChapter(curLessonIdx)) {
+    _nb.disabled = false;
+    _nb.textContent = '다음 개념 →';
+  } else {
+    _nb.disabled = curPage === pages.length - 1;
+    _nb.textContent = curPage === pages.length - 2 ? '완료 🎉' : '다음 →';
+  }
 }
 
 function startLesson(idx) {
   if (idx < 0 || idx >= LESSONS.length) return;
   curLessonIdx = idx;
   curPage = 0;
-  pages = buildPages(LESSONS[idx]);
+  pages = buildPages(idx);
   document.getElementById('l-title').textContent = LESSONS[idx].title;
   document.getElementById('lesson').classList.add('show');
   document.body.style.overflow = 'hidden';
@@ -456,7 +483,12 @@ function exitLesson() {
   curLessonIdx = -1;
 }
 
-function nextPage() { if (curPage < pages.length - 1) { curPage++; renderPage(); } }
+function nextPage() {
+  if (curPage < pages.length - 1) { curPage++; renderPage(); return; }
+  if (pages[curPage].type === 'learn' && !isLastInChapter(curLessonIdx) && curLessonIdx + 1 < LESSONS.length) {
+    startLesson(curLessonIdx + 1);
+  }
+}
 function prevPage() { if (curPage > 0) { curPage--; renderPage(); } }
 
 document.addEventListener('keydown', e => {

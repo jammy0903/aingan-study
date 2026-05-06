@@ -1,0 +1,258 @@
+/* ─── Chrome 브라우저 프레임 오버레이 ─── */
+
+#chrome-frame {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 99999;
+  font-family: -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  font-size: 13px;
+  user-select: none;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── 탭 바 ── */
+#chrome-tabbar {
+  display: flex;
+  align-items: flex-end;
+  height: 40px;
+  background: #dee1e6;
+  padding: 0 8px 0 100px;
+  gap: 0;
+}
+
+/* 윈도우 컨트롤 (최소화/최대화/닫기) */
+#chrome-winctrl {
+  position: absolute;
+  top: 0; right: 0;
+  display: flex;
+  align-items: center;
+  height: 40px;
+  padding-right: 2px;
+  gap: 0;
+}
+
+.chrome-winbtn {
+  width: 46px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #3c4043;
+  transition: background .1s;
+}
+.chrome-winbtn:hover { background: rgba(0,0,0,.1); }
+.chrome-winbtn.close:hover { background: #e81123; color: #fff; }
+.chrome-winbtn svg { width: 10px; height: 10px; }
+
+/* 탭 */
+.chrome-tab {
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  max-width: 220px;
+  width: 190px;
+  height: 34px;
+  padding: 0 10px 0 12px;
+  gap: 6px;
+  cursor: pointer;
+  border-radius: 8px 8px 0 0;
+  margin-right: 1px;
+  transition: background .1s;
+  overflow: hidden;
+  flex-shrink: 1;
+}
+
+.chrome-tab.active {
+  background: #f1f3f4;
+  z-index: 2;
+}
+
+.chrome-tab:not(.active) {
+  background: transparent;
+}
+.chrome-tab:not(.active):hover { background: rgba(255,255,255,.4); }
+
+.chrome-tab-favicon {
+  width: 16px; height: 16px;
+  flex-shrink: 0;
+  border-radius: 2px;
+}
+
+.chrome-tab-title {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 12px;
+  color: #202124;
+  font-weight: 400;
+  line-height: 1;
+}
+
+.chrome-tab:not(.active) .chrome-tab-title { color: #5f6368; }
+
+.chrome-tab-close {
+  flex-shrink: 0;
+  width: 16px; height: 16px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; color: #5f6368;
+  opacity: 0;
+  transition: opacity .1s, background .1s;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+}
+.chrome-tab:hover .chrome-tab-close { opacity: 1; }
+.chrome-tab-close:hover { background: rgba(0,0,0,.15); color: #202124; }
+
+.chrome-tab-new {
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px; color: #5f6368;
+  cursor: pointer;
+  margin-left: 4px;
+  margin-bottom: 3px;
+  transition: background .1s;
+  background: none;
+  border: none;
+  font-family: inherit;
+}
+.chrome-tab-new:hover { background: rgba(0,0,0,.1); color: #202124; }
+
+/* ── 툴바 (주소창 라인) ── */
+#chrome-toolbar {
+  display: flex;
+  align-items: center;
+  height: 48px;
+  background: #f1f3f4;
+  padding: 0 12px;
+  gap: 8px;
+  border-bottom: 1px solid #dadce0;
+}
+
+/* 뒤로/앞으로/새로고침 */
+.chrome-nav-btn {
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  color: #3c4043;
+  transition: background .1s;
+  border: none; background: none;
+  flex-shrink: 0;
+}
+.chrome-nav-btn:hover { background: rgba(0,0,0,.08); }
+.chrome-nav-btn.disabled { color: #aaa; cursor: default; }
+.chrome-nav-btn.disabled:hover { background: none; }
+
+/* 주소창 */
+#chrome-omnibox {
+  flex: 1;
+  max-width: 680px;
+  margin: 0 auto;
+  height: 32px;
+  background: #fff;
+  border: 1px solid #dadce0;
+  border-radius: 100px;
+  display: flex;
+  align-items: center;
+  padding: 0 14px;
+  gap: 6px;
+  cursor: text;
+  transition: box-shadow .2s;
+}
+
+#chrome-omnibox:hover {
+  box-shadow: 0 1px 6px rgba(32,33,36,.28);
+  border-color: transparent;
+}
+
+.omni-lock {
+  color: #5f6368;
+  font-size: 12px;
+  flex-shrink: 0;
+  display: flex; align-items: center;
+}
+
+.omni-url {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 14px;
+  color: #202124;
+  letter-spacing: 0;
+}
+
+.omni-url .omni-scheme { color: #5f6368; }
+.omni-url .omni-domain { font-weight: 500; }
+
+.omni-star {
+  flex-shrink: 0;
+  color: #5f6368; font-size: 14px; cursor: pointer;
+  transition: color .1s;
+}
+.omni-star:hover { color: #1a73e8; }
+
+/* 오른쪽 아이콘들 */
+.chrome-toolbar-right {
+  display: flex; align-items: center; gap: 4px; margin-left: 4px;
+}
+
+.chrome-ext-btn {
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; color: #5f6368;
+  transition: background .1s;
+  font-size: 14px;
+}
+.chrome-ext-btn:hover { background: rgba(0,0,0,.08); }
+
+.chrome-avatar {
+  width: 24px; height: 24px;
+  border-radius: 50%;
+  background: #1a73e8;
+  color: white;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 700;
+  cursor: pointer;
+  margin-left: 2px;
+}
+
+/* ── 북마크 바 ── */
+#chrome-bookmarks {
+  display: flex;
+  align-items: center;
+  height: 28px;
+  background: #f1f3f4;
+  padding: 0 8px;
+  gap: 2px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.chrome-bm {
+  display: flex; align-items: center; gap: 4px;
+  padding: 3px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  color: #3c4043;
+  font-size: 12px;
+  white-space: nowrap;
+  transition: background .1s;
+}
+.chrome-bm:hover { background: rgba(0,0,0,.08); }
+.chrome-bm .bm-icon { font-size: 13px; }
+
+/* ── 컨텐츠 영역 패딩 (Chrome 프레임 높이만큼) ── */
+body.chrome-framed {
+  padding-top: 116px !important;  /* 40 + 48 + 28 */
+}

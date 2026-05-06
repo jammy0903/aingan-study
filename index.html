@@ -1,40 +1,56 @@
 <!doctype html>
 <html lang="ko">
 <head>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>aingan.click</title>
   <link rel="stylesheet" href="./memory-frame.css">
+  <style>
+    .index-card { border-top: 4px solid var(--line); }
+    .index-card.blue  { border-top-color: #1a73e8; }
+    .index-card.red   { border-top-color: #ea4335; }
+    .index-card.amber { border-top-color: #fbbc05; }
+  </style>
+<script src="chrome-frame.js"></script>
 </head>
 <body>
   <main class="shell">
+    <header style="margin-bottom:20px;display:flex;align-items:center;gap:12px;padding:16px 20px;background:#fff;border-radius:16px;border:1px solid #dadce0;box-shadow:0 1px 3px rgba(60,64,67,.15)">
+      <span style="font-size:1.5rem">🎓</span>
+      <div>
+        <div style="font-size:1.1rem;font-weight:700;color:#202124">aingan.click</div>
+        <div style="font-size:.82rem;color:#5f6368;margin-top:1px">TOPCIT · 한국사 학습 플랫폼</div>
+      </div>
+    </header>
     <section class="index-grid">
-      <article class="index-card" style="border: 2px solid rgba(37,99,235,0.25); background: linear-gradient(135deg, rgba(239,246,255,0.9), rgba(255,255,255,0.9));">
+      <article class="index-card blue">
         <h2>🎯 TOPCIT 퀴즈</h2>
         <p>기출 복원문제 31선 + 6과목 단답형 예상문제 1,050개. 헤더에서 기출/예상 토글, 영역별 필터, 학습 친화적 해설 제공.</p>
         <div class="index-actions">
           <a class="btn primary" href="./topcit_quiz.html">퀴즈 풀기</a>
         </div>
       </article>
-      <article class="index-card" style="border: 2px solid rgba(220,38,38,0.25); background: linear-gradient(135deg, rgba(254,242,242,0.9), rgba(255,255,255,0.9));">
+      <article class="index-card red">
         <h2>📚 TOPCIT 개념집</h2>
         <p>6과목 675개 개념을 기출 분석 기반 우선순위(1🔴/2🟡/3🟢/4⚪)로 정리. 커리큘럼 모드와 우선순위 모드 토글 지원, 완료 체크 저장.</p>
         <div class="index-actions">
-          <a class="btn primary" href="./topcit_concepts.html">개념 학습</a>
+          <a class="btn primary" style="background:#ea4335;border-color:#ea4335;" href="./topcit_concepts.html">개념 학습</a>
         </div>
       </article>
-      <article class="index-card" style="border: 2px solid rgba(37,99,235,0.25); background: linear-gradient(135deg, rgba(239,246,255,0.9), rgba(255,255,255,0.9));">
+      <article class="index-card blue">
         <h2>📘 TOPCIT 레슨 뷰어</h2>
         <p>6과목별 카드 뷰 + 챕터 탭 + 우선순위 필터. 카드 클릭 → 한 개념씩 풀스크린으로 읽기.</p>
         <div class="index-actions">
           <a class="btn primary" href="./topcit_lesson/">레슨 열기</a>
         </div>
       </article>
-      <article class="index-card" style="border: 2px solid rgba(139,111,71,0.3); background: linear-gradient(135deg, rgba(250,246,240,0.95), rgba(255,255,255,0.9));">
+      <article class="index-card amber">
         <h2>📖 한국사능력검정</h2>
         <p>심화 1급 시대별 레슨. 선사~현대 7시대 153개 개념을 풀스크린 카드로 학습.</p>
         <div class="index-actions">
-          <a class="btn primary" href="./hankuksa/" style="background:#8b6f47;border-color:#8b6f47;">한국사 열기</a>
+          <a class="btn primary" href="./hankuksa/" style="background:#f9ab00;border-color:#f9ab00;color:#202124;">한국사 열기</a>
         </div>
       </article>
     </section>
