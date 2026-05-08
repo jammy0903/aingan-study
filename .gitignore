@@ -1,0 +1,3 @@
+# Local Playwright artifacts
+.playwright-cli/
+output/playwright/
