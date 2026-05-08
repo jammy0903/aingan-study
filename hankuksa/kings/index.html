@@ -48,13 +48,13 @@ a{color:inherit;text-decoration:none}
 .result-info{color:var(--muted);font-size:13px;margin-bottom:12px;padding-bottom:2px}
 .list{display:flex;flex-direction:column}
 .achievement-row{position:relative;display:grid;grid-template-columns:92px minmax(0,1fr);column-gap:18px;padding:0 0 30px}
-.achievement-row::before{content:'';position:absolute;left:35px;top:70px;bottom:4px;width:2px;background:#e5e8eb}
+.achievement-row::before{content:'';position:absolute;left:35px;top:70px;bottom:4px;width:2px;background:linear-gradient(180deg,var(--dynasty-soft,#e5e8eb),#e5e8eb)}
 .achievement-row:last-child::before{display:none}
 .marker{position:relative;display:flex;align-items:flex-start;justify-content:center;padding-top:2px}
-.year-circle{display:flex;align-items:center;justify-content:center;width:70px;height:70px;border:3px solid var(--mark);border-radius:50%;background:#fff;color:#173c4c;font-size:15px;font-weight:800;line-height:1.12;text-align:center;padding:8px;word-break:keep-all;box-shadow:0 0 0 6px #e8f2f4}
+.year-circle{display:flex;align-items:center;justify-content:center;width:70px;height:70px;border:3px solid var(--dynasty,#245c6f);border-radius:50%;background:#fff;color:var(--dynasty-ink,#173c4c);font-size:15px;font-weight:800;line-height:1.12;text-align:center;padding:8px;word-break:keep-all;box-shadow:0 0 0 6px var(--dynasty-soft,#e8f2f4)}
 .result{min-width:0;padding:0 0 2px}
 .site-row{display:flex;align-items:center;gap:10px;margin-bottom:4px;min-width:0}
-.favicon{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;background:#eef6e8;color:#41602f;border:1px solid #dadce0;font-size:12px;font-weight:800;flex-shrink:0}
+.favicon{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;background:var(--dynasty-soft,#eef6e8);color:var(--dynasty-ink,#41602f);border:1px solid var(--dynasty-soft,#dadce0);font-size:12px;font-weight:800;flex-shrink:0}
 .site-meta{display:flex;flex-direction:column;gap:1px;min-width:0}
 .site-name{font-size:13px;color:#202124;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .site-url{font-size:12px;color:#4d5156;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -64,11 +64,19 @@ a{color:inherit;text-decoration:none}
 .snippet{color:var(--body);font-size:13.5px;line-height:1.58;margin-top:3px;word-break:keep-all}
 .meta-line{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-top:8px}
 .pill{display:inline-flex;align-items:center;min-height:23px;border-radius:999px;background:var(--chip);color:#4d5156;font-size:12px;font-weight:500;padding:3px 8px;line-height:1.2}
-.pill-main{background:#e8f2f4;color:#173c4c;font-weight:700}
+.pill-main{background:var(--dynasty-soft,#e8f2f4);color:var(--dynasty-ink,#173c4c);font-weight:700}
 .lesson-link{display:inline-flex;align-items:center;color:#1a73e8;font-size:13px;font-weight:500;margin-top:8px}
 .lesson-link:hover{text-decoration:underline}
 .empty{display:none;color:var(--muted);font-size:14px;padding:50px 0}
 .empty.show{display:block}
+
+.dynasty-goguryeo{--dynasty:#245c6f;--dynasty-soft:#e8f2f4;--dynasty-ink:#173c4c}
+.dynasty-baekje{--dynasty:#b95f3e;--dynasty-soft:#fbede6;--dynasty-ink:#7a331f}
+.dynasty-silla{--dynasty:#b58a1e;--dynasty-soft:#fff4cf;--dynasty-ink:#6c4e00}
+.dynasty-unified-silla{--dynasty:#4f7f62;--dynasty-soft:#e8f4ec;--dynasty-ink:#315c43}
+.dynasty-balhae{--dynasty:#6d5cae;--dynasty-soft:#f0edfb;--dynasty-ink:#463880}
+.dynasty-goryeo{--dynasty:#2f6db3;--dynasty-soft:#e8f0fb;--dynasty-ink:#214f86}
+.dynasty-joseon{--dynasty:#7c5a3a;--dynasty-soft:#f2ece5;--dynasty-ink:#56381f}
 
 @media(max-width:900px){
   .header-inner{grid-template-columns:40px minmax(0,1fr);padding:10px 14px 8px}
@@ -148,6 +156,16 @@ const empty = document.getElementById('empty');
 let achievements = [];
 let activeDynasty = 'all';
 
+const DYNASTY_CLASSES = {
+  '고구려':'dynasty-goguryeo',
+  '백제':'dynasty-baekje',
+  '신라':'dynasty-silla',
+  '통일신라':'dynasty-unified-silla',
+  '발해':'dynasty-balhae',
+  '고려':'dynasty-goryeo',
+  '조선':'dynasty-joseon'
+};
+
 function escHtml(value) {
   return String(value || '').replace(/[&<>"]/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[ch]));
 }
@@ -170,6 +188,10 @@ function searchableText(item) {
   ].join(' ').toLowerCase();
 }
 
+function dynastyClass(item) {
+  return DYNASTY_CLASSES[item.dynasty] || '';
+}
+
 function render() {
   const query = queryValue();
   const items = achievements
@@ -179,7 +201,7 @@ function render() {
     .filter(item => !query || searchableText(item).includes(query));
 
   list.innerHTML = items.map(item => `
-    <article class="achievement-row">
+    <article class="achievement-row ${escHtml(dynastyClass(item))}">
       <div class="marker" aria-hidden="true">
         <div class="year-circle">${escHtml(item.year)}</div>
       </div>
