@@ -24,7 +24,7 @@
 }
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%;overflow:hidden}
-body{font-family:var(--font);background:var(--bg);color:var(--ink)}
+body{font-family:var(--font);background:var(--bg);color:var(--ink);display:flex;flex-direction:column}
 button,input,a{font:inherit}
 a{color:inherit;text-decoration:none}
 
@@ -34,19 +34,23 @@ a{color:inherit;text-decoration:none}
 .title-wrap{min-width:0;flex:1}
 .title{font-size:1.08rem;font-weight:800;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;letter-spacing:0}
 .subline{font-size:.75rem;color:var(--muted);line-height:1.2;margin-top:.1rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.count-badge{flex-shrink:0;padding:.28rem .72rem;border-radius:999px;background:#e8f2f4;color:var(--spine-dark);font-size:.78rem;font-weight:800}
+.top-actions{display:flex;align-items:center;gap:.45rem;flex-shrink:0}
+.nav-button,.count-badge{display:inline-flex;align-items:center;justify-content:center;border-radius:999px;font-size:.78rem;font-weight:800;white-space:nowrap}
+.nav-button{height:2.05rem;padding:0 .72rem;border:1px solid #bfd0d8;background:#fff;color:var(--spine-dark)}
+.nav-button:hover{background:#eef6f8;border-color:#9cc1ca}
+.count-badge{height:2.05rem;padding:0 .72rem;background:#e8f2f4;color:var(--spine-dark)}
 
 .controls{background:rgba(246,247,251,.94);backdrop-filter:blur(14px);border-bottom:1px solid var(--line);padding:.72rem 1rem .78rem;position:relative;z-index:20}
-.control-inner{max-width:1180px;margin:0 auto;display:grid;grid-template-columns:minmax(210px,1fr) auto;gap:.75rem;align-items:center}
+.control-inner{max-width:1180px;margin:0 auto;display:grid;grid-template-columns:minmax(210px,262px) minmax(0,1fr);gap:.75rem;align-items:start}
 .search{width:100%;height:2.65rem;border:1.5px solid #cad7de;border-radius:.7rem;background:#fff;color:var(--ink);padding:0 .92rem;font-size:.94rem;outline:none;box-shadow:0 1px 2px rgba(31,37,40,.03)}
 .search:focus{border-color:var(--spine);box-shadow:0 0 0 4px rgba(36,92,111,.12)}
-.chips{display:flex;gap:.4rem;overflow-x:auto;scrollbar-width:none;max-width:100%}
+.chips{min-width:0;display:flex;flex-wrap:wrap;gap:.4rem;max-width:100%}
 .chips::-webkit-scrollbar{display:none}
 .chip{flex-shrink:0;border:1.5px solid #bfd0d8;background:#fff;color:#40545d;border-radius:999px;padding:.52rem .78rem;font-size:.78rem;font-weight:800;cursor:pointer;white-space:nowrap;transition:background .15s,border-color .15s,color .15s}
 .chip:hover{border-color:var(--spine);color:var(--spine-dark)}
 .chip.active{background:var(--spine);border-color:var(--spine);color:#fff}
 
-.timeline-viewport{height:calc(100vh - 118px);overflow:auto;overscroll-behavior:contain;scrollbar-color:#9fb6c0 transparent;cursor:grab}
+.timeline-viewport{flex:1;min-height:0;overflow:auto;overscroll-behavior:contain;scrollbar-color:#9fb6c0 transparent;cursor:grab}
 .timeline-viewport.dragging{cursor:grabbing;user-select:none}
 .timeline-viewport.dragging .event-card{pointer-events:none}
 .timeline-canvas{position:relative;width:min(1180px,100%);margin:0 auto;padding:1.35rem 1.2rem 4rem}
@@ -70,7 +74,6 @@ a{color:inherit;text-decoration:none}
 .year-pill{position:absolute;top:.2rem;left:50%;transform:translateX(-50%);display:inline-flex;align-items:center;justify-content:center;min-width:4.5rem;max-width:6.3rem;padding:.25rem .58rem;border-radius:999px;background:linear-gradient(135deg,var(--spine-dark),var(--spine));color:#fff;font-size:.72rem;font-weight:800;text-align:center;line-height:1.25;box-shadow:0 8px 16px rgba(36,92,111,.18);z-index:3}
 .meta{display:flex;flex-wrap:wrap;gap:.34rem;margin-bottom:.5rem}
 .tag{display:inline-flex;align-items:center;border-radius:999px;padding:.2rem .54rem;background:#edf4f6;color:var(--spine-dark);font-size:.72rem;font-weight:800;line-height:1.2}
-.tag-number{background:#e8eef2;color:#344850}
 .tag-country{background:#e8f2ee;color:#315c43}
 .tag-century{background:#f8f0e8;color:#87553b}
 .tag-era{background:#f7ecd9;color:#7d551b}
@@ -92,10 +95,11 @@ a{color:inherit;text-decoration:none}
   .topbar{height:58px;padding:0 .82rem}
   .title{font-size:1rem}
   .subline{display:none}
-  .count-badge{font-size:.72rem;padding:.24rem .58rem}
+  .top-actions{gap:.34rem}
+  .nav-button,.count-badge{height:1.9rem;padding:0 .55rem;font-size:.72rem}
   .controls{padding:.62rem .78rem .7rem}
   .control-inner{grid-template-columns:1fr;gap:.55rem}
-  .timeline-viewport{height:calc(100dvh - 148px);min-height:0;overflow:auto;cursor:auto}
+  .timeline-viewport{height:auto;min-height:0;overflow:auto;cursor:auto}
   .timeline-canvas{padding:1rem .78rem 3.4rem}
   .timeline-list{gap:.8rem}
   .timeline-list::before{left:1.55rem;transform:none;width:6px}
@@ -110,6 +114,9 @@ a{color:inherit;text-decoration:none}
   .event-title{font-size:.96rem}
   .event-note{font-size:.86rem;line-height:1.6}
 }
+@media(max-width:430px){
+  .count-badge{display:none}
+}
 </style>
 </head>
 <body>
@@ -119,7 +126,10 @@ a{color:inherit;text-decoration:none}
     <h1 class="title">한국사 통합 연도표</h1>
     <div class="subline">한능검 기출 기준: 체제 정비·전성기 흐름 중심</div>
   </div>
-  <div class="count-badge" id="count-badge">0개 사건</div>
+  <div class="top-actions">
+    <a class="nav-button" href="../kings/">왕 업적</a>
+    <div class="count-badge" id="count-badge">0개 사건</div>
+  </div>
 </header>
 
 <section class="controls" aria-label="연표 필터">
@@ -177,8 +187,8 @@ const EVENTS = [
   {year:'346~375',sort:346,era:'삼국·남북국',kind:'전성기',title:'근초고왕의 백제 전성기',note:'마한 정복, 부자 상속제 확립, 고흥의 서기 편찬, 칠지도와 아직기·왕인 전승, 요서·산둥·규슈 방면 진출 키워드로 백제 전성기를 정리한다.',tags:['근초고왕','마한 정복','부자상속제','고흥','서기 편찬','칠지도','아직기','왕인','요서·산둥·규슈'],href:'../02/?q=근초고왕'},
   {year:'4세기 후반',sort:356,era:'삼국·남북국',kind:'체제정비',title:'내물마립간의 신라 성장',note:'박혁거세 건국 전승 이후 박·석·김 3성이 왕위를 교대로 잇던 흐름에서 내물마립간 이후 김씨 왕위 세습과 마립간 칭호가 굳어진다. 400년에는 광개토대왕의 도움으로 왜·가야 세력을 격퇴한다.',tags:['박혁거세','박·석·김','내물마립간','김씨 왕위 세습','마립간','광개토대왕','왜 격퇴'],href:'../02/?q=내물마립간'},
   {year:'371',sort:371,era:'삼국·남북국',kind:'전쟁',title:'백제의 평양성 공격',note:'근초고왕이 평양성을 공격하고 고구려 고국원왕이 전사한다.',tags:['근초고왕','고국원왕','평양성'],href:'../02/?q=근초고왕'},
-  {year:'372',sort:372,era:'삼국·남북국',kind:'제도',title:'고구려 태학 설립·불교 수용',note:'소수림왕이 태학을 세우고 전진에서 불교를 받아들여 국가 체제를 정비한다.',tags:['소수림왕','태학','불교'],href:'../02/?q=소수림왕'},
-  {year:'373',sort:373,era:'삼국·남북국',kind:'제도',title:'소수림왕의 율령 반포',note:'고구려가 율령을 반포해 왕권 중심의 중앙집권 체제를 강화한다.',tags:['소수림왕','율령','중앙집권'],href:'../02/?q=율령'},
+  {year:'372',sort:372,era:'삼국·남북국',kind:'제도',ruler:'소수림왕',title:'고구려 태학 설립·불교 수용',note:'소수림왕이 태학을 세우고 전진에서 불교를 받아들여 국가 체제를 정비한다.',tags:['소수림왕','태학','불교'],href:'../02/?q=소수림왕'},
+  {year:'373',sort:373,era:'삼국·남북국',kind:'제도',ruler:'소수림왕',title:'소수림왕의 율령 반포',note:'고구려가 율령을 반포해 왕권 중심의 중앙집권 체제를 강화한다.',tags:['소수림왕','율령','중앙집권'],href:'../02/?q=율령'},
   {year:'384',sort:384,era:'삼국·남북국',kind:'문화',title:'백제 불교 수용',note:'침류왕 때 동진의 승려 마라난타를 통해 불교가 수용된다.',tags:['침류왕','마라난타','불교'],href:'../02/?q=불교'},
   {year:'391',sort:391,era:'삼국·남북국',kind:'정치',title:'광개토대왕 즉위',note:'고구려의 정복 활동이 본격화되고 만주와 한반도 북부 지배력이 커진다.',tags:['광개토대왕','정복 활동','영락'],href:'../02/?q=광개토대왕'},
   {year:'427',sort:427,era:'삼국·남북국',kind:'정치',title:'장수왕의 평양 천도',note:'고구려가 평양으로 수도를 옮겨 남진 정책을 본격화한다.',tags:['장수왕','평양 천도','남진'],href:'../02/?q=장수왕'},
@@ -376,9 +386,10 @@ const RULER_RULES = [
   {label:'태조왕',terms:['태조왕','고씨세습','옥저 복속']},
   {label:'고국천왕',terms:['고국천왕','진대법']},
   {label:'미천왕',terms:['미천왕','서안평','낙랑군 축출','대방군 점령']},
+  {label:'고이왕',terms:['고이왕','관등제','관복제']},
   {label:'근초고왕',terms:['근초고왕','마한 정복','서기 편찬','칠지도','백제의 평양성 공격']},
   {label:'고국원왕',terms:['고국원왕']},
-  {label:'내물마립간',terms:['내물마립간','내물왕','김씨 왕위 세습','마립간']},
+  {label:'내물마립간',terms:['내물마립간','내물왕','김씨 왕위 세습']},
   {label:'소수림왕',terms:['소수림왕','고구려 태학','태학 설립']},
   {label:'침류왕',terms:['침류왕','백제 불교 수용','마라난타']},
   {label:'광개토대왕',terms:['광개토대왕','영락','신라 지원']},
@@ -390,13 +401,13 @@ const RULER_RULES = [
   {label:'무령왕',terms:['무령왕','22담로']},
   {label:'지증왕',terms:['지증왕','순장 금지','우경','동시전','신라 국호','왕 칭호','우산국']},
   {label:'법흥왕',terms:['법흥왕','병부 설치','공복 제정','골품제','건원','불교 공인','이차돈','금관가야 병합']},
-  {label:'성왕',terms:['성왕','사비 천도','남부여','노리사치계','관산성']},
+  {label:'성왕',terms:['사비 천도','남부여','노리사치계','관산성']},
   {label:'진흥왕',terms:['진흥왕','거칠부','국사 편찬','개국','화랑도','황룡사','단양 적성비','순수비','대가야 병합']},
   {label:'영양왕',terms:['살수대첩','을지문덕']},
   {label:'선덕여왕',terms:['선덕여왕','첨성대']},
   {label:'의자왕',terms:['의자왕','대야성','백제 멸망']},
   {label:'보장왕',terms:['안시성 전투','고구려 멸망']},
-  {label:'문무왕',terms:['삼국 통일','매소성','기벌포']},
+  {label:'문무왕',terms:['신라의 삼국 통일','매소성','기벌포']},
   {label:'신문왕',terms:['신문왕','김흠돌','국학','9주 5소경','관료전','녹읍 폐지']},
   {label:'대조영',terms:['대조영','발해 건국']},
   {label:'성덕왕',terms:['성덕왕','정전 지급']},
@@ -405,6 +416,7 @@ const RULER_RULES = [
   {label:'경덕왕',terms:['경덕왕','녹읍 부활','불국사','석굴암']},
   {label:'원성왕',terms:['원성왕','독서삼품과']},
   {label:'발해 선왕',terms:['발해 선왕','선왕','해동성국','5경 15부 62주']},
+  {label:'흥덕왕',terms:['장보고','청해진']},
   {label:'궁예',terms:['궁예','후고구려','태봉']},
   {label:'견훤',terms:['견훤','후백제']},
   {label:'왕건',terms:['왕건','고려 건국','후삼국 통일']},
@@ -413,7 +425,7 @@ const RULER_RULES = [
   {label:'경종',terms:['경종','전시과']},
   {label:'성종',terms:['성종','최승로','시무 28조','12목']},
   {label:'공민왕',terms:['공민왕','반원 개혁','쌍성총관부','정동행성 이문소']},
-  {label:'태조 이성계',terms:['이성계','조선 건국','한양 천도']},
+  {label:'태조 이성계',terms:['이성계','한양 천도']},
   {label:'세종',terms:['세종','훈민정음']},
   {label:'세조',terms:['세조','수양대군','계유정난']},
   {label:'성종',terms:['성종','경국대전']},
@@ -520,7 +532,7 @@ function render() {
     .filter(matchesActiveEra)
     .filter(event => !query || searchableText(event).includes(query));
 
-  timeline.innerHTML = events.map((event, order) => {
+  timeline.innerHTML = events.map(event => {
     const ruler = rulerLabel(event);
     return `
     <article class="event">
@@ -531,7 +543,6 @@ function render() {
       </div>
       <a class="event-card" href="${escHtml(encodeURI(event.href))}" aria-label="${escHtml(event.year + ' ' + event.title)}">
         <div class="meta">
-          <span class="tag tag-number">#${order + 1}</span>
           <span class="tag tag-country">${escHtml(countryLabel(event))}</span>
           ${ruler ? `<span class="tag tag-ruler">${escHtml(ruler)}</span>` : ''}
           <span class="tag tag-century">${escHtml(centuryLabel(event))}</span>
