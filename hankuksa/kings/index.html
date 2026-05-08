@@ -67,6 +67,14 @@ a{color:inherit;text-decoration:none}
 .pill-main{background:var(--dynasty-soft,#e8f2f4);color:var(--dynasty-ink,#173c4c);font-weight:700}
 .lesson-link{display:inline-flex;align-items:center;color:#1a73e8;font-size:13px;font-weight:500;margin-top:8px}
 .lesson-link:hover{text-decoration:underline}
+.flow-note{position:relative;display:grid;grid-template-columns:92px minmax(0,1fr);column-gap:18px;padding:0 0 30px}
+.flow-note::before{content:'';position:absolute;left:35px;top:0;bottom:4px;width:2px;background:#e5e8eb}
+.flow-marker{display:flex;justify-content:center;padding-top:4px}
+.flow-dot{width:16px;height:16px;border-radius:50%;background:#fff;border:3px solid #6d5cae;box-shadow:0 0 0 6px #f0edfb}
+.flow-result{min-width:0;padding:0 0 2px}
+.flow-label{display:inline-flex;align-items:center;min-height:22px;border-radius:999px;background:#f0edfb;color:#463880;font-size:12px;font-weight:800;padding:3px 8px;margin-bottom:5px}
+.flow-title{color:#202124;font-size:16px;font-weight:700;line-height:1.35;word-break:keep-all}
+.flow-text{color:var(--body);font-size:13.5px;line-height:1.62;margin-top:5px;word-break:keep-all}
 .empty{display:none;color:var(--muted);font-size:14px;padding:50px 0}
 .empty.show{display:block}
 
@@ -96,17 +104,23 @@ a{color:inherit;text-decoration:none}
   .results-shell{padding-top:12px}
   .achievement-row{grid-template-columns:72px minmax(0,1fr);column-gap:12px;padding-bottom:28px}
   .achievement-row::before{left:29px;top:62px}
-  .year-circle{width:58px;height:58px;font-size:13px;border-width:2px;box-shadow:0 0 0 5px #e8f2f4}
+  .year-circle{width:58px;height:58px;font-size:13px;border-width:2px;box-shadow:0 0 0 5px var(--dynasty-soft,#e8f2f4)}
+  .flow-note{grid-template-columns:72px minmax(0,1fr);column-gap:12px;padding-bottom:28px}
+  .flow-note::before{left:29px}
   .site-row{gap:8px}
   .favicon{width:25px;height:25px;font-size:11px}
   .result-title{font-size:18px}
+  .flow-title{font-size:15px}
   .snippet{font-size:13px;line-height:1.55}
+  .flow-text{font-size:13px;line-height:1.58}
   .count-badge{display:none}
 }
 
 @media(max-width:380px){
   .achievement-row{grid-template-columns:62px minmax(0,1fr);column-gap:10px}
   .achievement-row::before{left:25px}
+  .flow-note{grid-template-columns:62px minmax(0,1fr);column-gap:10px}
+  .flow-note::before{left:25px}
   .year-circle{width:52px;height:52px;font-size:12px}
 }
 </style>
@@ -192,15 +206,22 @@ function dynastyClass(item) {
   return DYNASTY_CLASSES[item.dynasty] || '';
 }
 
-function render() {
-  const query = queryValue();
-  const items = achievements
-    .slice()
-    .sort((a, b) => Number(a.sort) - Number(b.sort) || String(a.id).localeCompare(String(b.id), 'ko'))
-    .filter(item => activeDynasty === 'all' || item.dynasty === activeDynasty)
-    .filter(item => !query || searchableText(item).includes(query));
+function flowNoteBefore(item) {
+  if (item.id !== 'balhae-mun-756') return '';
+  return `
+    <section class="flow-note" aria-label="발해 무왕에서 문왕으로 이어지는 흐름">
+      <div class="flow-marker" aria-hidden="true"><span class="flow-dot"></span></div>
+      <div class="flow-result">
+        <span class="flow-label">흐름 정리</span>
+        <div class="flow-title">무왕의 대외 팽창 이후, 문왕은 제도 정비로 발해를 안정시켰다</div>
+        <p class="flow-text">무왕 때 발해는 당과 맞서 싸우며 세력을 키웠다. 그런데 땅이 넓어지고 사람도 많아지면서 &quot;왕이 명령하면 다 되는&quot; 초기 방식만으로는 나라 운영이 어려워졌다. 그래서 문왕은 방향을 바꿔 당과 친하게 지내며 선진 제도와 문화를 받아들였고, 이를 발해식으로 고쳐 3성 6부 같은 중앙 행정 조직을 정비했다. 즉, 싸워서 나라를 키운 뒤에는 제도와 수도를 갖춰 나라를 오래 안정시키려 한 것이다.</p>
+      </div>
+    </section>
+  `;
+}
 
-  list.innerHTML = items.map(item => `
+function achievementHtml(item) {
+  return `
     <article class="achievement-row ${escHtml(dynastyClass(item))}">
       <div class="marker" aria-hidden="true">
         <div class="year-circle">${escHtml(item.year)}</div>
@@ -223,7 +244,18 @@ function render() {
         <a class="lesson-link" href="${escHtml(encodeURI(item.href))}">관련 단원으로 이동</a>
       </div>
     </article>
-  `).join('');
+  `;
+}
+
+function render() {
+  const query = queryValue();
+  const items = achievements
+    .slice()
+    .sort((a, b) => Number(a.sort) - Number(b.sort) || String(a.id).localeCompare(String(b.id), 'ko'))
+    .filter(item => activeDynasty === 'all' || item.dynasty === activeDynasty)
+    .filter(item => !query || searchableText(item).includes(query));
+
+  list.innerHTML = items.map(item => `${flowNoteBefore(item)}${achievementHtml(item)}`).join('');
 
   countBadge.textContent = `${items.length}개 업적`;
   resultInfo.textContent = `약 ${items.length.toLocaleString('ko-KR')}개 결과 (0.12초)`;
