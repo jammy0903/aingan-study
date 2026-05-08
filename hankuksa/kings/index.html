@@ -85,6 +85,7 @@ a{color:inherit;text-decoration:none}
 .dynasty-balhae{--dynasty:#6d5cae;--dynasty-soft:#f0edfb;--dynasty-ink:#463880}
 .dynasty-goryeo{--dynasty:#2f6db3;--dynasty-soft:#e8f0fb;--dynasty-ink:#214f86}
 .dynasty-joseon{--dynasty:#7c5a3a;--dynasty-soft:#f2ece5;--dynasty-ink:#56381f}
+.dynasty-daehan{--dynasty:#8a4f7d;--dynasty-soft:#f6eaf4;--dynasty-ink:#613356}
 
 @media(max-width:900px){
   .header-inner{grid-template-columns:40px minmax(0,1fr);padding:10px 14px 8px}
@@ -150,6 +151,7 @@ a{color:inherit;text-decoration:none}
       <button type="button" class="chip" data-dynasty="발해">발해</button>
       <button type="button" class="chip" data-dynasty="고려">고려</button>
       <button type="button" class="chip" data-dynasty="조선">조선</button>
+      <button type="button" class="chip" data-dynasty="대한제국">대한제국</button>
     </div>
   </section>
 </header>
@@ -178,7 +180,8 @@ const DYNASTY_CLASSES = {
   '통일신라':'dynasty-unified-silla',
   '발해':'dynasty-balhae',
   '고려':'dynasty-goryeo',
-  '조선':'dynasty-joseon'
+  '조선':'dynasty-joseon',
+  '대한제국':'dynasty-daehan'
 };
 
 function escHtml(value) {
