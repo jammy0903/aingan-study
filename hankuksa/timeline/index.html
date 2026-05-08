@@ -50,8 +50,6 @@ a{color:inherit;text-decoration:none}
 .timeline-viewport.dragging{cursor:grabbing;user-select:none}
 .timeline-viewport.dragging .event-card{pointer-events:none}
 .timeline-canvas{position:relative;width:min(1180px,100%);margin:0 auto;padding:1.35rem 1.2rem 4rem}
-.timeline-note{background:#fff;border:1px solid #dce4e8;border-left:5px solid var(--gold);border-radius:.7rem;padding:.82rem .95rem;margin:0 0 1rem;box-shadow:0 5px 14px rgba(31,37,40,.04);color:#4e5b61;font-size:.9rem;line-height:1.65;word-break:keep-all}
-.timeline-note strong{color:#6f4b17;font-weight:800}
 .timeline-list{position:relative;display:flex;flex-direction:column;gap:.92rem;padding:.4rem 0}
 .timeline-list::before{content:'';position:absolute;left:50%;top:.5rem;bottom:.5rem;width:7px;transform:translateX(-50%);border-radius:999px;background:linear-gradient(180deg,var(--spine),var(--green) 45%,var(--accent));box-shadow:0 0 0 7px rgba(36,92,111,.08)}
 .event{position:relative;display:grid;grid-template-columns:minmax(0,1fr) 74px minmax(0,1fr);align-items:start;min-height:5.5rem}
@@ -95,7 +93,6 @@ a{color:inherit;text-decoration:none}
   .control-inner{grid-template-columns:1fr;gap:.55rem}
   .timeline-viewport{height:calc(100dvh - 148px);min-height:0;overflow:auto;cursor:auto}
   .timeline-canvas{padding:1rem .78rem 3.4rem}
-  .timeline-note{font-size:.84rem;line-height:1.58;margin-bottom:.82rem;padding:.74rem .82rem}
   .timeline-list{gap:.8rem}
   .timeline-list::before{left:1.55rem;transform:none;width:6px}
   .event{grid-template-columns:3.5rem minmax(0,1fr);min-height:auto}
@@ -116,7 +113,7 @@ a{color:inherit;text-decoration:none}
   <a class="back" href="../" aria-label="한국사 목록으로">←</a>
   <div class="title-wrap">
     <h1 class="title">한국사 통합 연도표</h1>
-    <div class="subline">선사부터 현대까지 한 축으로 정렬</div>
+    <div class="subline">한능검 기출 기준: 체제 정비·전성기 흐름 중심</div>
   </div>
   <div class="count-badge" id="count-badge">0개 사건</div>
 </header>
@@ -139,9 +136,6 @@ a{color:inherit;text-decoration:none}
 
 <main class="timeline-viewport" id="viewport">
   <div class="timeline-canvas">
-    <div class="timeline-note">
-      <strong>정렬 기준:</strong> 삼국의 초기 건국 항목은 건국 전승 연도 기준입니다. 그래서 전승상으로는 신라 기원전 57년, 고구려 기원전 37년, 백제 기원전 18년 순서입니다. 다만 중앙집권 고대 국가로 체제를 정비한 순서는 신라가 고구려·백제보다 늦습니다.
-    </div>
     <div class="timeline-list" id="timeline"></div>
     <div class="empty" id="empty">검색 결과가 없습니다.</div>
   </div>
@@ -158,16 +152,16 @@ const EVENTS = [
   {year:'기원전 5세기',sort:-500,era:'선사',kind:'문화',title:'철기 문화 보급',note:'철제 농기구와 무기, 세형동검·잔무늬거울, 중국 화폐와 붓이 출토된다.',tags:['철기','세형동검','다호리'],href:'../01/?q=철기'},
   {year:'기원전 194',sort:-194,era:'선사',kind:'정치',title:'위만조선 성립',note:'위만이 고조선의 왕이 되며 중계 무역과 철기 문화가 확대된다.',tags:['위만','중계 무역','철기'],href:'../01/?q=위만조선'},
   {year:'기원전 108',sort:-108,era:'선사',kind:'정치',title:'고조선 멸망과 한사군 설치',note:'한 무제의 공격으로 고조선이 멸망하고 한사군이 설치된다.',tags:['고조선 멸망','한사군','한 무제'],href:'../01/?q=고조선 멸망'},
-  {year:'기원전 57',sort:-57,era:'고대',kind:'건국전승',title:'신라 건국 전승',note:'박혁거세 건국 전승 기준의 연도다. 중앙집권 고대 국가로 체제를 완성한 시기는 고구려·백제보다 늦다.',tags:['신라','박혁거세','전승 연도'],href:'../02/?q=신라'},
-  {year:'기원전 37',sort:-37,era:'고대',kind:'건국전승',title:'고구려 건국 전승',note:'주몽 건국 전승 기준의 연도다. 이후 4세기 소수림왕 때 율령·불교·태학으로 체제를 정비한다.',tags:['고구려','주몽','전승 연도'],href:'../02/?q=고구려'},
-  {year:'기원전 18',sort:-18,era:'고대',kind:'건국전승',title:'백제 건국 전승',note:'온조 건국 전승 기준의 연도다. 한강 유역을 바탕으로 성장해 4세기 근초고왕 때 전성기를 맞는다.',tags:['백제','온조','전승 연도'],href:'../02/?q=백제'},
-  {year:'42',sort:42,era:'고대',kind:'건국',title:'금관가야 건국 전승',note:'낙동강 하류의 철 생산과 해상 교역을 바탕으로 가야 세력이 성장한다.',tags:['가야','금관가야','철'],href:'../02/?q=가야'},
+  {year:'1~6세기',sort:42,era:'고대',kind:'연맹',title:'가야 연맹과 철 문화',note:'낙동강 유역의 철 생산과 교역을 바탕으로 금관가야·대가야 중심의 연맹이 성장한다.',tags:['가야','철','덩이쇠'],href:'../02/?q=가야'},
+  {year:'1~2세기',sort:100,era:'고대',kind:'체제정비',title:'고구려 중앙집권 기틀',note:'태조왕 때 계루부 고씨 왕위 세습과 옥저 복속으로 고구려 성장 기반이 마련된다.',tags:['태조왕','고구려','옥저 복속'],href:'../02/?q=고구려'},
+  {year:'194',sort:194,era:'고대',kind:'체제정비',title:'고국천왕의 체제 정비·진대법',note:'5부가 행정 구역 성격으로 바뀌고 부자 상속이 강화되며, 진대법으로 민생 안정책이 시행된다.',tags:['고국천왕','진대법','부자 상속'],href:'../02/?q=고구려'},
+  {year:'3세기 중엽',sort:260,era:'고대',kind:'체제정비',title:'고이왕의 백제 체제 정비',note:'백제가 한강 유역을 장악하고 관등·관복제를 정비하며 중앙집권 국가의 토대를 갖춘다.',tags:['고이왕','관등제','관복제'],href:'../02/?q=백제'},
   {year:'313',sort:313,era:'고대',kind:'정치',title:'고구려의 낙랑군 축출',note:'고구려가 낙랑군을 축출하며 대동강 유역으로 세력을 넓힌다.',tags:['낙랑군','대동강','고구려'],href:'../02/?q=고구려'},
-  {year:'346',sort:346,era:'고대',kind:'정치',title:'근초고왕 즉위',note:'백제 전성기의 기반이 열리고 한강 유역 지배와 대외 교류가 강화된다.',tags:['근초고왕','백제 전성기','한강'],href:'../02/?q=근초고왕'},
+  {year:'346~375',sort:346,era:'고대',kind:'전성기',title:'근초고왕의 백제 전성기',note:'마한 정복, 고구려 공격, 서기 편찬, 중국·왜와의 교류로 백제의 전성기를 이끈다.',tags:['근초고왕','마한 정복','서기'],href:'../02/?q=근초고왕'},
+  {year:'4세기 후반',sort:356,era:'고대',kind:'체제정비',title:'내물왕의 신라 중앙집권 기틀',note:'김씨 왕위 계승권이 확립되고 마립간 칭호가 사용되며 신라가 중앙집권 국가로 발전하기 시작한다.',tags:['내물왕','마립간','김씨 왕위 세습'],href:'../02/?q=신라'},
   {year:'371',sort:371,era:'고대',kind:'전쟁',title:'백제의 평양성 공격',note:'근초고왕이 평양성을 공격하고 고구려 고국원왕이 전사한다.',tags:['근초고왕','고국원왕','평양성'],href:'../02/?q=근초고왕'},
   {year:'372',sort:372,era:'고대',kind:'제도',title:'고구려 태학 설립·불교 수용',note:'소수림왕이 태학을 세우고 전진에서 불교를 받아들여 국가 체제를 정비한다.',tags:['소수림왕','태학','불교'],href:'../02/?q=소수림왕'},
   {year:'373',sort:373,era:'고대',kind:'제도',title:'소수림왕의 율령 반포',note:'고구려가 율령을 반포해 왕권 중심의 중앙집권 체제를 강화한다.',tags:['소수림왕','율령','중앙집권'],href:'../02/?q=율령'},
-  {year:'375',sort:375,era:'고대',kind:'정치',title:'근초고왕 사망',note:'백제 전성기를 이끈 근초고왕이 사망해 4세기 삼국 정세의 비교 기준이 된다.',tags:['근초고왕','백제','4세기'],href:'../02/?q=근초고왕'},
   {year:'384',sort:384,era:'고대',kind:'문화',title:'백제 불교 수용',note:'침류왕 때 동진의 승려 마라난타를 통해 불교가 수용된다.',tags:['침류왕','마라난타','불교'],href:'../02/?q=불교'},
   {year:'391',sort:391,era:'고대',kind:'정치',title:'광개토대왕 즉위',note:'고구려의 정복 활동이 본격화되고 만주와 한반도 북부 지배력이 커진다.',tags:['광개토대왕','정복 활동','영락'],href:'../02/?q=광개토대왕'},
   {year:'400',sort:400,era:'고대',kind:'전쟁',title:'광개토대왕의 신라 지원',note:'고구려가 왜의 침입을 받은 신라를 지원하며 남방 영향력을 넓힌다.',tags:['광개토대왕','신라 지원','왜'],href:'../02/?q=광개토대왕'},
