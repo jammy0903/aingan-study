@@ -57,6 +57,23 @@ body{font-family:var(--font-sans);background:#f8f4ee;color:#202124;min-height:10
 .fb-hero{background:#fff;border:1.5px solid #e6dccf;border-radius:1.15rem;padding:1.12rem 1.12rem 1.05rem;box-shadow:0 10px 22px rgba(73,48,19,.05)}
 .fb-hero-title{font-size:1.16rem;font-weight:800;color:#2e5a4a;font-family:var(--font-serif);margin-bottom:.3rem}
 .fb-hero-sub{font-size:.92rem;line-height:1.72;color:#5f5347}
+.phase-map{max-width:1180px;margin:.85rem auto .65rem;padding:0 1.25rem}
+.phase-panel{background:#fff;border:1.5px solid #e6dccf;border-radius:1.15rem;padding:1.05rem 1.1rem;box-shadow:0 8px 22px rgba(73,48,19,.05)}
+.phase-head{display:flex;align-items:flex-end;justify-content:space-between;gap:.75rem;margin-bottom:.9rem}
+.phase-title{font-size:1.08rem;font-weight:800;color:#2e5a4a;font-family:var(--font-serif)}
+.phase-note{font-size:.78rem;font-weight:800;color:#9c5300;background:#fff0db;border:1px solid #e5bf86;border-radius:999px;padding:.18rem .58rem;white-space:nowrap}
+.phase-grid{display:grid;grid-template-columns:1fr;gap:.72rem}
+.phase-step{position:relative;border:1.5px solid #eadfce;border-radius:.92rem;padding:.86rem .88rem .84rem;background:#fffdf9;min-height:7.2rem}
+.phase-step::before{content:'';position:absolute;left:0;top:0;bottom:0;width:5px;border-radius:.92rem 0 0 .92rem;background:var(--phase-accent,#4a7d6d)}
+.phase-step:nth-child(1){--phase-accent:#4a7d6d}
+.phase-step:nth-child(2){--phase-accent:#8b6f47}
+.phase-step:nth-child(3){--phase-accent:#8c5a6a}
+.phase-step:nth-child(4){--phase-accent:#5d6f9a}
+.phase-label{display:inline-flex;align-items:center;border-radius:999px;padding:.16rem .52rem;background:color-mix(in srgb,var(--phase-accent) 14%,#fff);color:var(--phase-accent);font-size:.72rem;font-weight:800;margin-bottom:.42rem}
+.phase-name{font-size:.98rem;font-weight:800;color:#241c12;line-height:1.42;font-family:var(--font-serif);margin-bottom:.24rem}
+.phase-power{font-size:.86rem;font-weight:800;color:#2e5a4a;margin-bottom:.24rem}
+.phase-desc{font-size:.86rem;line-height:1.64;color:#5f5347;word-break:keep-all}
+@media(min-width:780px){.phase-grid{grid-template-columns:repeat(4,1fr)}}
 
 .fb-timeline{position:relative;display:flex;flex-direction:column;gap:1.15rem;padding:1.15rem 0 0}
 .fb-timeline::before{content:'';position:absolute;left:1.15rem;top:1.25rem;bottom:.25rem;width:6px;border-radius:999px;background:linear-gradient(180deg,#4a7d6d 0%,#2e5a4a 100%);box-shadow:0 0 0 6px #4a7d6d10}
@@ -201,7 +218,7 @@ body{font-family:var(--font-sans);background:#f8f4ee;color:#202124;min-height:10
   .header{padding:.8rem .95rem;gap:.62rem}
   .header h1{font-size:.96rem}
   .header-cnt{font-size:.72rem;padding:.2rem .5rem}
-  .view-toggle,.search-wrap,.tabs,.section-group,#fb-view{padding-left:.9rem;padding-right:.9rem}
+  .view-toggle,.search-wrap,.tabs,.section-group,#fb-view,.phase-map{padding-left:.9rem;padding-right:.9rem}
   .search{font-size:.95rem;padding:.74rem .96rem}
   .tab,.vtab{font-size:.78rem}
   .card{padding:.92rem .88rem .78rem;min-height:auto}
@@ -209,6 +226,8 @@ body{font-family:var(--font-sans);background:#f8f4ee;color:#202124;min-height:10
   .card-preview{font-size:.92rem;line-height:1.64}
   .fb-hero-title{font-size:1.06rem}
   .fb-hero-sub,.fb-card-preview{font-size:.88rem}
+  .phase-head{align-items:flex-start;flex-direction:column;gap:.45rem}
+  .phase-panel{padding:.95rem}
   .fb-card{padding:.95rem .92rem .9rem 1rem}
   .l-head{padding:.75rem .9rem}
   .l-title{font-size:.95rem}
@@ -252,6 +271,41 @@ body{font-family:var(--font-sans);background:#f8f4ee;color:#202124;min-height:10
 <div class="search-wrap">
   <input class="search" type="text" placeholder="🔍  개념 검색..." oninput="applyFilters()">
 </div>
+
+<section class="phase-map" aria-label="고려 4단계 권력층 흐름">
+  <div class="phase-panel">
+    <div class="phase-head">
+      <div class="phase-title">고려 4단계 권력층 흐름</div>
+      <div class="phase-note">무신정변은 1170년</div>
+    </div>
+    <div class="phase-grid">
+      <div class="phase-step">
+        <div class="phase-label">1단계</div>
+        <div class="phase-name">건국 초기</div>
+        <div class="phase-power">권력층: 호족</div>
+        <div class="phase-desc">태조 왕건이 지방 호족을 혼인 정책·사심관·기인 제도로 포섭하며 고려를 세운 단계.</div>
+      </div>
+      <div class="phase-step">
+        <div class="phase-label">2단계</div>
+        <div class="phase-name">문벌귀족 사회</div>
+        <div class="phase-power">권력층: 문벌귀족</div>
+        <div class="phase-desc">호족 기반 세력이 중앙 관료·귀족 가문으로 굳어지고 음서·공음전으로 특권을 세습한 단계.</div>
+      </div>
+      <div class="phase-step">
+        <div class="phase-label">3단계</div>
+        <div class="phase-name">무신 집권기</div>
+        <div class="phase-power">권력층: 무신</div>
+        <div class="phase-desc">1170년 무신정변 뒤 문신 중심 질서가 무너지고 무신들이 정권을 잡은 단계.</div>
+      </div>
+      <div class="phase-step">
+        <div class="phase-label">4단계</div>
+        <div class="phase-name">원 간섭기</div>
+        <div class="phase-power">권력층: 권문세족</div>
+        <div class="phase-desc">몽골 침입과 강화 이후 약 80년 원 간섭을 받으며 친원 세력인 권문세족이 성장한 단계.</div>
+      </div>
+    </div>
+  </div>
+</section>
 
 <div id="card-view" class="show">
   <div class="tabs" id="tab-bar"><button class="tab active" onclick="filterTab(this,'all')">전체</button><button class="tab" onclick="filterTab(this,'0')">고려 초기 왕들</button><button class="tab" onclick="filterTab(this,'1')">고려 귀족 사회와 무신정권</button><button class="tab" onclick="filterTab(this,'2')">고려 대외관계</button><button class="tab" onclick="filterTab(this,'3')">고려 후기</button><button class="tab" onclick="filterTab(this,'4')">고려 문화</button><button class="tab" onclick="filterTab(this,'5')">고려 제도와 사회</button><button class="tab" onclick="filterTab(this,'6')">고려 사회와 사상</button></div>
