@@ -50,6 +50,8 @@ a{color:inherit;text-decoration:none}
 .timeline-viewport.dragging{cursor:grabbing;user-select:none}
 .timeline-viewport.dragging .event-card{pointer-events:none}
 .timeline-canvas{position:relative;width:min(1180px,100%);margin:0 auto;padding:1.35rem 1.2rem 4rem}
+.timeline-note{background:#fff;border:1px solid #dce4e8;border-left:5px solid var(--gold);border-radius:.7rem;padding:.82rem .95rem;margin:0 0 1rem;box-shadow:0 5px 14px rgba(31,37,40,.04);color:#4e5b61;font-size:.9rem;line-height:1.65;word-break:keep-all}
+.timeline-note strong{color:#6f4b17;font-weight:800}
 .timeline-list{position:relative;display:flex;flex-direction:column;gap:.92rem;padding:.4rem 0}
 .timeline-list::before{content:'';position:absolute;left:50%;top:.5rem;bottom:.5rem;width:7px;transform:translateX(-50%);border-radius:999px;background:linear-gradient(180deg,var(--spine),var(--green) 45%,var(--accent));box-shadow:0 0 0 7px rgba(36,92,111,.08)}
 .event{position:relative;display:grid;grid-template-columns:minmax(0,1fr) 74px minmax(0,1fr);align-items:start;min-height:5.5rem}
@@ -93,6 +95,7 @@ a{color:inherit;text-decoration:none}
   .control-inner{grid-template-columns:1fr;gap:.55rem}
   .timeline-viewport{height:calc(100dvh - 148px);min-height:0;overflow:auto;cursor:auto}
   .timeline-canvas{padding:1rem .78rem 3.4rem}
+  .timeline-note{font-size:.84rem;line-height:1.58;margin-bottom:.82rem;padding:.74rem .82rem}
   .timeline-list{gap:.8rem}
   .timeline-list::before{left:1.55rem;transform:none;width:6px}
   .event{grid-template-columns:3.5rem minmax(0,1fr);min-height:auto}
@@ -136,6 +139,9 @@ a{color:inherit;text-decoration:none}
 
 <main class="timeline-viewport" id="viewport">
   <div class="timeline-canvas">
+    <div class="timeline-note">
+      <strong>정렬 기준:</strong> 삼국의 초기 건국 항목은 건국 전승 연도 기준입니다. 그래서 전승상으로는 신라 기원전 57년, 고구려 기원전 37년, 백제 기원전 18년 순서입니다. 다만 중앙집권 고대 국가로 체제를 정비한 순서는 신라가 고구려·백제보다 늦습니다.
+    </div>
     <div class="timeline-list" id="timeline"></div>
     <div class="empty" id="empty">검색 결과가 없습니다.</div>
   </div>
@@ -152,9 +158,9 @@ const EVENTS = [
   {year:'기원전 5세기',sort:-500,era:'선사',kind:'문화',title:'철기 문화 보급',note:'철제 농기구와 무기, 세형동검·잔무늬거울, 중국 화폐와 붓이 출토된다.',tags:['철기','세형동검','다호리'],href:'../01/?q=철기'},
   {year:'기원전 194',sort:-194,era:'선사',kind:'정치',title:'위만조선 성립',note:'위만이 고조선의 왕이 되며 중계 무역과 철기 문화가 확대된다.',tags:['위만','중계 무역','철기'],href:'../01/?q=위만조선'},
   {year:'기원전 108',sort:-108,era:'선사',kind:'정치',title:'고조선 멸망과 한사군 설치',note:'한 무제의 공격으로 고조선이 멸망하고 한사군이 설치된다.',tags:['고조선 멸망','한사군','한 무제'],href:'../01/?q=고조선 멸망'},
-  {year:'기원전 57',sort:-57,era:'고대',kind:'건국',title:'신라 건국 전승',note:'박혁거세 건국 전승으로 사로국에서 신라로 성장하는 흐름이 시작된다.',tags:['신라','박혁거세','사로국'],href:'../02/?q=신라'},
-  {year:'기원전 37',sort:-37,era:'고대',kind:'건국',title:'고구려 건국 전승',note:'주몽 건국 전승을 바탕으로 압록강 유역의 고구려가 성장한다.',tags:['고구려','주몽','압록강'],href:'../02/?q=고구려'},
-  {year:'기원전 18',sort:-18,era:'고대',kind:'건국',title:'백제 건국 전승',note:'온조 건국 전승으로 한강 유역 백제의 성장 흐름이 시작된다.',tags:['백제','온조','한강'],href:'../02/?q=백제'},
+  {year:'기원전 57',sort:-57,era:'고대',kind:'건국전승',title:'신라 건국 전승',note:'박혁거세 건국 전승 기준의 연도다. 중앙집권 고대 국가로 체제를 완성한 시기는 고구려·백제보다 늦다.',tags:['신라','박혁거세','전승 연도'],href:'../02/?q=신라'},
+  {year:'기원전 37',sort:-37,era:'고대',kind:'건국전승',title:'고구려 건국 전승',note:'주몽 건국 전승 기준의 연도다. 이후 4세기 소수림왕 때 율령·불교·태학으로 체제를 정비한다.',tags:['고구려','주몽','전승 연도'],href:'../02/?q=고구려'},
+  {year:'기원전 18',sort:-18,era:'고대',kind:'건국전승',title:'백제 건국 전승',note:'온조 건국 전승 기준의 연도다. 한강 유역을 바탕으로 성장해 4세기 근초고왕 때 전성기를 맞는다.',tags:['백제','온조','전승 연도'],href:'../02/?q=백제'},
   {year:'42',sort:42,era:'고대',kind:'건국',title:'금관가야 건국 전승',note:'낙동강 하류의 철 생산과 해상 교역을 바탕으로 가야 세력이 성장한다.',tags:['가야','금관가야','철'],href:'../02/?q=가야'},
   {year:'313',sort:313,era:'고대',kind:'정치',title:'고구려의 낙랑군 축출',note:'고구려가 낙랑군을 축출하며 대동강 유역으로 세력을 넓힌다.',tags:['낙랑군','대동강','고구려'],href:'../02/?q=고구려'},
   {year:'346',sort:346,era:'고대',kind:'정치',title:'근초고왕 즉위',note:'백제 전성기의 기반이 열리고 한강 유역 지배와 대외 교류가 강화된다.',tags:['근초고왕','백제 전성기','한강'],href:'../02/?q=근초고왕'},
