@@ -127,8 +127,17 @@ a{color:inherit;text-decoration:none}
       <button type="button" class="chip active" data-era="all">전체</button>
       <button type="button" class="chip" data-era="선사">선사</button>
       <button type="button" class="chip" data-era="초기국가">초기국가</button>
+      <button type="button" class="chip" data-era="고조선">고조선</button>
       <button type="button" class="chip" data-era="고대">고대</button>
+      <button type="button" class="chip" data-era="고구려">고구려</button>
+      <button type="button" class="chip" data-era="백제">백제</button>
+      <button type="button" class="chip" data-era="신라">신라</button>
+      <button type="button" class="chip" data-era="가야">가야</button>
+      <button type="button" class="chip" data-era="통일신라">통일신라</button>
+      <button type="button" class="chip" data-era="발해">발해</button>
       <button type="button" class="chip" data-era="후삼국">후삼국</button>
+      <button type="button" class="chip" data-era="후백제">후백제</button>
+      <button type="button" class="chip" data-era="후고구려">후고구려</button>
       <button type="button" class="chip" data-era="고려">고려</button>
       <button type="button" class="chip" data-era="조선">조선</button>
       <button type="button" class="chip" data-era="근대">근대</button>
@@ -371,24 +380,32 @@ function eventText(event) {
   return [event.year,event.era,event.kind,event.title,event.note,...(event.tags || [])].join(' ');
 }
 
-function countryLabel(event) {
-  if (event.country) return event.country;
+function countryLabels(event) {
+  if (event.country) {
+    const countries = Array.isArray(event.country) ? event.country : String(event.country).split('·');
+    return countries.map(country => country.trim()).filter(Boolean);
+  }
   const text = eventText(event);
   const packed = compact(text);
   const labels = COUNTRY_RULES
     .filter(rule => rule.terms.some(term => text.includes(term) || packed.includes(compact(term))))
     .map(rule => rule.label);
-  const scopedLabels = [...new Set(labels)]
-    .filter(label => !labels.some(other => other !== label && other.includes(label)));
-  if (scopedLabels.length) return scopedLabels.slice(0, 2).join('·');
-  if (event.era === '선사') return '한반도';
-  if (event.era === '초기국가') return '초기 국가';
-  if (event.era === '고대') return '삼국/남북국';
-  if (event.era === '후삼국') return '후삼국';
-  if (event.era === '근대') return event.sort >= 1897 ? '대한제국' : '조선';
-  if (event.era === '일제') return '일제 강점기';
-  if (event.era === '현대') return '대한민국';
-  return event.era;
+  const uniqueLabels = [...new Set(labels)];
+  const scopedLabels = uniqueLabels
+    .filter(label => !uniqueLabels.some(other => other !== label && other.includes(label)));
+  if (scopedLabels.length) return scopedLabels.slice(0, 2);
+  if (event.era === '선사') return ['한반도'];
+  if (event.era === '초기국가') return ['초기 국가'];
+  if (event.era === '고대') return ['삼국/남북국'];
+  if (event.era === '후삼국') return ['후삼국'];
+  if (event.era === '근대') return [event.sort >= 1897 ? '대한제국' : '조선'];
+  if (event.era === '일제') return ['일제 강점기'];
+  if (event.era === '현대') return ['대한민국'];
+  return [event.era];
+}
+
+function countryLabel(event) {
+  return countryLabels(event).join('·');
 }
 
 function centuryFromYear(year) {
@@ -416,12 +433,16 @@ function searchableText(event) {
   return [eventText(event),countryLabel(event),centuryLabel(event)].join(' ').toLowerCase();
 }
 
+function matchesActiveEra(event) {
+  return activeEra === 'all' || event.era === activeEra || countryLabels(event).includes(activeEra);
+}
+
 function render() {
   const query = search.value.trim().toLowerCase();
   const events = EVENTS
     .map((event, index) => ({...event,index}))
     .sort((a, b) => a.sort - b.sort || a.index - b.index)
-    .filter(event => activeEra === 'all' || event.era === activeEra)
+    .filter(matchesActiveEra)
     .filter(event => !query || searchableText(event).includes(query));
 
   timeline.innerHTML = events.map(event => `
