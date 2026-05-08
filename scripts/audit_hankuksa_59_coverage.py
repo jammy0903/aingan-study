@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Audit whether Hankuksa 59th exam text choices are covered by app data.
+"""Audit whether Hankuksa exam text choices are covered by app data.
 
 This intentionally ignores image-only choices. Coverage is keyword based:
 if a choice/view text contains a meaningful historical term, that term should
@@ -8,6 +8,7 @@ appear somewhere in `hankuksa/**/*.html` or `hankuksa/data/*.json`.
 
 from __future__ import annotations
 
+import argparse
 import importlib.util
 import json
 import re
@@ -19,13 +20,9 @@ from typing import Iterable
 
 
 ROOT = Path(__file__).resolve().parents[1]
-RAW_TEXT = ROOT / "tmp" / "pdfs" / "columns" / "59.txt"
-REPORT_MD = ROOT / "reports" / "hankuksa_59_coverage_audit.md"
-REPORT_JSON = ROOT / "reports" / "hankuksa_59_coverage_audit.json"
 ANALYZER = ROOT / "scripts" / "analyze_hankuksa_questions.py"
 DEEP_ANALYSIS_JSON = ROOT / "reports" / "hankuksa_question_deep_analysis_59_75.json"
-
-PDF_PATH = "/mnt/c/Users/ksj/Downloads/한국사능력검정심화20220611(59회)(해설집).pdf"
+DEFAULT_ROUND = 59
 
 
 STOPWORDS = {
@@ -136,6 +133,49 @@ STOPWORDS = {
     "설치",
     "전투",
     "운동",
+    "개척하여",
+    "결사였다",
+    "결성되었다",
+    "교유하였습니다",
+    "구실로",
+    "근거지로",
+    "기록하였습니다",
+    "두었다",
+    "맡았다",
+    "보관하",
+    "보급되었다",
+    "봉기하였어요",
+    "비판적인",
+    "상영되었습니다",
+    "선포되었어요",
+    "설립하여",
+    "신설되",
+    "신문인",
+    "알려져",
+    "위하여",
+    "유배되었다",
+    "저술하여",
+    "제거되었다",
+    "조직되었다",
+    "조직하여",
+    "주도하여",
+    "지정되었습니다",
+    "출판되었습니다",
+    "칠레와",
+    "통제하기",
+    "파견되었다",
+    "폐간되었다",
+    "간행되었습니다",
+    "검색한다",
+    "견제한다",
+    "발행되었다",
+    "전말",
+    "지역인",
+    "체결되었다",
+    "찾아본다",
+    "해설하였습",
+    "해결하기",
+    "활용하여",
 }
 
 PARTICLE_RE = re.compile(
@@ -527,11 +567,27 @@ def is_good_term(term: str) -> bool:
     return True
 
 
-def load_question_text() -> str:
-    if RAW_TEXT.exists():
-        return RAW_TEXT.read_text(encoding="utf-8")
+def raw_text_path(round_no: int) -> Path:
+    return ROOT / "tmp" / "pdfs" / "columns" / f"{round_no}.txt"
+
+
+def report_md_path(round_no: int) -> Path:
+    return ROOT / "reports" / f"hankuksa_{round_no}_coverage_audit.md"
+
+
+def report_json_path(round_no: int) -> Path:
+    return ROOT / "reports" / f"hankuksa_{round_no}_coverage_audit.json"
+
+
+def load_question_text(round_no: int) -> str:
+    raw_text = raw_text_path(round_no)
+    if raw_text.exists():
+        return raw_text.read_text(encoding="utf-8")
     analyzer = load_analyzer()
-    return analyzer.reconstruct_pdf_text(PDF_PATH)
+    pdfs = getattr(analyzer, "PDFS", {})
+    if round_no not in pdfs:
+        raise ValueError(f"Unsupported Hankuksa round: {round_no}")
+    return analyzer.reconstruct_pdf_text(pdfs[round_no])
 
 
 def pre_explanation_lines(lines: list[str]) -> list[str]:
@@ -594,13 +650,13 @@ def extract_units(question) -> list[Unit]:
     return units
 
 
-def extract_deep_analysis_units() -> dict[int, list[Unit]]:
+def extract_deep_analysis_units(round_no: int) -> dict[int, list[Unit]]:
     if not DEEP_ANALYSIS_JSON.exists():
         return {}
     data = json.loads(DEEP_ANALYSIS_JSON.read_text(encoding="utf-8"))
     units: defaultdict[int, list[Unit]] = defaultdict(list)
     for question in data.get("questions", []):
-        if question.get("round") != 59:
+        if question.get("round") != round_no:
             continue
         number = int(question["number"])
         keywords = [
@@ -678,13 +734,13 @@ def source_hits(term: str, file_texts: dict[str, str]) -> list[str]:
     return hits[:6]
 
 
-def audit() -> dict[str, object]:
+def audit(round_no: int = DEFAULT_ROUND) -> dict[str, object]:
     analyzer = load_analyzer()
-    raw_text = load_question_text()
-    questions = analyzer.split_questions(59, raw_text)
+    raw_text = load_question_text(round_no)
+    questions = analyzer.split_questions(round_no, raw_text)
     corpus, file_texts = load_corpus()
     declared_terms = extract_declared_terms()
-    deep_units = extract_deep_analysis_units()
+    deep_units = extract_deep_analysis_units(round_no)
 
     details = []
     status_counter: Counter[str] = Counter()
@@ -738,7 +794,7 @@ def audit() -> dict[str, object]:
 
     return {
         "source": {
-            "round": 59,
+            "round": round_no,
             "question_count": len(questions),
             "corpus_files": sorted(file_texts),
             "coverage_basis": "hankuksa/**/*.html + hankuksa/data/*.json",
@@ -759,7 +815,7 @@ def render_markdown(result: dict[str, object]) -> str:
     summary = result["summary"]
     source = result["source"]
     lines = [
-        "# 한국사능력검정 심화 59회 선지·보기 DB 커버리지 점검",
+        f"# 한국사능력검정 심화 {source['round']}회 선지·보기 DB 커버리지 점검",
         "",
         "이미지로만 제공된 자료는 제외하되, 심층 분석에서 추출한 문항 핵심어까지 포함해 현재 `hankuksa` 앱 데이터에 들어있는지 점검했다.",
         "",
@@ -823,9 +879,14 @@ def render_markdown(result: dict[str, object]) -> str:
 
 
 def main() -> None:
-    result = audit()
-    REPORT_JSON.write_text(json.dumps(result, ensure_ascii=False, indent=2), encoding="utf-8")
-    REPORT_MD.write_text(render_markdown(result), encoding="utf-8")
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("round", nargs="?", type=int, default=DEFAULT_ROUND, help="한능검 회차")
+    args = parser.parse_args()
+    result = audit(args.round)
+    report_json_path(args.round).write_text(
+        json.dumps(result, ensure_ascii=False, indent=2), encoding="utf-8"
+    )
+    report_md_path(args.round).write_text(render_markdown(result), encoding="utf-8")
     print(json.dumps(result["summary"], ensure_ascii=False, indent=2))
 
 

@@ -1481,9 +1481,9 @@
             "hankuksa/01/index.html",
             "hankuksa/04/index.html",
             "hankuksa/05/index.html",
+            "hankuksa/06/index.html",
             "hankuksa/analysis.html",
-            "hankuksa/data/royal-achievements.json",
-            "hankuksa/data/royal-flow-notes.json"
+            "hankuksa/data/royal-achievements.json"
           ]
         }
       ]
@@ -1844,7 +1844,8 @@
           "term": "아라비아 상인",
           "covered": true,
           "sources": [
-            "hankuksa/02/index.html"
+            "hankuksa/02/index.html",
+            "hankuksa/03/index.html"
           ]
         },
         {
@@ -3459,7 +3460,9 @@
           "sources": [
             "hankuksa/04/index.html",
             "hankuksa/06/index.html",
-            "hankuksa/07/index.html"
+            "hankuksa/07/index.html",
+            "hankuksa/data/royal-achievements.json",
+            "hankuksa/timeline/index.html"
           ]
         },
         {
@@ -4874,7 +4877,8 @@
           "sources": [
             "hankuksa/04/index.html",
             "hankuksa/data/royal-achievements.json",
-            "hankuksa/data/royal-flow-notes.json"
+            "hankuksa/data/royal-flow-notes.json",
+            "hankuksa/timeline/index.html"
           ]
         }
       ]
@@ -4952,7 +4956,8 @@
           "sources": [
             "hankuksa/04/index.html",
             "hankuksa/data/royal-achievements.json",
-            "hankuksa/data/royal-flow-notes.json"
+            "hankuksa/data/royal-flow-notes.json",
+            "hankuksa/timeline/index.html"
           ]
         }
       ]
@@ -4999,7 +5004,8 @@
           "sources": [
             "hankuksa/04/index.html",
             "hankuksa/data/royal-achievements.json",
-            "hankuksa/data/royal-flow-notes.json"
+            "hankuksa/data/royal-flow-notes.json",
+            "hankuksa/timeline/index.html"
           ]
         }
       ]
@@ -6598,6 +6604,7 @@
           "covered": true,
           "sources": [
             "hankuksa/05/index.html",
+            "hankuksa/06/index.html",
             "hankuksa/timeline/index.html"
           ]
         }
@@ -6615,6 +6622,7 @@
           "covered": true,
           "sources": [
             "hankuksa/05/index.html",
+            "hankuksa/06/index.html",
             "hankuksa/data/royal-flow-notes.json",
             "hankuksa/index.html",
             "hankuksa/timeline/index.html"
@@ -6699,6 +6707,7 @@
           "covered": true,
           "sources": [
             "hankuksa/05/index.html",
+            "hankuksa/06/index.html",
             "hankuksa/data/royal-flow-notes.json",
             "hankuksa/index.html",
             "hankuksa/timeline/index.html"
@@ -6709,6 +6718,7 @@
           "covered": true,
           "sources": [
             "hankuksa/05/index.html",
+            "hankuksa/06/index.html",
             "hankuksa/timeline/index.html"
           ]
         },
@@ -7315,7 +7325,8 @@
           "term": "신민회",
           "covered": true,
           "sources": [
-            "hankuksa/05/index.html"
+            "hankuksa/05/index.html",
+            "hankuksa/06/index.html"
           ]
         }
       ]
@@ -7668,6 +7679,7 @@
           "covered": true,
           "sources": [
             "hankuksa/05/index.html",
+            "hankuksa/07/index.html",
             "hankuksa/analysis.html"
           ]
         }
@@ -7763,6 +7775,7 @@
           "covered": true,
           "sources": [
             "hankuksa/05/index.html",
+            "hankuksa/07/index.html",
             "hankuksa/analysis.html"
           ]
         }
@@ -8514,6 +8527,14 @@
           "sources": [
             "hankuksa/06/index.html"
           ]
+        },
+        {
+          "term": "소작쟁",
+          "covered": true,
+          "sources": [
+            "hankuksa/06/index.html",
+            "hankuksa/timeline/index.html"
+          ]
         }
       ]
     },
@@ -8563,6 +8584,7 @@
           "covered": true,
           "sources": [
             "hankuksa/02/index.html",
+            "hankuksa/03/index.html",
             "hankuksa/05/index.html",
             "hankuksa/06/index.html",
             "hankuksa/07/index.html"
@@ -9363,9 +9385,9 @@
             "hankuksa/01/index.html",
             "hankuksa/04/index.html",
             "hankuksa/05/index.html",
+            "hankuksa/06/index.html",
             "hankuksa/analysis.html",
-            "hankuksa/data/royal-achievements.json",
-            "hankuksa/data/royal-flow-notes.json"
+            "hankuksa/data/royal-achievements.json"
           ]
         }
       ]
@@ -9473,7 +9495,9 @@
           "term": "경찰서",
           "covered": true,
           "sources": [
-            "hankuksa/06/index.html"
+            "hankuksa/06/index.html",
+            "hankuksa/07/index.html",
+            "hankuksa/timeline/index.html"
           ]
         },
         {
@@ -9491,9 +9515,9 @@
             "hankuksa/02/index.html",
             "hankuksa/05/index.html",
             "hankuksa/06/index.html",
+            "hankuksa/07/index.html",
             "hankuksa/analysis.html",
-            "hankuksa/data/royal-achievements.json",
-            "hankuksa/timeline/index.html"
+            "hankuksa/data/royal-achievements.json"
           ]
         },
         {
@@ -9581,9 +9605,9 @@
             "hankuksa/01/index.html",
             "hankuksa/04/index.html",
             "hankuksa/05/index.html",
+            "hankuksa/06/index.html",
             "hankuksa/analysis.html",
-            "hankuksa/data/royal-achievements.json",
-            "hankuksa/data/royal-flow-notes.json"
+            "hankuksa/data/royal-achievements.json"
           ]
         }
       ]
@@ -9620,7 +9644,8 @@
           "term": "인권",
           "covered": true,
           "sources": [
-            "hankuksa/07/index.html"
+            "hankuksa/07/index.html",
+            "hankuksa/timeline/index.html"
           ]
         },
         {
@@ -9708,7 +9733,8 @@
             "hankuksa/03/index.html",
             "hankuksa/04/index.html",
             "hankuksa/05/index.html",
-            "hankuksa/06/index.html"
+            "hankuksa/06/index.html",
+            "hankuksa/07/index.html"
           ]
         },
         {
@@ -9717,10 +9743,10 @@
           "sources": [
             "hankuksa/01/index.html",
             "hankuksa/02/index.html",
+            "hankuksa/03/index.html",
             "hankuksa/05/index.html",
             "hankuksa/07/index.html",
-            "hankuksa/data/royal-achievements.json",
-            "hankuksa/timeline/index.html"
+            "hankuksa/data/royal-achievements.json"
           ]
         },
         {
@@ -9984,7 +10010,8 @@
           "term": "조절",
           "covered": true,
           "sources": [
-            "hankuksa/07/index.html"
+            "hankuksa/07/index.html",
+            "hankuksa/data/royal-achievements.json"
           ]
         },
         {
@@ -11425,9 +11452,9 @@
               "hankuksa/01/index.html",
               "hankuksa/04/index.html",
               "hankuksa/05/index.html",
+              "hankuksa/06/index.html",
               "hankuksa/analysis.html",
-              "hankuksa/data/royal-achievements.json",
-              "hankuksa/data/royal-flow-notes.json"
+              "hankuksa/data/royal-achievements.json"
             ]
           }
         ]
@@ -11790,7 +11817,8 @@
             "term": "아라비아 상인",
             "covered": true,
             "sources": [
-              "hankuksa/02/index.html"
+              "hankuksa/02/index.html",
+              "hankuksa/03/index.html"
             ]
           },
           {
@@ -13421,7 +13449,9 @@
             "sources": [
               "hankuksa/04/index.html",
               "hankuksa/06/index.html",
-              "hankuksa/07/index.html"
+              "hankuksa/07/index.html",
+              "hankuksa/data/royal-achievements.json",
+              "hankuksa/timeline/index.html"
             ]
           },
           {
@@ -14846,7 +14876,8 @@
             "sources": [
               "hankuksa/04/index.html",
               "hankuksa/data/royal-achievements.json",
-              "hankuksa/data/royal-flow-notes.json"
+              "hankuksa/data/royal-flow-notes.json",
+              "hankuksa/timeline/index.html"
             ]
           }
         ]
@@ -14924,7 +14955,8 @@
             "sources": [
               "hankuksa/04/index.html",
               "hankuksa/data/royal-achievements.json",
-              "hankuksa/data/royal-flow-notes.json"
+              "hankuksa/data/royal-flow-notes.json",
+              "hankuksa/timeline/index.html"
             ]
           }
         ]
@@ -14971,7 +15003,8 @@
             "sources": [
               "hankuksa/04/index.html",
               "hankuksa/data/royal-achievements.json",
-              "hankuksa/data/royal-flow-notes.json"
+              "hankuksa/data/royal-flow-notes.json",
+              "hankuksa/timeline/index.html"
             ]
           }
         ]
@@ -16590,6 +16623,7 @@
             "covered": true,
             "sources": [
               "hankuksa/05/index.html",
+              "hankuksa/06/index.html",
               "hankuksa/timeline/index.html"
             ]
           }
@@ -16607,6 +16641,7 @@
             "covered": true,
             "sources": [
               "hankuksa/05/index.html",
+              "hankuksa/06/index.html",
               "hankuksa/data/royal-flow-notes.json",
               "hankuksa/index.html",
               "hankuksa/timeline/index.html"
@@ -16691,6 +16726,7 @@
             "covered": true,
             "sources": [
               "hankuksa/05/index.html",
+              "hankuksa/06/index.html",
               "hankuksa/data/royal-flow-notes.json",
               "hankuksa/index.html",
               "hankuksa/timeline/index.html"
@@ -16701,6 +16737,7 @@
             "covered": true,
             "sources": [
               "hankuksa/05/index.html",
+              "hankuksa/06/index.html",
               "hankuksa/timeline/index.html"
             ]
           },
@@ -17315,7 +17352,8 @@
             "term": "신민회",
             "covered": true,
             "sources": [
-              "hankuksa/05/index.html"
+              "hankuksa/05/index.html",
+              "hankuksa/06/index.html"
             ]
           }
         ]
@@ -17672,6 +17710,7 @@
             "covered": true,
             "sources": [
               "hankuksa/05/index.html",
+              "hankuksa/07/index.html",
               "hankuksa/analysis.html"
             ]
           }
@@ -17767,6 +17806,7 @@
             "covered": true,
             "sources": [
               "hankuksa/05/index.html",
+              "hankuksa/07/index.html",
               "hankuksa/analysis.html"
             ]
           }
@@ -18528,6 +18568,14 @@
             "sources": [
               "hankuksa/06/index.html"
             ]
+          },
+          {
+            "term": "소작쟁",
+            "covered": true,
+            "sources": [
+              "hankuksa/06/index.html",
+              "hankuksa/timeline/index.html"
+            ]
           }
         ]
       },
@@ -18577,6 +18625,7 @@
             "covered": true,
             "sources": [
               "hankuksa/02/index.html",
+              "hankuksa/03/index.html",
               "hankuksa/05/index.html",
               "hankuksa/06/index.html",
               "hankuksa/07/index.html"
@@ -19389,9 +19438,9 @@
               "hankuksa/01/index.html",
               "hankuksa/04/index.html",
               "hankuksa/05/index.html",
+              "hankuksa/06/index.html",
               "hankuksa/analysis.html",
-              "hankuksa/data/royal-achievements.json",
-              "hankuksa/data/royal-flow-notes.json"
+              "hankuksa/data/royal-achievements.json"
             ]
           }
         ]
@@ -19499,7 +19548,9 @@
             "term": "경찰서",
             "covered": true,
             "sources": [
-              "hankuksa/06/index.html"
+              "hankuksa/06/index.html",
+              "hankuksa/07/index.html",
+              "hankuksa/timeline/index.html"
             ]
           },
           {
@@ -19517,9 +19568,9 @@
               "hankuksa/02/index.html",
               "hankuksa/05/index.html",
               "hankuksa/06/index.html",
+              "hankuksa/07/index.html",
               "hankuksa/analysis.html",
-              "hankuksa/data/royal-achievements.json",
-              "hankuksa/timeline/index.html"
+              "hankuksa/data/royal-achievements.json"
             ]
           },
           {
@@ -19607,9 +19658,9 @@
               "hankuksa/01/index.html",
               "hankuksa/04/index.html",
               "hankuksa/05/index.html",
+              "hankuksa/06/index.html",
               "hankuksa/analysis.html",
-              "hankuksa/data/royal-achievements.json",
-              "hankuksa/data/royal-flow-notes.json"
+              "hankuksa/data/royal-achievements.json"
             ]
           }
         ]
@@ -19648,7 +19699,8 @@
             "term": "인권",
             "covered": true,
             "sources": [
-              "hankuksa/07/index.html"
+              "hankuksa/07/index.html",
+              "hankuksa/timeline/index.html"
             ]
           },
           {
@@ -19736,7 +19788,8 @@
               "hankuksa/03/index.html",
               "hankuksa/04/index.html",
               "hankuksa/05/index.html",
-              "hankuksa/06/index.html"
+              "hankuksa/06/index.html",
+              "hankuksa/07/index.html"
             ]
           },
           {
@@ -19745,10 +19798,10 @@
             "sources": [
               "hankuksa/01/index.html",
               "hankuksa/02/index.html",
+              "hankuksa/03/index.html",
               "hankuksa/05/index.html",
               "hankuksa/07/index.html",
-              "hankuksa/data/royal-achievements.json",
-              "hankuksa/timeline/index.html"
+              "hankuksa/data/royal-achievements.json"
             ]
           },
           {
@@ -20014,7 +20067,8 @@
             "term": "조절",
             "covered": true,
             "sources": [
-              "hankuksa/07/index.html"
+              "hankuksa/07/index.html",
+              "hankuksa/data/royal-achievements.json"
             ]
           },
           {
