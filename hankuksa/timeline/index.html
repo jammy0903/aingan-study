@@ -70,6 +70,8 @@ a{color:inherit;text-decoration:none}
 .year-pill{position:absolute;top:.2rem;left:50%;transform:translateX(-50%);display:inline-flex;align-items:center;justify-content:center;min-width:4.5rem;max-width:6.3rem;padding:.25rem .58rem;border-radius:999px;background:linear-gradient(135deg,var(--spine-dark),var(--spine));color:#fff;font-size:.72rem;font-weight:800;text-align:center;line-height:1.25;box-shadow:0 8px 16px rgba(36,92,111,.18);z-index:3}
 .meta{display:flex;flex-wrap:wrap;gap:.34rem;margin-bottom:.5rem}
 .tag{display:inline-flex;align-items:center;border-radius:999px;padding:.2rem .54rem;background:#edf4f6;color:var(--spine-dark);font-size:.72rem;font-weight:800;line-height:1.2}
+.tag-country{background:#e8f2ee;color:#315c43}
+.tag-century{background:#f8f0e8;color:#87553b}
 .tag-era{background:#f7ecd9;color:#7d551b}
 .tag-kind{background:#eef1fa;color:#564998}
 .event-title{font-size:1.02rem;font-weight:800;line-height:1.42;letter-spacing:0;color:#161b1d;margin-bottom:.32rem;word-break:keep-all}
@@ -155,7 +157,7 @@ const EVENTS = [
   {year:'기원전 194',sort:-194,era:'초기국가',kind:'정치',title:'위만조선 성립',note:'위만이 고조선의 왕이 되며 중계 무역과 철기 문화가 확대된다.',tags:['위만','중계 무역','철기'],href:'../01/?q=위만조선'},
   {year:'기원전 108',sort:-108,era:'초기국가',kind:'정치',title:'고조선 멸망과 한사군 설치',note:'한 무제의 공격으로 고조선이 멸망하고 한사군이 설치된다.',tags:['고조선 멸망','한사군','한 무제'],href:'../01/?q=고조선 멸망'},
   {year:'1~6세기',sort:42,era:'고대',kind:'연맹',title:'가야 연맹과 철 문화',note:'낙동강 유역의 철 생산과 교역을 바탕으로 금관가야·대가야 중심의 연맹이 성장한다.',tags:['가야','철','덩이쇠'],href:'../02/?q=가야'},
-  {year:'1~2세기',sort:100,era:'고대',kind:'체제정비',title:'고구려 중앙집권 기틀',note:'태조왕 때 계루부 고씨 왕위 세습과 옥저 복속으로 고구려 성장 기반이 마련된다.',tags:['태조왕','고구려','옥저 복속'],href:'../02/?q=고구려'},
+  {year:'1~2세기',sort:100,era:'고대',kind:'체제정비',title:'고구려의 중앙집권 기틀',note:'태조왕 때 계루부 고씨 왕위 세습과 옥저 복속으로 고구려 성장 기반이 마련된다.',tags:['태조왕','고구려','고씨세습','옥저 복속'],href:'../02/?q=고구려'},
   {year:'194',sort:194,era:'고대',kind:'체제정비',title:'고국천왕의 체제 정비·진대법',note:'5부가 행정 구역 성격으로 바뀌고 부자 상속이 강화되며, 진대법으로 민생 안정책이 시행된다.',tags:['고국천왕','진대법','부자 상속'],href:'../02/?q=고구려'},
   {year:'3세기 중엽',sort:260,era:'고대',kind:'체제정비',title:'고이왕의 백제 체제 정비',note:'백제가 한강 유역을 장악하고 관등·관복제를 정비하며 중앙집권 국가의 토대를 갖춘다.',tags:['고이왕','관등제','관복제'],href:'../02/?q=백제'},
   {year:'313',sort:313,era:'고대',kind:'정치',title:'고구려의 낙랑군 축출',note:'고구려가 낙랑군을 축출하며 대동강 유역으로 세력을 넓힌다.',tags:['낙랑군','대동강','고구려'],href:'../02/?q=고구려'},
@@ -336,8 +338,76 @@ function escHtml(value) {
   return String(value || '').replace(/[&<>"]/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[ch]));
 }
 
+const COUNTRY_RULES = [
+  {label:'대한민국 임시정부',terms:['대한민국 임시정부','임시정부','한국광복군','건국강령']},
+  {label:'대한민국',terms:['대한민국 정부','대한민국','제헌 국회','제헌 헌법','이승만','장면','박정희','전두환','노태우','김영삼','김대중','노무현','농지개혁','4·19','5·16','유신','6월 민주항쟁','금융실명제','지방자치제','IMF','새마을운동','경부고속도로','판문점 선언']},
+  {label:'남북',terms:['남북','6·15','10·4 선언']},
+  {label:'일제 강점기',terms:['조선 총독부','일제','토지조사','회사령','산미 증식','치안유지법','한인애국단','조선어학회','국가총동원법','징병제','여자정신근로령']},
+  {label:'대한제국',terms:['대한제국','광무개혁','을사늑약','통감부','헤이그','정미7조약','군대 해산','한일의정서','국권 피탈','한일 병합']},
+  {label:'조선',terms:['조선','흥선대원군','강화도 조약','동학농민운동','갑오개혁','을미사변','아관파천','독립협회']},
+  {label:'고려',terms:['고려','서희','강감찬','윤관','최우','공민왕','삼별초','무신정변','팔만대장경','전시과','과거제','이자겸','묘청']},
+  {label:'후백제',terms:['후백제','견훤']},
+  {label:'후고구려',terms:['후고구려','궁예','태봉']},
+  {label:'발해',terms:['발해','대조영','무왕','문왕','선왕','해동성국','상경 용천부','등주 공격']},
+  {label:'통일신라',terms:['통일신라','신문왕','성덕왕','경덕왕','원성왕','장보고','청해진','관료전','정전','녹읍','국학','9주 5소경','독서삼품과','불국사','석굴암']},
+  {label:'고구려',terms:['고구려','태조왕','고국천왕','미천왕','소수림왕','광개토대왕','장수왕','을지문덕','살수대첩','안시성','고씨세습']},
+  {label:'백제',terms:['백제','고이왕','근초고왕','침류왕','성왕','개로왕','관산성','사비 천도','마라난타']},
+  {label:'신라',terms:['신라','내물왕','지증왕','법흥왕','진흥왕','선덕여왕','이차돈','이사부','우산국','금관가야 병합','대가야 병합','나당연합']},
+  {label:'가야',terms:['가야','금관가야','대가야','덩이쇠']},
+  {label:'고조선',terms:['고조선','단군','위만조선','위만','한사군']}
+];
+
+function compact(value) {
+  return String(value || '').replace(/\s+/g, '');
+}
+
+function eventText(event) {
+  return [event.year,event.era,event.kind,event.title,event.note,...(event.tags || [])].join(' ');
+}
+
+function countryLabel(event) {
+  if (event.country) return event.country;
+  const text = eventText(event);
+  const packed = compact(text);
+  const labels = COUNTRY_RULES
+    .filter(rule => rule.terms.some(term => text.includes(term) || packed.includes(compact(term))))
+    .map(rule => rule.label);
+  const scopedLabels = [...new Set(labels)]
+    .filter(label => !labels.some(other => other !== label && other.includes(label)));
+  if (scopedLabels.length) return scopedLabels.slice(0, 2).join('·');
+  if (event.era === '선사') return '한반도';
+  if (event.era === '초기국가') return '초기 국가';
+  if (event.era === '고대') return '삼국/남북국';
+  if (event.era === '후삼국') return '후삼국';
+  if (event.era === '근대') return event.sort >= 1897 ? '대한제국' : '조선';
+  if (event.era === '일제') return '일제 강점기';
+  if (event.era === '현대') return '대한민국';
+  return event.era;
+}
+
+function centuryFromYear(year) {
+  if (year <= 0) return `기원전 ${Math.max(1, Math.ceil(Math.abs(year) / 100))}세기`;
+  return `${Math.floor((Math.floor(year) - 1) / 100) + 1}세기`;
+}
+
+function centuryLabel(event) {
+  const raw = String(event.year || '');
+  const writtenCentury = raw.match(/(?:기원전\s*)?\d+(?:~\d+)?세기(?:\s*(?:전반|중엽|후반))?/);
+  if (writtenCentury) return writtenCentury[0].replace(/\s+/g, ' ');
+  const bceRange = raw.match(/기원전\s*(\d+)(?:~(\d+))?/);
+  if (bceRange) {
+    const first = Math.ceil(Number(bceRange[1]) / 100);
+    const second = bceRange[2] ? Math.ceil(Number(bceRange[2]) / 100) : first;
+    return first === second ? `기원전 ${first}세기` : `기원전 ${first}~${second}세기`;
+  }
+  const sort = Number(event.sort);
+  if (!Number.isFinite(sort)) return '세기 미상';
+  if (sort <= -10000) return '선사 시대';
+  return centuryFromYear(sort);
+}
+
 function searchableText(event) {
-  return [event.year,event.era,event.kind,event.title,event.note,...(event.tags || [])].join(' ').toLowerCase();
+  return [eventText(event),countryLabel(event),centuryLabel(event)].join(' ').toLowerCase();
 }
 
 function render() {
@@ -357,6 +427,8 @@ function render() {
       </div>
       <a class="event-card" href="${escHtml(encodeURI(event.href))}" aria-label="${escHtml(event.year + ' ' + event.title)}">
         <div class="meta">
+          <span class="tag tag-country">${escHtml(countryLabel(event))}</span>
+          <span class="tag tag-century">${escHtml(centuryLabel(event))}</span>
           <span class="tag tag-era">${escHtml(event.era)}</span>
           <span class="tag tag-kind">${escHtml(event.kind)}</span>
         </div>
