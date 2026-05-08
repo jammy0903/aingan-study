@@ -49,7 +49,7 @@ a{color:inherit;text-decoration:none}
 .list{display:flex;flex-direction:column}
 .achievement-row{position:relative;display:grid;grid-template-columns:92px minmax(0,1fr);column-gap:18px;padding:0 0 30px}
 .achievement-row::before{content:'';position:absolute;left:35px;top:70px;bottom:4px;width:2px;background:linear-gradient(180deg,var(--dynasty-soft,#e5e8eb),#e5e8eb)}
-.achievement-row:last-child::before{display:none}
+.list>:last-child::before{display:none}
 .marker{position:relative;display:flex;align-items:flex-start;justify-content:center;padding-top:2px}
 .year-circle{display:flex;align-items:center;justify-content:center;width:70px;height:70px;border:3px solid var(--dynasty,#245c6f);border-radius:50%;background:#fff;color:var(--dynasty-ink,#173c4c);font-size:15px;font-weight:800;line-height:1.12;text-align:center;padding:8px;word-break:keep-all;box-shadow:0 0 0 6px var(--dynasty-soft,#e8f2f4)}
 .result{min-width:0;padding:0 0 2px}
@@ -68,11 +68,11 @@ a{color:inherit;text-decoration:none}
 .lesson-link{display:inline-flex;align-items:center;color:#1a73e8;font-size:13px;font-weight:500;margin-top:8px}
 .lesson-link:hover{text-decoration:underline}
 .flow-note{position:relative;display:grid;grid-template-columns:92px minmax(0,1fr);column-gap:18px;padding:0 0 30px}
-.flow-note::before{content:'';position:absolute;left:35px;top:0;bottom:4px;width:2px;background:#e5e8eb}
+.flow-note::before{content:'';position:absolute;left:35px;top:0;bottom:4px;width:2px;background:linear-gradient(180deg,var(--dynasty-soft,#e5e8eb),#e5e8eb)}
 .flow-marker{display:flex;justify-content:center;padding-top:4px}
-.flow-dot{width:16px;height:16px;border-radius:50%;background:#fff;border:3px solid #6d5cae;box-shadow:0 0 0 6px #f0edfb}
+.flow-dot{width:16px;height:16px;border-radius:50%;background:#fff;border:3px solid var(--dynasty,#6d5cae);box-shadow:0 0 0 6px var(--dynasty-soft,#f0edfb)}
 .flow-result{min-width:0;padding:0 0 2px}
-.flow-label{display:inline-flex;align-items:center;min-height:22px;border-radius:999px;background:#f0edfb;color:#463880;font-size:12px;font-weight:800;padding:3px 8px;margin-bottom:5px}
+.flow-label{display:inline-flex;align-items:center;min-height:22px;border-radius:999px;background:var(--dynasty-soft,#f0edfb);color:var(--dynasty-ink,#463880);font-size:12px;font-weight:800;padding:3px 8px;margin-bottom:5px}
 .flow-title{color:#202124;font-size:16px;font-weight:700;line-height:1.35;word-break:keep-all}
 .flow-text{color:var(--body);font-size:13.5px;line-height:1.62;margin-top:5px;word-break:keep-all}
 .empty{display:none;color:var(--muted);font-size:14px;padding:50px 0}
@@ -168,6 +168,7 @@ const countBadge = document.getElementById('count-badge');
 const resultInfo = document.getElementById('result-info');
 const empty = document.getElementById('empty');
 let achievements = [];
+let flowNotes = [];
 let activeDynasty = 'all';
 
 const DYNASTY_CLASSES = {
@@ -202,19 +203,44 @@ function searchableText(item) {
   ].join(' ').toLowerCase();
 }
 
+function searchableFlowText(note) {
+  return [
+    note.label,
+    note.title,
+    note.body,
+    ...(note.dynasties || []),
+    ...(note.tags || [])
+  ].join(' ').toLowerCase();
+}
+
 function dynastyClass(item) {
   return DYNASTY_CLASSES[item.dynasty] || '';
 }
 
-function flowNoteBefore(item) {
-  if (item.id !== 'balhae-mun-756') return '';
+function flowNoteClass(note) {
+  const dynasty = note.colorDynasty || (note.dynasties || [])[0];
+  return DYNASTY_CLASSES[dynasty] || '';
+}
+
+function matchesActiveDynasty(value) {
+  return activeDynasty === 'all' || value === activeDynasty;
+}
+
+function noteMatches(note, query) {
+  const dynasties = note.dynasties || [];
+  const dynastyMatch = activeDynasty === 'all' || dynasties.includes(activeDynasty);
+  const queryMatch = !query || searchableFlowText(note).includes(query);
+  return dynastyMatch && queryMatch;
+}
+
+function flowNoteHtml(note) {
   return `
-    <section class="flow-note" aria-label="발해 무왕에서 문왕으로 이어지는 흐름">
+    <section class="flow-note ${escHtml(flowNoteClass(note))}" aria-label="${escHtml(note.title)}">
       <div class="flow-marker" aria-hidden="true"><span class="flow-dot"></span></div>
       <div class="flow-result">
-        <span class="flow-label">흐름 정리</span>
-        <div class="flow-title">무왕의 대외 팽창 이후, 문왕은 제도 정비로 발해를 안정시켰다</div>
-        <p class="flow-text">무왕 때 발해는 당과 맞서 싸우며 세력을 키웠다. 그런데 땅이 넓어지고 사람도 많아지면서 &quot;왕이 명령하면 다 되는&quot; 초기 방식만으로는 나라 운영이 어려워졌다. 그래서 문왕은 방향을 바꿔 당과 친하게 지내며 선진 제도와 문화를 받아들였고, 이를 발해식으로 고쳐 3성 6부 같은 중앙 행정 조직을 정비했다. 즉, 싸워서 나라를 키운 뒤에는 제도와 수도를 갖춰 나라를 오래 안정시키려 한 것이다.</p>
+        <span class="flow-label">${escHtml(note.label || '흐름 정리')}</span>
+        <div class="flow-title">${escHtml(note.title)}</div>
+        <p class="flow-text">${escHtml(note.body)}</p>
       </div>
     </section>
   `;
@@ -249,17 +275,33 @@ function achievementHtml(item) {
 
 function render() {
   const query = queryValue();
-  const items = achievements
+  const sortedItems = achievements
     .slice()
-    .sort((a, b) => Number(a.sort) - Number(b.sort) || String(a.id).localeCompare(String(b.id), 'ko'))
-    .filter(item => activeDynasty === 'all' || item.dynasty === activeDynasty)
-    .filter(item => !query || searchableText(item).includes(query));
+    .sort((a, b) => Number(a.sort) - Number(b.sort) || String(a.id).localeCompare(String(b.id), 'ko'));
 
-  list.innerHTML = items.map(item => `${flowNoteBefore(item)}${achievementHtml(item)}`).join('');
+  let visibleAchievements = 0;
+  let visibleNotes = 0;
+  const html = [];
 
-  countBadge.textContent = `${items.length}개 업적`;
-  resultInfo.textContent = `약 ${items.length.toLocaleString('ko-KR')}개 결과 (0.12초)`;
-  empty.classList.toggle('show', items.length === 0);
+  sortedItems.forEach(item => {
+    const notes = flowNotes
+      .filter(note => note.insertBeforeId === item.id)
+      .filter(note => noteMatches(note, query));
+    visibleNotes += notes.length;
+    html.push(...notes.map(flowNoteHtml));
+
+    const itemVisible = matchesActiveDynasty(item.dynasty) && (!query || searchableText(item).includes(query));
+    if (itemVisible) {
+      visibleAchievements += 1;
+      html.push(achievementHtml(item));
+    }
+  });
+
+  list.innerHTML = html.join('');
+
+  countBadge.textContent = `${visibleAchievements}개 업적`;
+  resultInfo.textContent = `${visibleAchievements.toLocaleString('ko-KR')}개 업적 · ${visibleNotes.toLocaleString('ko-KR')}개 흐름`;
+  empty.classList.toggle('show', visibleAchievements + visibleNotes === 0);
 }
 
 chips.addEventListener('click', event => {
@@ -277,13 +319,29 @@ search.addEventListener('focus', () => {
 
 search.addEventListener('input', render);
 
-fetch('../data/royal-achievements.json')
+function loadJson(url, fallback) {
+  return fetch(url)
+    .then(response => {
+      if (!response.ok) {
+        if (fallback !== undefined) return fallback;
+        throw new Error('JSON load failed');
+      }
+      return response.json();
+    })
+    .catch(error => {
+      if (fallback !== undefined) return fallback;
+      throw error;
+    });
+}
+
+Promise.all([
+  loadJson('../data/royal-achievements.json'),
+  loadJson('../data/royal-flow-notes.json', [])
+])
   .then(response => {
-    if (!response.ok) throw new Error('JSON load failed');
-    return response.json();
-  })
-  .then(data => {
+    const [data, notes] = response;
     achievements = Array.isArray(data) ? data : [];
+    flowNotes = Array.isArray(notes) ? notes : [];
     render();
   })
   .catch(() => {
