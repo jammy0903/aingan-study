@@ -70,10 +70,12 @@ a{color:inherit;text-decoration:none}
 .year-pill{position:absolute;top:.2rem;left:50%;transform:translateX(-50%);display:inline-flex;align-items:center;justify-content:center;min-width:4.5rem;max-width:6.3rem;padding:.25rem .58rem;border-radius:999px;background:linear-gradient(135deg,var(--spine-dark),var(--spine));color:#fff;font-size:.72rem;font-weight:800;text-align:center;line-height:1.25;box-shadow:0 8px 16px rgba(36,92,111,.18);z-index:3}
 .meta{display:flex;flex-wrap:wrap;gap:.34rem;margin-bottom:.5rem}
 .tag{display:inline-flex;align-items:center;border-radius:999px;padding:.2rem .54rem;background:#edf4f6;color:var(--spine-dark);font-size:.72rem;font-weight:800;line-height:1.2}
+.tag-number{background:#e8eef2;color:#344850}
 .tag-country{background:#e8f2ee;color:#315c43}
 .tag-century{background:#f8f0e8;color:#87553b}
 .tag-era{background:#f7ecd9;color:#7d551b}
 .tag-kind{background:#eef1fa;color:#564998}
+.tag-ruler{background:#eef6e8;color:#41602f}
 .event-title{font-size:1.02rem;font-weight:800;line-height:1.42;letter-spacing:0;color:#161b1d;margin-bottom:.32rem;word-break:keep-all}
 .event-note{font-size:.9rem;line-height:1.65;color:#4e5b61;word-break:keep-all}
 .keywords{display:flex;flex-wrap:wrap;gap:.28rem;margin-top:.62rem}
@@ -368,6 +370,67 @@ const COUNTRY_RULES = [
   {label:'고조선',terms:['고조선','단군','위만조선','위만','한사군']}
 ];
 
+const RULER_RULES = [
+  {label:'단군왕검',terms:['단군조선 건국','단군왕검','단군']},
+  {label:'위만',terms:['위만조선','위만']},
+  {label:'태조왕',terms:['태조왕','고씨세습','옥저 복속']},
+  {label:'고국천왕',terms:['고국천왕','진대법']},
+  {label:'미천왕',terms:['미천왕','서안평','낙랑군 축출','대방군 점령']},
+  {label:'근초고왕',terms:['근초고왕','마한 정복','서기 편찬','칠지도','백제의 평양성 공격']},
+  {label:'고국원왕',terms:['고국원왕']},
+  {label:'내물마립간',terms:['내물마립간','내물왕','김씨 왕위 세습','마립간']},
+  {label:'소수림왕',terms:['소수림왕','고구려 태학','태학 설립']},
+  {label:'침류왕',terms:['침류왕','백제 불교 수용','마라난타']},
+  {label:'광개토대왕',terms:['광개토대왕','영락','신라 지원']},
+  {label:'장수왕',terms:['장수왕','평양 천도','한성 함락']},
+  {label:'비유왕',terms:['비유왕']},
+  {label:'눌지왕',terms:['눌지왕']},
+  {label:'문주왕',terms:['문주왕','웅진 천도']},
+  {label:'동성왕',terms:['동성왕','혼인 동맹','혼인동맹']},
+  {label:'무령왕',terms:['무령왕','22담로']},
+  {label:'지증왕',terms:['지증왕','순장 금지','우경','동시전','신라 국호','왕 칭호','우산국']},
+  {label:'법흥왕',terms:['법흥왕','병부 설치','공복 제정','골품제','건원','불교 공인','이차돈','금관가야 병합']},
+  {label:'성왕',terms:['성왕','사비 천도','남부여','노리사치계','관산성']},
+  {label:'진흥왕',terms:['진흥왕','거칠부','국사 편찬','개국','화랑도','황룡사','단양 적성비','순수비','대가야 병합']},
+  {label:'영양왕',terms:['살수대첩','을지문덕']},
+  {label:'선덕여왕',terms:['선덕여왕','첨성대']},
+  {label:'의자왕',terms:['의자왕','대야성','백제 멸망']},
+  {label:'보장왕',terms:['안시성 전투','고구려 멸망']},
+  {label:'문무왕',terms:['삼국 통일','매소성','기벌포']},
+  {label:'신문왕',terms:['신문왕','김흠돌','국학','9주 5소경','관료전','녹읍 폐지']},
+  {label:'대조영',terms:['대조영','발해 건국']},
+  {label:'성덕왕',terms:['성덕왕','정전 지급']},
+  {label:'발해 무왕',terms:['발해 무왕','무왕','등주 공격','장문휴']},
+  {label:'발해 문왕',terms:['발해 문왕','3성 6부','상경 용천부']},
+  {label:'경덕왕',terms:['경덕왕','녹읍 부활','불국사','석굴암']},
+  {label:'원성왕',terms:['원성왕','독서삼품과']},
+  {label:'발해 선왕',terms:['발해 선왕','선왕','해동성국','5경 15부 62주']},
+  {label:'궁예',terms:['궁예','후고구려','태봉']},
+  {label:'견훤',terms:['견훤','후백제']},
+  {label:'왕건',terms:['왕건','고려 건국','후삼국 통일']},
+  {label:'경순왕',terms:['경순왕','신라 항복']},
+  {label:'광종',terms:['광종','노비안검법','과거제','쌍기']},
+  {label:'경종',terms:['경종','전시과']},
+  {label:'성종',terms:['성종','최승로','시무 28조','12목']},
+  {label:'공민왕',terms:['공민왕','반원 개혁','쌍성총관부','정동행성 이문소']},
+  {label:'태조 이성계',terms:['이성계','조선 건국','한양 천도']},
+  {label:'세종',terms:['세종','훈민정음']},
+  {label:'세조',terms:['세조','수양대군','계유정난']},
+  {label:'성종',terms:['성종','경국대전']},
+  {label:'연산군',terms:['연산군','무오사화','갑자사화']},
+  {label:'중종',terms:['중종','조광조','기묘사화']},
+  {label:'명종',terms:['명종','을사사화']},
+  {label:'선조',terms:['선조','임진왜란','훈련도감','정유재란']},
+  {label:'광해군',terms:['광해군','대동법','인조반정']},
+  {label:'인조',terms:['인조','정묘호란','병자호란']},
+  {label:'숙종',terms:['숙종','상평통보']},
+  {label:'영조',terms:['영조','탕평','균역법']},
+  {label:'정조',terms:['정조','규장각','신해통공','장용영','수원 화성']},
+  {label:'순조',terms:['순조','신유박해','홍경래']},
+  {label:'고종',terms:['고종','흥선대원군','대한제국','광무개혁','헤이그 특사']},
+  {label:'순종',terms:['순종 인산일','6·10 만세']}
+];
+
 function compact(value) {
   return String(value || '').replace(/\s+/g, '');
 }
@@ -404,6 +467,22 @@ function countryLabel(event) {
   return countryLabels(event).join('·');
 }
 
+function rulerLabels(event) {
+  if (event.ruler) {
+    const rulers = Array.isArray(event.ruler) ? event.ruler : String(event.ruler).split('·');
+    return rulers.map(ruler => ruler.trim()).filter(Boolean);
+  }
+  const text = eventText(event);
+  const packed = compact(text);
+  return [...new Set(RULER_RULES
+    .filter(rule => rule.terms.some(term => text.includes(term) || packed.includes(compact(term))))
+    .map(rule => rule.label))].slice(0, 3);
+}
+
+function rulerLabel(event) {
+  return rulerLabels(event).join('·');
+}
+
 function centuryFromYear(year) {
   if (year <= 0) return `기원전 ${Math.max(1, Math.ceil(Math.abs(year) / 100))}세기`;
   return `${Math.floor((Math.floor(year) - 1) / 100) + 1}세기`;
@@ -426,7 +505,7 @@ function centuryLabel(event) {
 }
 
 function searchableText(event) {
-  return [eventText(event),countryLabel(event),centuryLabel(event)].join(' ').toLowerCase();
+  return [eventText(event),countryLabel(event),rulerLabel(event),centuryLabel(event)].join(' ').toLowerCase();
 }
 
 function matchesActiveEra(event) {
@@ -441,7 +520,9 @@ function render() {
     .filter(matchesActiveEra)
     .filter(event => !query || searchableText(event).includes(query));
 
-  timeline.innerHTML = events.map(event => `
+  timeline.innerHTML = events.map((event, order) => {
+    const ruler = rulerLabel(event);
+    return `
     <article class="event">
       <div class="branch" aria-hidden="true">
         <span class="year-pill">${escHtml(event.year)}</span>
@@ -450,7 +531,9 @@ function render() {
       </div>
       <a class="event-card" href="${escHtml(encodeURI(event.href))}" aria-label="${escHtml(event.year + ' ' + event.title)}">
         <div class="meta">
+          <span class="tag tag-number">#${order + 1}</span>
           <span class="tag tag-country">${escHtml(countryLabel(event))}</span>
+          ${ruler ? `<span class="tag tag-ruler">${escHtml(ruler)}</span>` : ''}
           <span class="tag tag-century">${escHtml(centuryLabel(event))}</span>
           <span class="tag tag-era">${escHtml(event.era)}</span>
           <span class="tag tag-kind">${escHtml(event.kind)}</span>
@@ -460,7 +543,7 @@ function render() {
         <div class="keywords">${(event.tags || []).map(tag => `<span>${escHtml(tag)}</span>`).join('')}</div>
       </a>
     </article>
-  `).join('');
+  `}).join('');
 
   countBadge.textContent = `${events.length}개 사건`;
   empty.classList.toggle('show', events.length === 0);
