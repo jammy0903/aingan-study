@@ -1,3 +1,5 @@
 # Local Playwright artifacts
 .playwright-cli/
 output/playwright/
+tmp/
+__pycache__/
