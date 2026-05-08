@@ -247,7 +247,7 @@ function flowNoteHtml(note) {
       <div class="flow-result">
         <span class="flow-label">${escHtml(note.label || '흐름 정리')}</span>
         <div class="flow-title">${escHtml(note.title)}</div>
-        <p class="flow-text">${escHtml(note.body)}</p>
+        <p class="flow-text">${formatMnemonic(note.body)}</p>
       </div>
     </section>
   `;

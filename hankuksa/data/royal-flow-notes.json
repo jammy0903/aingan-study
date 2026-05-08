@@ -170,6 +170,16 @@
     "tags": ["문무왕", "대조영", "발해 건국", "고구려 유민", "남북국"]
   },
   {
+    "id": "balhae-era-name-order-mnemonic",
+    "insertBeforeId": "balhae-daejoyeong-698",
+    "label": "연호 순서 암기",
+    "title": "발해 왕·연호 순서",
+    "body": "**천안대건흥** = 대조영 천통, 무왕 인안, 문왕 대흥, 선왕 건흥 순서다.",
+    "dynasties": ["발해"],
+    "colorDynasty": "발해",
+    "tags": ["천안대건흥", "대조영", "천통", "무왕", "인안", "문왕", "대흥", "선왕", "건흥"]
+  },
+  {
     "id": "balhae-mu-to-mun",
     "insertBeforeId": "balhae-mun-756",
     "label": "흐름 정리",
@@ -178,6 +188,16 @@
     "dynasties": ["발해"],
     "colorDynasty": "발해",
     "tags": ["무왕", "문왕", "등주 공격", "당 문물 수용", "3성 6부"]
+  },
+  {
+    "id": "late-silla-rebellion-order-mnemonic",
+    "insertBeforeId": "silla-heondeok-822",
+    "label": "순서 중요",
+    "title": "신라 하대 반란 4개 순서",
+    "body": "순서 중요: 김헌창의 난 → 장보고의 난 → 원종·애노의 난 → 적고적의 난. 연도는 822 → 846 → 889 → 896으로 잡는다.",
+    "dynasties": ["통일신라"],
+    "colorDynasty": "통일신라",
+    "tags": ["김헌창의 난", "장보고의 난", "원종·애노의 난", "적고적의 난", "반란 순서"]
   },
   {
     "id": "late-silla-to-goryeo",
