@@ -352,8 +352,38 @@ function filterTab(btn, ch) {
   applyFilters();
 }
 
+const LESSON_SEARCH_CACHE = new Map();
+
+function flattenSearchValue(value) {
+  if (value == null) return '';
+  if (typeof value === 'string' || typeof value === 'number') return String(value);
+  if (Array.isArray(value)) return value.map(flattenSearchValue).join(' ');
+  if (typeof value === 'object') return Object.values(value).map(flattenSearchValue).join(' ');
+  return '';
+}
+
+function lessonIndexFromNode(node) {
+  const raw = node?.getAttribute?.('onclick') || node?.querySelector?.('[onclick^="startLesson"]')?.getAttribute('onclick') || '';
+  const m = raw.match(/startLesson\((\d+)\)/);
+  return m ? Number(m[1]) : -1;
+}
+
+function lessonSearchText(idx) {
+  if (!Number.isInteger(idx) || !LESSONS[idx]) return '';
+  if (!LESSON_SEARCH_CACHE.has(idx)) {
+    LESSON_SEARCH_CACHE.set(idx, flattenSearchValue(LESSONS[idx]).toLowerCase());
+  }
+  return LESSON_SEARCH_CACHE.get(idx);
+}
+
+function nodeMatchesQuery(node, q) {
+  if (!q) return true;
+  if ((node.textContent || '').toLowerCase().includes(q)) return true;
+  return lessonSearchText(lessonIndexFromNode(node)).includes(q);
+}
+
 function applyFilters() {
-  const q = document.querySelector('.search').value.toLowerCase();
+  const q = document.querySelector('.search').value.trim().toLowerCase();
   // 카드뷰
   document.querySelectorAll('.section-group').forEach(grp => {
     const chOk = curTab === 'all' || grp.dataset.chapter === curTab;
@@ -361,7 +391,7 @@ function applyFilters() {
     if (chOk) {
       let any = false;
       grp.querySelectorAll('.card').forEach(c => {
-        const show = !q || c.textContent.toLowerCase().includes(q);
+        const show = nodeMatchesQuery(c, q);
         c.classList.toggle('hidden-card', !show);
         if (show) any = true;
       });
@@ -370,7 +400,7 @@ function applyFilters() {
   });
   // fishbone 뷰
   document.querySelectorAll('#fb-view .fb-event').forEach(ev => {
-    ev.style.display = (!q || ev.textContent.toLowerCase().includes(q)) ? '' : 'none';
+    ev.style.display = nodeMatchesQuery(ev, q) ? '' : 'none';
   });
 }
 
