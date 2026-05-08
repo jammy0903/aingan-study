@@ -1,5 +1,15 @@
 [
   {
+    "id": "goguryeo-king-order-mnemonic",
+    "insertBeforeId": "goguryeo-taejo-100",
+    "label": "왕 순서 암기",
+    "title": "고구려 왕 순서 암기",
+    "body": "동태천원소광장은 동명성왕까지 포함한 긴 순서, 태고미고소광장은 한능검 핵심 왕 중심 순서로 잡는다. 핵심 흐름은 태조왕-고국천왕-미천왕-고국원왕-소수림왕-광개토대왕-장수왕 순서다.",
+    "dynasties": ["고구려"],
+    "colorDynasty": "고구려",
+    "tags": ["동태천원소광장", "태고미고소광장", "동명성왕", "태조왕", "고국천왕", "미천왕", "고국원왕", "소수림왕", "광개토대왕", "장수왕"]
+  },
+  {
     "id": "goguryeo-taejo-to-gogukcheon",
     "insertBeforeId": "goguryeo-gogukcheon-194",
     "label": "흐름 정리",
@@ -18,6 +28,16 @@
     "dynasties": ["고구려", "백제", "신라"],
     "colorDynasty": "백제",
     "tags": ["고이왕", "관등제", "관복제", "중앙집권", "신라 성장"]
+  },
+  {
+    "id": "baekje-king-order-mnemonic",
+    "insertBeforeId": "baekje-goi-260",
+    "label": "왕 순서 암기",
+    "title": "백제 왕 순서 암기",
+    "body": "고근침 비개문동 무성의 = 고이왕-근초고왕-침류왕-비유왕-개로왕-문주왕-동성왕-무령왕-성왕-의자왕 순서다.",
+    "dynasties": ["백제"],
+    "colorDynasty": "백제",
+    "tags": ["고근침", "비개문동", "무성의", "고이왕", "근초고왕", "침류왕", "비유왕", "개로왕", "문주왕", "동성왕", "무령왕", "성왕", "의자왕"]
   },
   {
     "id": "goi-to-geunchogo",
