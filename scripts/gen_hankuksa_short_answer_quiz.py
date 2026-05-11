@@ -78,6 +78,21 @@ STOP_TERMS = {
 }
 
 
+def is_single_answer(value: str) -> bool:
+    value = normalize_term(value)
+    if not value:
+        return False
+    if re.search(r"(과|와)\s+", value):
+        return False
+    if "/" in value:
+        return False
+    if re.search(r"(?<!\d)·|·(?!\d)", value):
+        return False
+    if " vs " in value.lower():
+        return False
+    return True
+
+
 def clean_text(value: str) -> str:
     value = re.sub(r"<[^>]+>", "", value or "")
     value = value.replace("`", "")
@@ -361,8 +376,12 @@ def build_concept_candidates() -> list[dict]:
             for concept in lesson.get("items") or []:
                 title = normalize_term(concept.get("title") or "")
                 keywords = [normalize_term(k) for k in concept.get("keywords", []) if useful_term(k)]
+                answer = ""
                 if title and len(keywords) >= 2:
                     answer = short_answer_label(title)
+                    if not is_single_answer(answer):
+                        answer = ""
+                if answer and len(keywords) >= 2:
                     clues = direct_clues(keywords, answer=answer)
                     if len(clues) < 2:
                         continue
@@ -389,7 +408,7 @@ def build_concept_candidates() -> list[dict]:
                 for row_idx, row in enumerate(concept.get("table") or []):
                     answer = normalize_term(row.get("시험포인트") or "")
                     story = clean_text(row.get("스토리") or "")
-                    if not useful_term(answer) or len(story) < 12:
+                    if not useful_term(answer) or not is_single_answer(answer) or len(story) < 12:
                         continue
                     clues = direct_clues(
                         split_clues(story, answer),
