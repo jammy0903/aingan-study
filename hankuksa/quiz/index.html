@@ -148,6 +148,7 @@ button{cursor:pointer}
       <section class="panel">
         <h2>관리</h2>
         <div class="mini-list">
+          <div class="mini-row"><span>저장</span><span id="save-text">DB 준비 중</span></div>
           <button class="btn danger" id="reset-btn" type="button">기록 초기화</button>
         </div>
       </section>
@@ -156,6 +157,8 @@ button{cursor:pointer}
 </main>
 
 <script>
+const PROGRESS_API = '/api/hankuksa-quiz-progress';
+
 const state = {
   bank: [],
   pool: [],
@@ -194,6 +197,7 @@ const els = {
   eraText: document.getElementById('era-text'),
   kindText: document.getElementById('kind-text'),
   roundText: document.getElementById('round-text'),
+  saveText: document.getElementById('save-text'),
   resetBtn: document.getElementById('reset-btn')
 };
 
@@ -210,18 +214,55 @@ function norm(value) {
     .replace(/[()\[\]{}'"`“”‘’.,/·:;!?~\-_\s]/g, '');
 }
 
-function loadStats() {
-  try {
-    const raw = localStorage.getItem('hankuksa-short-answer-quiz-v1');
-    if (raw) state.stats = JSON.parse(raw);
-  } catch (_) {
-    state.stats = { byId: {} };
-  }
-  if (!state.stats.byId) state.stats.byId = {};
+function resultOf(id) {
+  const value = state.stats.byId[id];
+  if (value === 'correct' || value === 'wrong') return value;
+  if (value && (value.last === 'correct' || value.last === 'wrong')) return value.last;
+  return '';
 }
 
-function saveStats() {
-  localStorage.setItem('hankuksa-short-answer-quiz-v1', JSON.stringify(state.stats));
+function setSaveStatus(text) {
+  els.saveText.textContent = text;
+}
+
+function normalizeProgress(data) {
+  const byId = {};
+  for (const [id, value] of Object.entries(data?.byId || {})) {
+    if (value === 'correct' || value === 'wrong') byId[id] = value;
+    else if (value?.last === 'correct' || value?.last === 'wrong') byId[id] = value.last;
+  }
+  return { byId };
+}
+
+async function loadStats() {
+  try {
+    const res = await fetch(PROGRESS_API, {
+      cache: 'no-store',
+      credentials: 'same-origin'
+    });
+    if (!res.ok) throw new Error('progress load failed');
+    state.stats = normalizeProgress(await res.json());
+    setSaveStatus('DB 연결됨');
+  } catch (_) {
+    state.stats = { byId: {} };
+    setSaveStatus('DB 불러오기 실패');
+  }
+}
+
+async function persistAnswer(questionId, correct) {
+  setSaveStatus('DB 저장 중');
+  try {
+    const res = await fetch(PROGRESS_API, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'same-origin',
+      body: JSON.stringify({ questionId, correct })
+    });
+    if (!res.ok) throw new Error('progress save failed');
+    setSaveStatus('DB 저장됨');
+  } catch (_) {
+    setSaveStatus('DB 저장 실패');
+  }
 }
 
 function shuffle(list) {
@@ -270,12 +311,11 @@ function applyFilters({ keepOrder = false } = {}) {
   const round = els.roundFilter.value;
   const query = els.search.value.trim();
   let next = state.bank.filter(item => {
-    const row = state.stats.byId[item.id] || {};
     const roundLabel = item.round ? String(item.round) + '회' : '개념카드';
     return (!era || item.era === era)
       && (!kind || item.kind === kind)
       && (!round || roundLabel === round)
-      && (!state.wrongOnly || row.last === 'wrong')
+      && (!state.wrongOnly || resultOf(item.id) === 'wrong')
       && matchesSearch(item, query);
   });
   if (!keepOrder) next = shuffle(next);
@@ -289,9 +329,9 @@ function currentItem() {
 }
 
 function renderStats() {
-  const rows = Object.values(state.stats.byId);
-  const correct = rows.filter(r => r.last === 'correct').length;
-  const wrong = rows.filter(r => r.last === 'wrong').length;
+  const rows = Object.keys(state.stats.byId).map(resultOf);
+  const correct = rows.filter(r => r === 'correct').length;
+  const wrong = rows.filter(r => r === 'wrong').length;
   const total = correct + wrong;
   els.poolCount.textContent = state.pool.length.toLocaleString('ko-KR');
   els.correctCount.textContent = correct.toLocaleString('ko-KR');
@@ -339,12 +379,7 @@ function checkAnswer() {
     return;
   }
   const ok = acceptableAnswers(item).some(answer => norm(answer) === norm(value));
-  const row = state.stats.byId[item.id] || { attempts: 0 };
-  row.attempts += 1;
-  row.last = ok ? 'correct' : 'wrong';
-  row.updatedAt = Date.now();
-  state.stats.byId[item.id] = row;
-  saveStats();
+  state.stats.byId[item.id] = ok ? 'correct' : 'wrong';
 
   state.checked = true;
   els.feedback.style.display = 'block';
@@ -354,6 +389,7 @@ function checkAnswer() {
   els.answerLine.textContent = '답: ' + item.answer + aliases;
   els.explain.textContent = item.explanation || '';
   renderStats();
+  persistAnswer(item.id, ok);
 }
 
 function nextQuestion() {
@@ -362,10 +398,20 @@ function nextQuestion() {
   render();
 }
 
-function resetStats() {
+async function resetStats() {
   state.stats = { byId: {} };
-  saveStats();
+  setSaveStatus('DB 삭제 중');
   applyFilters({ keepOrder: true });
+  try {
+    const res = await fetch(PROGRESS_API, {
+      method: 'DELETE',
+      credentials: 'same-origin'
+    });
+    if (!res.ok) throw new Error('progress reset failed');
+    setSaveStatus('DB 초기화됨');
+  } catch (_) {
+    setSaveStatus('DB 초기화 실패');
+  }
 }
 
 els.search.addEventListener('input', () => applyFilters());
@@ -392,9 +438,9 @@ fetch('questions.json', { cache: 'no-store' })
     if (!res.ok) throw new Error('quiz data load failed');
     return res.json();
   })
-  .then(data => {
+  .then(async data => {
     state.bank = data.questions || [];
-    loadStats();
+    await loadStats();
     initFilters(data.meta || {});
     applyFilters();
   })
