@@ -47,18 +47,22 @@ function sendJson(res, status, body) {
 }
 
 export default async function handler(req, res) {
-  const sql = neon(process.env.DATABASE_URL);
-
-  const cookies = parseCookies(req.headers.cookie);
-  let uid = cookies.uid;
-  const newCookie = !uid;
-
-  if (!uid) uid = crypto.randomUUID();
-
-  const cookieHeader = `uid=${uid}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=31536000`;
-  if (newCookie) res.setHeader('Set-Cookie', cookieHeader);
-
   try {
+    if (!process.env.DATABASE_URL) {
+      sendJson(res, 500, { ok: false, error: 'DATABASE_URL is not configured' });
+      return;
+    }
+
+    const sql = neon(process.env.DATABASE_URL);
+    const cookies = parseCookies(req.headers.cookie);
+    let uid = cookies.uid;
+    const newCookie = !uid;
+
+    if (!uid) uid = crypto.randomUUID();
+
+    const cookieHeader = `uid=${uid}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=31536000`;
+    if (newCookie) res.setHeader('Set-Cookie', cookieHeader);
+
     await ensureSchema(sql);
 
     if (req.method === 'GET') {
