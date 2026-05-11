@@ -64,6 +64,17 @@ STOP_TERMS = {
     "분야",
     "장면",
     "핵심",
+    "원인→결과",
+    "멸망",
+    "침략국",
+    "전투",
+    "빌미",
+    "후속",
+    "피해",
+    "초기",
+    "철수",
+    "통치 변화",
+    "호족·사상",
 }
 
 
@@ -79,6 +90,19 @@ def normalize_term(value: str) -> str:
     value = re.sub(r"^[①②③④⑤]\s*", "", value)
     value = re.sub(r"\s+", " ", value)
     return value.strip(" .,;:/·-")
+
+
+def short_answer_label(answer: str) -> str:
+    answer = re.sub(r" 시대 도구와 생활$", " 시대", answer)
+    if answer.endswith("의 체제 정비"):
+        return answer.removesuffix("의 체제 정비")
+    if answer.endswith("의 정복 활동"):
+        return answer.removesuffix("의 정복 활동")
+    if answer.endswith("의 영토 확장"):
+        return answer.removesuffix("의 영토 확장")
+    if answer.endswith("의 개혁"):
+        return answer.removesuffix("의 개혁")
+    return answer
 
 
 def useful_term(term: str) -> bool:
@@ -108,6 +132,62 @@ def aliases_for(answer: str) -> list[str]:
     # Preserve order while deduplicating.
     seen = set()
     return [a for a in aliases if not (a in seen or seen.add(a))]
+
+
+def strip_hint_noise(text: str) -> str:
+    text = clean_text(text)
+    patterns = [
+        r"^헷갈릴 때는 흐름으로 끊어 봐\.\s*",
+        r"^결과까지 이어서 보면 더 선명해져\.\s*",
+        r"^이 이야기는 .*? 장면이야\.\s*",
+        r"여기서는 사건 이름만 외우면 금방 헷갈려\.\s*",
+        r"먼저 앞 상황을 잡고, 그 상황이 어떤 선택이나 충돌을 만들었는지 본 다음, 그 결과가 다음 시대로 어떻게 이어졌는지를 따라가면 돼\.\s*",
+    ]
+    for pattern in patterns:
+        text = re.sub(pattern, "", text)
+    return text.strip()
+
+
+def answer_in_text(answer: str, text: str) -> bool:
+    compact_answer = re.sub(r"\s+", "", answer)
+    compact_text = re.sub(r"\s+", "", text)
+    return bool(compact_answer) and compact_answer in compact_text
+
+
+def clue_allowed(clue: str, answer: str) -> bool:
+    clue = normalize_term(strip_hint_noise(clue))
+    if not useful_term(clue):
+        return False
+    if answer_in_text(answer, clue) or answer_in_text(clue, answer):
+        return False
+    return True
+
+
+def split_clues(text: str, answer: str) -> list[str]:
+    text = strip_hint_noise(text)
+    text = re.sub(r"^[^:：]{1,8}[:：]\s*", "", text)
+    parts = re.split(r"\s*(?:/|→|,|;|·|\n|\.)\s*", text)
+    clues: list[str] = []
+    for part in parts:
+        part = re.sub(r"^[가-힣A-Za-z0-9 ]{1,8}[:：]\s*", "", part).strip()
+        part = part.strip(" -")
+        if clue_allowed(part, answer):
+            clues.append(part)
+    return clues
+
+
+def direct_clues(*groups: list[str], answer: str, limit: int = 6) -> list[str]:
+    out: list[str] = []
+    for group in groups:
+        for clue in group:
+            clue = normalize_term(strip_hint_noise(clue))
+            if not clue_allowed(clue, answer):
+                continue
+            if clue not in out:
+                out.append(clue)
+            if len(out) >= limit:
+                return out
+    return out
 
 
 def source_label(question: dict) -> str:
@@ -149,13 +229,17 @@ def make_item(
     question: dict,
     explanation: str,
 ) -> dict:
-    answer = normalize_term(answer)
+    raw_answer = normalize_term(answer)
+    answer = short_answer_label(raw_answer)
+    aliases = aliases_for(answer)
+    if raw_answer != answer:
+        aliases.append(raw_answer)
     return {
         "id": qid,
         "kind": kind,
         "prompt": clean_text(prompt),
         "answer": answer,
-        "aliases": aliases_for(answer),
+        "aliases": list(dict.fromkeys(aliases)),
         "clues": [normalize_term(c) for c in clues if useful_term(c)][:6],
         "era": infer_era(question, explanation),
         "type": question.get("type") or "기출 단서",
@@ -177,13 +261,17 @@ def make_concept_item(
     source: str,
     explanation: str,
 ) -> dict:
-    answer = normalize_term(answer)
+    raw_answer = normalize_term(answer)
+    answer = short_answer_label(raw_answer)
+    aliases = aliases_for(answer)
+    if raw_answer != answer:
+        aliases.append(raw_answer)
     return {
         "id": qid,
         "kind": kind,
         "prompt": clean_text(prompt),
         "answer": answer,
-        "aliases": aliases_for(answer),
+        "aliases": list(dict.fromkeys(aliases)),
         "clues": [normalize_term(c) for c in clues if useful_term(c)][:6],
         "era": era,
         "type": "개념 회상",
@@ -274,8 +362,12 @@ def build_concept_candidates() -> list[dict]:
                 title = normalize_term(concept.get("title") or "")
                 keywords = [normalize_term(k) for k in concept.get("keywords", []) if useful_term(k)]
                 if title and len(keywords) >= 2:
-                    prompt = "다음 단서들이 가리키는 핵심 개념명을 쓰세요."
-                    key = (prompt + "|".join(keywords[:6]), title)
+                    answer = short_answer_label(title)
+                    clues = direct_clues(keywords, answer=answer)
+                    if len(clues) < 2:
+                        continue
+                    prompt = "단서를 보고 핵심 인물·사건·제도를 쓰세요."
+                    key = (prompt + "|".join(clues), answer)
                     if key not in seen:
                         seen.add(key)
                         items.append(
@@ -283,8 +375,8 @@ def build_concept_candidates() -> list[dict]:
                                 qid=f"k-{unit}-{len(items)}",
                                 kind="개념 단답",
                                 prompt=prompt,
-                                answer=title,
-                                clues=keywords,
+                                answer=answer,
+                                clues=clues,
                                 era=era,
                                 source=f"{unit}권 개념카드 · {chapter}",
                                 explanation=concept.get("explanation")
@@ -299,9 +391,16 @@ def build_concept_candidates() -> list[dict]:
                     story = clean_text(row.get("스토리") or "")
                     if not useful_term(answer) or len(story) < 12:
                         continue
-                    prompt_story = cloze_text(story, answer) if answer in story else story
-                    prompt = f"다음 설명이 가리키는 시험 포인트를 쓰세요. {prompt_story}"
-                    key = (prompt, answer)
+                    clues = direct_clues(
+                        split_clues(story, answer),
+                        [title],
+                        keywords,
+                        answer=answer,
+                    )
+                    if len(clues) < 2:
+                        continue
+                    prompt = "단서를 보고 시험 포인트를 쓰세요."
+                    key = (prompt + "|".join(clues), answer)
                     if key in seen:
                         continue
                     seen.add(key)
@@ -311,37 +410,12 @@ def build_concept_candidates() -> list[dict]:
                             kind="시험포인트",
                             prompt=prompt,
                             answer=answer,
-                            clues=[title] + [k for k in keywords if k != answer],
+                            clues=clues,
                             era=era,
                             source=f"{unit}권 개념카드 · {chapter}",
                             explanation=story,
                         )
                     )
-
-                for text_idx, text in enumerate(
-                    [concept.get("background"), concept.get("why"), concept.get("trap")]
-                ):
-                    text = clean_text(text or "")
-                    if len(text) < 18:
-                        continue
-                    for term in pick_cloze_terms(text, keywords):
-                        prompt = f"빈칸에 들어갈 핵심어를 쓰세요. {cloze_text(text, term)}"
-                        key = (prompt, term)
-                        if key in seen:
-                            continue
-                        seen.add(key)
-                        items.append(
-                            make_concept_item(
-                                qid=f"m-{unit}-{len(items)}-{text_idx}",
-                                kind="개념 빈칸",
-                                prompt=prompt,
-                                answer=term,
-                                clues=[title] + [k for k in keywords if k != term],
-                                era=era,
-                                source=f"{unit}권 개념카드 · {chapter}",
-                                explanation=text,
-                            )
-                        )
 
     return items
 
@@ -365,11 +439,12 @@ def build_candidates(questions: list[dict]) -> tuple[list[dict], list[dict]]:
             if "통합 연표에서 검색" in text:
                 continue
             for term in pick_cloze_terms(text, keywords):
-                other_clues = [k for k in keywords if k != term]
-                if not other_clues:
+                clean_hint = strip_hint_noise(cloze_text(text, term))
+                other_clues = direct_clues([clean_hint], keywords, answer=term)
+                if len(other_clues) < 2:
                     continue
-                prompt = f"빈칸에 들어갈 핵심어를 쓰세요. {cloze_text(text, term)}"
-                key = (prompt, term)
+                prompt = "단서를 보고 핵심어를 쓰세요."
+                key = (prompt + "|".join(other_clues), term)
                 if key in seen:
                     continue
                 seen.add(key)
@@ -428,8 +503,8 @@ def interleave_by(items: list[dict], field: str) -> list[dict]:
 def balanced_sample(
     cloze_items: list[dict], era_items: list[dict], concept_items: list[dict]
 ) -> list[dict]:
-    target_cloze = len(cloze_items)
-    target_era = min(300, len(era_items))
+    target_cloze = min(220, len(cloze_items))
+    target_era = min(250, len(era_items))
     picked = cloze_items[:target_cloze]
     picked.extend(era_items[:target_era])
     if len(picked) < TARGET_COUNT:
