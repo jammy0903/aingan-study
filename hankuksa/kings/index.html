@@ -196,6 +196,17 @@ function queryValue() {
   return value === '왕 업적 연도표' ? '' : value.toLowerCase();
 }
 
+function queryMatches(text, query) {
+  if (!query) return true;
+  const compactText = text.replace(/\s+/g, '');
+  const compactQuery = query.replace(/\s+/g, '');
+  if (text.includes(query) || compactText.includes(compactQuery)) return true;
+  return query.split(/\s+/).filter(Boolean).every(token => {
+    const stem = token.replace(/[이가은는을를에의]$/u, '');
+    return text.includes(token) || text.includes(stem) || compactText.includes(stem.replace(/\s+/g, ''));
+  });
+}
+
 function searchableText(item) {
   return [
     item.year,
@@ -236,7 +247,7 @@ function matchesActiveDynasty(value) {
 function noteMatches(note, query) {
   const dynasties = note.dynasties || [];
   const dynastyMatch = activeDynasty === 'all' || dynasties.includes(activeDynasty);
-  const queryMatch = !query || searchableFlowText(note).includes(query);
+  const queryMatch = queryMatches(searchableFlowText(note), query);
   return dynastyMatch && queryMatch;
 }
 
@@ -312,7 +323,7 @@ function render() {
     visibleNotes += notes.length;
     html.push(...notes.map(flowNoteHtml));
 
-    const itemVisible = matchesActiveDynasty(item.dynasty) && (!query || searchableText(item).includes(query));
+    const itemVisible = matchesActiveDynasty(item.dynasty) && queryMatches(searchableText(item), query);
     if (itemVisible) {
       visibleAchievements += 1;
       html.push(achievementHtml(item));
