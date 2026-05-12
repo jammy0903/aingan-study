@@ -20,6 +20,64 @@ const GENERIC_KEYWORDS = new Set([
   '조선', '고려', '근대', '통일신라', '삼국', '남북국', '일제강점기',
   '업적', '핵심', '시험', '빈출', '비교', '순서'
 ]);
+const ROYAL_NAME_KEYWORDS = new Set([
+  '태조', '정종', '태종', '세종', '문종', '단종', '세조', '예종', '성종',
+  '연산군', '중종', '인종', '명종', '선조', '광해군', '인조', '효종',
+  '현종', '숙종', '경종', '영조', '정조', '순조', '헌종', '철종', '고종', '순종',
+  '태조왕', '고국천왕', '동천왕', '미천왕', '소수림왕', '광개토대왕', '장수왕',
+  '고이왕', '근초고왕', '침류왕', '비유왕', '문주왕', '동성왕', '무령왕', '성왕',
+  '무왕', '의자왕', '내물마립간', '지증왕', '법흥왕', '진흥왕', '무열왕', '문무왕',
+  '신문왕', '대조영', '선왕', '원성왕', '진성여왕', '태조왕건', '광종', '경종',
+  '문종', '공민왕'
+].map(compact));
+const MEMORY_ONLY_KEYWORDS = new Set([
+  '순헌철', '경속통회', '대오태자신흥민등번호105'
+]);
+const AWKWARD_ERA_CHOICES = new Set([
+  '고려 · 고려 관제',
+  '고려 · 고려 문화',
+  '조선 · 조선 관제',
+  '조선 · 조선 법전',
+  '조선 · 동학 농민군'
+]);
+const ERA_DISTRACTOR_POOLS = {
+  '고려': [
+    '고려 · 태조 왕건',
+    '고려 · 광종',
+    '고려 · 성종',
+    '고려 · 현종',
+    '고려 · 공민왕',
+    '고려 · 일연',
+    '고려 · 김윤후'
+  ],
+  '조선': [
+    '조선 · 태종',
+    '조선 · 세종',
+    '조선 · 세조',
+    '조선 · 성종',
+    '조선 · 선조',
+    '조선 · 광해군',
+    '조선 · 영조',
+    '조선 · 정조',
+    '조선 · 순조',
+    '조선 · 철종',
+    '조선 · 고종'
+  ],
+  '근대': [
+    '조선 · 박규수',
+    '조선 · 고종',
+    '대한제국 · 최익현',
+    '대한제국 · 안중근',
+    '조선 · 정제두',
+    '조선 · 홍대용'
+  ],
+  '대한제국': [
+    '대한제국 · 최익현',
+    '대한제국 · 안중근',
+    '조선 · 고종',
+    '조선 · 박규수'
+  ]
+};
 
 function readJson(filePath) {
   return JSON.parse(fs.readFileSync(filePath, 'utf8'));
@@ -127,13 +185,47 @@ function keywordSeeds(item) {
   });
 }
 
-function keywordBundle(item) {
-  const seeds = keywordSeeds(item);
-  const fallback = unique([
+function titleTerms(item) {
+  return clean(item.title)
+    .split(/[·,/]|와|과|및/g)
+    .map(value => value.trim())
+    .filter(Boolean);
+}
+
+function isUsefulTerm(value, item) {
+  const key = compact(value);
+  if (key.length < 2) return false;
+  if (GENERIC_KEYWORDS.has(key)) return false;
+  if (ROYAL_NAME_KEYWORDS.has(key)) return false;
+  if (MEMORY_ONLY_KEYWORDS.has(key)) return false;
+  if (/^\d+(?:년|년대|세기)?$/.test(key)) return false;
+  const blockers = [
+    item.id,
+    item.year,
+    item.sort,
+    item.dynasty,
+    item.period,
+    item.king,
+    item.category
+  ].map(compact).filter(Boolean);
+  return !blockers.includes(key);
+}
+
+function quizTerms(item, count = 3) {
+  const raw = unique([
+    ...titleTerms(item),
     ...(item.keywords || []),
-    ...clean(item.title).split(/[·,와과및\-\s]+/g)
-  ]).filter(value => compact(value).length >= 2);
-  return unique([...seeds, ...fallback]).slice(0, 3).join(' · ');
+    ...keywordSeeds(item)
+  ]).filter(term => isUsefulTerm(term, item));
+  const fallback = unique([
+    ...titleTerms(item),
+    ...(item.keywords || [])
+  ]).filter(term => compact(term).length >= 2);
+  return unique([...raw, ...fallback]).slice(0, count);
+}
+
+function keywordBundle(item) {
+  return quizTerms(item, 3).join(' · ');
 }
 
 function bundlePool(item, achievements) {
@@ -147,7 +239,8 @@ function bundlePool(item, achievements) {
 }
 
 function connection(item) {
-  return `${item.period} · ${item.king} · ${keywordBundle(item)}`;
+  const subject = subjectText(item);
+  return `${subject}: ${quizTerms(item, 3).join(' · ')}`;
 }
 
 function connectionPool(item, achievements) {
@@ -158,6 +251,21 @@ function connectionPool(item, achievements) {
     .filter(other => other.id !== item.id && other.period !== item.period)
     .sort((a, b) => stableHash(`${item.id}|connection|${a.id}`).localeCompare(stableHash(`${item.id}|connection|${b.id}`)));
   return samePeriod.concat(rest).map(connection);
+}
+
+function subjectText(item) {
+  const special = {
+    '고려 관제': '고려 중앙 관제',
+    '고려 문화': '고려 문화재',
+    '조선 관제': '조선 중앙 관제',
+    '조선 법전': '조선 법전 순서',
+    '동학 농민군': '동학농민운동'
+  };
+  const subject = special[clean(item.king)] || clean(item.king);
+  const dynasty = clean(item.dynasty);
+  if (!dynasty || compact(subject).startsWith(compact(dynasty))) return subject;
+  if (Object.values(special).some(value => compact(value) === compact(subject))) return subject;
+  return `${dynasty} ${subject}`;
 }
 
 function compactExplanation(item, prefix) {
@@ -191,11 +299,11 @@ function buildConnectionQuestions(achievements, nextId) {
     questions.push(baseItem(
       nextId(),
       '연결 판별',
-      '다음 중 시대·주체·핵심 키워드 연결이 모두 맞는 것을 고르세요.',
+      `${withParticle(item.title, '과', '와')} 직접 연결되는 보기로 맞는 것을 고르세요.`,
       answer,
-      unique([item.title, item.year, item.category, ...keywordSeeds(item).slice(0, 3)]),
+      unique([item.title, item.year, item.category, ...quizTerms(item, 3)]),
       item.period,
-      compactExplanation(item, `${answer} 연결이 맞다.`),
+      compactExplanation(item, `${withParticle(item.title, '은', '는')} ${withParticle(answer, '과', '와')} 연결된다.`),
       choicesFor(answer, connectionPool(item, achievements), `${item.id}|connection`)
     ));
   }
@@ -370,6 +478,119 @@ function buildColonialYearQuestions(nextId) {
   ];
 }
 
+const BASE_QUESTION_REWRITES = {
+  'hqa-0135': {
+    kind: '오답 함정',
+    prompt: '고려 중앙 관제의 연결로 맞는 것을 고르세요.',
+    answer: '중서문하성·중추원·어사대·삼사, 단 고려 삼사는 회계 기구',
+    clues: ['고려 관제', '중서문하성', '중추원', '어사대', '고려 삼사'],
+    explanation: '고려 중앙 관제는 중서문하성·중추원·어사대·삼사를 묶는다. 고려 삼사는 회계 기구이고, 조선 삼사는 사헌부·사간원·홍문관이므로 기능이 다르다.',
+    choices: [
+      '중서문하성·중추원·어사대·삼사, 단 고려 삼사는 회계 기구',
+      '의정부·6조·사헌부·사간원·홍문관, 단 삼사는 언론·감찰·경연 기구',
+      '집현전·홍문관·규장각, 단 모두 고려의 왕명 출납 기구',
+      '통리기무아문·12사·별기군, 단 모두 고려 후기 관제'
+    ]
+  },
+  'hqa-0162': {
+    kind: '오답 함정',
+    prompt: '부석사 무량수전과 직접 연결되는 설명을 고르세요.',
+    answer: '고려 시대 주심포 양식 목조 건축',
+    clues: ['고려 문화', '부석사 무량수전', '주심포', '목조 건축'],
+    explanation: '부석사 무량수전은 고려 시대 주심포 양식 목조 건축으로 자주 출제된다. 다보탑·석가탑은 통일신라 불국사 석탑과 구분한다.',
+    choices: [
+      '고려 시대 주심포 양식 목조 건축',
+      '백제 무왕 때 조성된 현존 최고 석탑',
+      '원 영향이 반영된 고려 후기 대리석 탑',
+      '조선 세조 때 세워진 원각사지 10층 석탑'
+    ]
+  },
+  'hqa-0174': {
+    kind: '오답 함정',
+    prompt: '경천사지 10층 석탑과 직접 연결되는 설명을 고르세요.',
+    answer: '원 영향이 반영된 고려 후기 대리석 석탑',
+    clues: ['고려 문화', '경천사지 10층 석탑', '원 영향', '대리석'],
+    explanation: '경천사지 10층 석탑은 고려 후기 원의 영향을 받은 대리석 석탑이다. 조선 세조 때의 원각사지 10층 석탑과 이름을 바꿔 내기 쉽다.',
+    choices: [
+      '원 영향이 반영된 고려 후기 대리석 석탑',
+      '조선 세조 때 만들어진 원각사지 10층 석탑',
+      '백제 무왕 때 조성된 미륵사지 석탑',
+      '통일신라 신문왕 때 세운 감은사지 3층 석탑'
+    ]
+  },
+  'hqa-0219': {
+    kind: '오답 함정',
+    prompt: '조선 중앙 관제의 기능 연결로 맞는 것을 고르세요.',
+    answer: '의정부=최고 정책 심의, 6조=행정 실무, 삼사=사헌부·사간원·홍문관',
+    clues: ['조선 관제', '의정부', '6조', '삼사', '사헌부', '사간원', '홍문관'],
+    explanation: '조선 중앙 관제는 의정부·6조·삼사를 기능으로 나눠 잡는다. 의정부는 최고 정책 심의, 6조는 행정 실무, 삼사는 사헌부·사간원·홍문관의 언론·감찰·경연 기능이다.',
+    choices: [
+      '의정부=최고 정책 심의, 6조=행정 실무, 삼사=사헌부·사간원·홍문관',
+      '의정부=화폐 출납, 6조=사림 탄압, 삼사=지방 행정 구역',
+      '의정부=군사 기밀 출납, 6조=왕명 출납, 삼사=고려 회계 기구',
+      '의정부=독립협회 의회 개편 대상, 6조=일제 자문 기구, 삼사=통감부'
+    ]
+  },
+  'hqa-0282': {
+    kind: '순서 배열',
+    prompt: '조선 법전 정리 순서로 맞는 것을 고르세요.',
+    answer: '경국대전-속대전-대전통편-대전회통',
+    clues: ['조선 법전', '경국대전', '속대전', '대전통편', '대전회통'],
+    explanation: '조선 법전은 경국대전(성종 완성·시행), 속대전(영조), 대전통편(정조), 대전회통(고종·흥선대원군 시기) 순서로 정리한다.',
+    choices: [
+      '경국대전-속대전-대전통편-대전회통',
+      '경국대전-대전통편-속대전-대전회통',
+      '속대전-경국대전-대전회통-대전통편',
+      '대전회통-대전통편-속대전-경국대전'
+    ]
+  },
+  'hqa-0297': {
+    kind: '오답 함정',
+    prompt: '우금치 전투와 동학농민운동의 연결로 맞는 것을 고르세요.',
+    answer: '2차 봉기 때 농민군이 공주 우금치에서 일본군·관군에게 패배',
+    clues: ['동학농민운동', '우금치', '2차 봉기', '보국안민', '제폭구민'],
+    explanation: '우금치 전투는 동학농민운동 2차 봉기 때 농민군이 공주 우금치에서 일본군·관군에게 패배한 전투다. 보국안민·제폭구민 구호와 함께 묶어 둔다.',
+    choices: [
+      '2차 봉기 때 농민군이 공주 우금치에서 일본군·관군에게 패배',
+      '1차 봉기 때 전주화약으로 집강소가 폐지된 전투',
+      '임진왜란 때 조선 수군이 일본군을 격파한 해전',
+      '정미의병이 서울 진공 작전으로 동대문 밖 30리까지 진격한 전투'
+    ]
+  }
+};
+
+function rewriteBaseQuestionOutliers(base) {
+  return base.map(item => {
+    const rewrite = BASE_QUESTION_REWRITES[item.id];
+    return sanitizeEraChoices(rewrite ? { ...item, ...rewrite } : item);
+  });
+}
+
+function sanitizeEraChoices(item) {
+  if (item.kind !== '시대 연결' || !Array.isArray(item.choices)) return item;
+  const reserved = new Set(item.choices.filter(choice => (
+    !AWKWARD_ERA_CHOICES.has(choice) || compact(choice) === compact(item.answer)
+  )));
+  const used = new Set();
+  const choices = item.choices.map(choice => {
+    const isAwkward = AWKWARD_ERA_CHOICES.has(choice) && compact(choice) !== compact(item.answer);
+    const blocked = new Set([...reserved, ...used]);
+    const value = isAwkward ? replacementEraChoice(item, blocked) : choice;
+    used.add(value);
+    return value;
+  });
+  return { ...item, choices };
+}
+
+function replacementEraChoice(item, used) {
+  const pool = ERA_DISTRACTOR_POOLS[item.era] || ERA_DISTRACTOR_POOLS[item.period] || ERA_DISTRACTOR_POOLS[item.dynasty] || [];
+  const sorted = [...pool].sort((a, b) => stableHash(`${item.id}|${a}`).localeCompare(stableHash(`${item.id}|${b}`)));
+  for (const candidate of sorted) {
+    if (compact(candidate) !== compact(item.answer) && !used.has(candidate)) return candidate;
+  }
+  return '조선 · 세종';
+}
+
 function recalcKinds(questions) {
   return Object.fromEntries(
     Object.entries(questions.reduce((acc, item) => {
@@ -382,7 +603,7 @@ function recalcKinds(questions) {
 function main() {
   const quiz = readJson(QUIZ_PATH);
   const achievements = readJson(ACHIEVEMENTS_PATH);
-  const base = quiz.questions.filter(item => !String(item.id || '').startsWith(PREFIX));
+  const base = rewriteBaseQuestionOutliers(quiz.questions.filter(item => !String(item.id || '').startsWith(PREFIX)));
   let seq = 1;
   const nextId = () => `${PREFIX}${String(seq++).padStart(4, '0')}`;
 
