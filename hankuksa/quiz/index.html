@@ -86,6 +86,13 @@ button{cursor:pointer}
 .mini-row:last-child{border-bottom:none;padding-bottom:0}
 .mini-row span:first-child{color:#4b5563}
 .mini-row span:last-child{font-weight:800}
+.review-block{display:flex;flex-direction:column;gap:.42rem;margin-top:.55rem}
+.review-title{font-size:.76rem;color:#4b5563;font-weight:800}
+.review-list{display:flex;flex-direction:column;gap:.35rem}
+.review-item{width:100%;border:1px solid #e2e8f0;border-radius:7px;background:#fff;text-align:left;padding:.48rem .55rem;font-size:.77rem;font-weight:800;line-height:1.35;color:#253044;word-break:keep-all}
+.review-item:hover{background:#f8fbff;border-color:#b8c8e6}
+.review-item.wrong{border-color:#f6aea9;color:#8c1d18;background:#fffafa}
+.review-empty{font-size:.78rem;color:var(--muted);line-height:1.4}
 .empty{display:none;background:#fff;border:1px solid var(--line);border-radius:8px;padding:1.5rem;text-align:center;color:var(--muted)}
 .empty.show{display:block}
 .kbd{font-size:.76rem;color:var(--muted);margin-top:.55rem}
@@ -161,6 +168,23 @@ button{cursor:pointer}
           <button class="btn danger" id="reset-btn" type="button">기록 초기화</button>
         </div>
       </section>
+      <section class="panel">
+        <h2>실력 분석</h2>
+        <div class="mini-list">
+          <div class="mini-row"><span>푼 문제</span><span id="answered-text">0 / 0</span></div>
+          <div class="mini-row"><span>남은 문제</span><span id="unanswered-text">0</span></div>
+          <div class="mini-row"><span>약한 시대</span><span id="weak-era-text">-</span></div>
+          <div class="mini-row"><span>약한 유형</span><span id="weak-kind-text">-</span></div>
+        </div>
+        <div class="review-block">
+          <div class="review-title">오답 기록</div>
+          <div class="review-list" id="wrong-review"></div>
+        </div>
+        <div class="review-block">
+          <div class="review-title">정답 기록</div>
+          <div class="review-list" id="correct-review"></div>
+        </div>
+      </section>
     </aside>
   </div>
 </main>
@@ -210,7 +234,13 @@ const els = {
   kindText: document.getElementById('kind-text'),
   roundText: document.getElementById('round-text'),
   saveText: document.getElementById('save-text'),
-  resetBtn: document.getElementById('reset-btn')
+  resetBtn: document.getElementById('reset-btn'),
+  answeredText: document.getElementById('answered-text'),
+  unansweredText: document.getElementById('unanswered-text'),
+  weakEraText: document.getElementById('weak-era-text'),
+  weakKindText: document.getElementById('weak-kind-text'),
+  wrongReview: document.getElementById('wrong-review'),
+  correctReview: document.getElementById('correct-review')
 };
 
 function esc(value) {
@@ -402,7 +432,7 @@ function paintChoices(item, selected) {
 }
 
 function renderStats() {
-  const rows = Object.keys(state.stats.byId).map(resultOf);
+  const rows = state.bank.map(item => resultOf(item.id)).filter(Boolean);
   const correct = rows.filter(r => r === 'correct').length;
   const wrong = rows.filter(r => r === 'wrong').length;
   const total = correct + wrong;
@@ -410,6 +440,77 @@ function renderStats() {
   els.correctCount.textContent = correct.toLocaleString('ko-KR');
   els.wrongCount.textContent = wrong.toLocaleString('ko-KR');
   els.rateCount.textContent = total ? Math.round((correct / total) * 100) + '%' : '0%';
+  renderAnalysis();
+}
+
+function groupProgress(field) {
+  const groups = new Map();
+  for (const item of state.bank) {
+    const result = resultOf(item.id);
+    if (!result) continue;
+    const key = item[field] || '-';
+    const row = groups.get(key) || { key, total: 0, correct: 0, wrong: 0 };
+    row.total += 1;
+    if (result === 'correct') row.correct += 1;
+    if (result === 'wrong') row.wrong += 1;
+    groups.set(key, row);
+  }
+  return [...groups.values()].map(row => ({
+    ...row,
+    rate: row.total ? row.correct / row.total : 0
+  }));
+}
+
+function weakLabel(field) {
+  const rows = groupProgress(field)
+    .filter(row => row.total > 0)
+    .sort((a, b) => a.rate - b.rate || b.wrong - a.wrong || b.total - a.total);
+  if (!rows.length) return '-';
+  const row = rows[0];
+  return `${row.key} ${Math.round(row.rate * 100)}% (${row.correct}/${row.total})`;
+}
+
+function shortPrompt(item) {
+  const text = item.prompt || item.answer || item.id;
+  return text.length > 46 ? text.slice(0, 45).trim() + '…' : text;
+}
+
+function renderReviewList(container, items, emptyText, className = '') {
+  if (!items.length) {
+    container.innerHTML = '<div class="review-empty">' + esc(emptyText) + '</div>';
+    return;
+  }
+  container.innerHTML = items.slice(0, 5).map(item => (
+    '<button class="review-item ' + className + '" type="button" data-review-id="' + esc(item.id) + '">' +
+      esc(shortPrompt(item)) +
+    '</button>'
+  )).join('');
+}
+
+function renderAnalysis() {
+  const answered = state.bank.filter(item => resultOf(item.id));
+  const correctItems = state.bank.filter(item => resultOf(item.id) === 'correct');
+  const wrongItems = state.bank.filter(item => resultOf(item.id) === 'wrong');
+  els.answeredText.textContent = `${answered.length.toLocaleString('ko-KR')} / ${state.bank.length.toLocaleString('ko-KR')}`;
+  els.unansweredText.textContent = (state.bank.length - answered.length).toLocaleString('ko-KR');
+  els.weakEraText.textContent = weakLabel('era');
+  els.weakKindText.textContent = weakLabel('kind');
+  renderReviewList(els.wrongReview, wrongItems, '아직 오답 기록 없음', 'wrong');
+  renderReviewList(els.correctReview, correctItems, '아직 정답 기록 없음');
+}
+
+function jumpToQuestion(id) {
+  const index = state.bank.findIndex(item => item.id === id);
+  if (index < 0) return;
+  els.search.value = '';
+  els.eraFilter.value = '';
+  els.kindFilter.value = '';
+  els.roundFilter.value = '';
+  state.wrongOnly = false;
+  els.wrongToggle.classList.remove('toggle-on');
+  state.pool = [...state.bank];
+  state.index = index;
+  render();
 }
 
 function render() {
@@ -520,6 +621,11 @@ els.choices.addEventListener('click', event => {
   const button = event.target.closest('.choice');
   if (!button || button.disabled) return;
   checkAnswer(button.dataset.choice || '');
+});
+document.addEventListener('click', event => {
+  const button = event.target.closest('[data-review-id]');
+  if (!button) return;
+  jumpToQuestion(button.dataset.reviewId || '');
 });
 els.input.addEventListener('keydown', event => {
   if (event.key !== 'Enter') return;
