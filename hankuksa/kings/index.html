@@ -200,10 +200,11 @@ function queryMatches(text, query) {
   if (!query) return true;
   const compactText = text.replace(/\s+/g, '');
   const compactQuery = query.replace(/\s+/g, '');
-  if (text.includes(query) || compactText.includes(compactQuery)) return true;
+  if (text.includes(query) || (compactQuery.length >= 3 && compactText.includes(compactQuery))) return true;
   return query.split(/\s+/).filter(Boolean).every(token => {
     const stem = token.replace(/[이가은는을를에의]$/u, '');
-    return text.includes(token) || text.includes(stem) || compactText.includes(stem.replace(/\s+/g, ''));
+    const compactStem = stem.replace(/\s+/g, '');
+    return text.includes(token) || text.includes(stem) || (compactStem.length >= 3 && compactText.includes(compactStem));
   });
 }
 
