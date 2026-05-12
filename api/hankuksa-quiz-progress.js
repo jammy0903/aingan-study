@@ -46,14 +46,23 @@ function sendJson(res, status, body) {
   res.end(JSON.stringify(body));
 }
 
+function databaseUrl() {
+  return process.env.DATABASE_URL
+    || process.env.POSTGRES_URL
+    || process.env.POSTGRES_PRISMA_URL
+    || process.env.POSTGRES_URL_NON_POOLING
+    || process.env.NEON_DATABASE_URL;
+}
+
 export default async function handler(req, res) {
   try {
-    if (!process.env.DATABASE_URL) {
-      sendJson(res, 500, { ok: false, error: 'DATABASE_URL is not configured' });
+    const url = databaseUrl();
+    if (!url) {
+      sendJson(res, 503, { ok: false, error: 'database url is not configured' });
       return;
     }
 
-    const sql = neon(process.env.DATABASE_URL);
+    const sql = neon(url);
     const cookies = parseCookies(req.headers.cookie);
     let uid = cookies.uid;
     const newCookie = !uid;

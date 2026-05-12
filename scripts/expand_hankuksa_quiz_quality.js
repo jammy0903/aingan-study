@@ -156,8 +156,8 @@ function buildAchievementQuestions(achievements) {
     const id = () => `${PREFIX}${String(seq++).padStart(4, '0')}`;
     questions.push(baseItem(
       id(),
-      '핵심 항목',
-      '다음 단서들이 가리키는 핵심 항목을 고르세요.',
+      '개념 객관식',
+      `${item.king}과 직접 연결되는 사건·업적을 고르세요.`,
       item.title,
       [],
       cluesFor(item, item.title),

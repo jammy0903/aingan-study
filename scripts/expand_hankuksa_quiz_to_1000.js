@@ -295,6 +295,26 @@ function compactExplanation(item, prefix) {
   return `${prefix} ${short}`;
 }
 
+function labelForCategory(category) {
+  const key = compact(category);
+  if (key.includes('개혁')) return '개혁';
+  if (key.includes('법전')) return '법전';
+  if (key.includes('제도')) return '제도';
+  if (key.includes('전투')) return '전투';
+  if (key.includes('외교')) return '조약·외교 사건';
+  if (key.includes('문화')) return '문화재·문화 항목';
+  if (key.includes('사상')) return '사상·학문';
+  if (key.includes('농민')) return '농민운동';
+  return '사건·업적';
+}
+
+function titleQuestionPrompt(item) {
+  const subject = subjectText(item);
+  const terms = quizTerms(item, 3).join('·');
+  const label = labelForCategory(item.category);
+  return `${subject}의 ${withParticle(terms, '과', '와')} 직접 연결되는 ${label}을 고르세요.`;
+}
+
 function buildKeywordQuestions(achievements, nextId) {
   const questions = [];
   for (const item of achievements) {
@@ -580,11 +600,46 @@ const BASE_QUESTION_REWRITES = {
   }
 };
 
-function rewriteBaseQuestionOutliers(base) {
+function rewriteBaseQuestionOutliers(base, achievements) {
+  const achievementByTitle = new Map(achievements.map(item => [compact(item.title), item]));
   return base.map(item => {
     const rewrite = BASE_QUESTION_REWRITES[item.id];
-    return sanitizeEraChoices(rewrite ? { ...item, ...rewrite } : item);
+    const rewritten = rewrite ? { ...item, ...rewrite } : rewriteVagueTitleQuestion(item, achievementByTitle);
+    return sanitizeEraChoices(rewritten);
   });
+}
+
+function rewriteVagueTitleQuestion(item, achievementByTitle) {
+  const achievement = achievementByTitle.get(compact(item.answer));
+  const shouldRewrite = item.kind === '핵심 항목'
+    || item.prompt === '다음 단서들이 가리키는 핵심 항목을 고르세요.'
+    || (achievement && String(item.id || '').startsWith('hqa-') && item.kind === '개념 객관식');
+
+  if (!shouldRewrite) {
+    return item;
+  }
+
+  if (!achievement) {
+    const clues = (item.clues || []).filter(Boolean).slice(0, 3).join('·');
+    return {
+      ...item,
+      kind: '개념 객관식',
+      prompt: `${withParticle(clues || item.era || '제시된 단서', '과', '와')} 직접 연결되는 항목을 고르세요.`
+    };
+  }
+
+  return {
+    ...item,
+    kind: '개념 객관식',
+    prompt: titleQuestionPrompt(achievement),
+    clues: unique([
+      achievement.period,
+      achievement.year,
+      achievement.category,
+      achievement.king,
+      ...quizTerms(achievement, 3)
+    ]).filter(Boolean)
+  };
 }
 
 function sanitizeEraChoices(item) {
@@ -624,7 +679,10 @@ function recalcKinds(questions) {
 function main() {
   const quiz = readJson(QUIZ_PATH);
   const achievements = readJson(ACHIEVEMENTS_PATH);
-  const base = rewriteBaseQuestionOutliers(quiz.questions.filter(item => !String(item.id || '').startsWith(PREFIX)));
+  const base = rewriteBaseQuestionOutliers(
+    quiz.questions.filter(item => !String(item.id || '').startsWith(PREFIX)),
+    achievements
+  );
   let seq = 1;
   const nextId = () => `${PREFIX}${String(seq++).padStart(4, '0')}`;
 

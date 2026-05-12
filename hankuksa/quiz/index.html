@@ -167,6 +167,7 @@ button{cursor:pointer}
 
 <script>
 const PROGRESS_API = '/api/hankuksa-quiz-progress';
+const LOCAL_PROGRESS_KEY = 'aingan.hankuksa.quiz.progress.v1';
 
 const state = {
   bank: [],
@@ -174,7 +175,8 @@ const state = {
   index: 0,
   checked: false,
   wrongOnly: false,
-  stats: { byId: {} }
+  stats: { byId: {} },
+  progressMode: 'db'
 };
 
 const els = {
@@ -244,6 +246,26 @@ function normalizeProgress(data) {
   return { byId };
 }
 
+function loadLocalStats() {
+  try {
+    return normalizeProgress(JSON.parse(localStorage.getItem(LOCAL_PROGRESS_KEY) || '{}'));
+  } catch (_) {
+    return { byId: {} };
+  }
+}
+
+function saveLocalStats() {
+  try {
+    localStorage.setItem(LOCAL_PROGRESS_KEY, JSON.stringify(state.stats));
+  } catch (_) {}
+}
+
+function clearLocalStats() {
+  try {
+    localStorage.removeItem(LOCAL_PROGRESS_KEY);
+  } catch (_) {}
+}
+
 async function loadStats() {
   try {
     const res = await fetch(PROGRESS_API, {
@@ -252,14 +274,22 @@ async function loadStats() {
     });
     if (!res.ok) throw new Error('progress load failed');
     state.stats = normalizeProgress(await res.json());
+    state.progressMode = 'db';
     setSaveStatus('DB 연결됨');
   } catch (_) {
-    state.stats = { byId: {} };
-    setSaveStatus('DB 불러오기 실패');
+    state.stats = loadLocalStats();
+    state.progressMode = 'local';
+    setSaveStatus('로컬 저장 사용');
   }
 }
 
 async function persistAnswer(questionId, correct) {
+  if (state.progressMode === 'local') {
+    saveLocalStats();
+    setSaveStatus('로컬 저장됨');
+    return;
+  }
+
   setSaveStatus('DB 저장 중');
   try {
     const res = await fetch(PROGRESS_API, {
@@ -271,7 +301,9 @@ async function persistAnswer(questionId, correct) {
     if (!res.ok) throw new Error('progress save failed');
     setSaveStatus('DB 저장됨');
   } catch (_) {
-    setSaveStatus('DB 저장 실패');
+    state.progressMode = 'local';
+    saveLocalStats();
+    setSaveStatus('로컬 저장됨');
   }
 }
 
@@ -449,8 +481,15 @@ function nextQuestion() {
 
 async function resetStats() {
   state.stats = { byId: {} };
-  setSaveStatus('DB 삭제 중');
+  clearLocalStats();
   applyFilters({ keepOrder: true });
+
+  if (state.progressMode === 'local') {
+    setSaveStatus('로컬 초기화됨');
+    return;
+  }
+
+  setSaveStatus('DB 삭제 중');
   try {
     const res = await fetch(PROGRESS_API, {
       method: 'DELETE',
@@ -459,7 +498,8 @@ async function resetStats() {
     if (!res.ok) throw new Error('progress reset failed');
     setSaveStatus('DB 초기화됨');
   } catch (_) {
-    setSaveStatus('DB 초기화 실패');
+    state.progressMode = 'local';
+    setSaveStatus('로컬 초기화됨');
   }
 }
 
