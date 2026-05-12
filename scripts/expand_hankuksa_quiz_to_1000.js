@@ -31,8 +31,15 @@ const ROYAL_NAME_KEYWORDS = new Set([
   '문종', '공민왕'
 ].map(compact));
 const MEMORY_ONLY_KEYWORDS = new Set([
-  '순헌철', '경속통회', '대오태자신흥민등번호105'
-]);
+  '순헌철',
+  '경속통회',
+  '대오태자 신흥민 등번호 105',
+  '홍칠이는 재한 이삼',
+  '건양친진단소태종우',
+  '개의팔년은과재도 금탁이노',
+  '부동탄 하모 한산해 진짜 평행 정말로',
+  '농약집 3456790'
+].map(compact));
 const AWKWARD_ERA_CHOICES = new Set([
   '고려 · 고려 관제',
   '고려 · 고려 문화',
@@ -77,6 +84,13 @@ const ERA_DISTRACTOR_POOLS = {
     '조선 · 고종',
     '조선 · 박규수'
   ]
+};
+const QUIZ_TERM_OVERRIDES = {
+  'joseon-law-codes-1865': ['경국대전', '속대전', '대전통편'],
+  'joseon-ganghwa-treaty-1876': ['조일수호조규', '최초 근대적 조약', '영사재판권'],
+  'joseon-gabo-reform-1st-1894': ['군국기무처', '의정부·8아문', '탁지아문'],
+  'joseon-gabo-reform-2nd-1894': ['홍범 14조', '7부·23부', '재판소'],
+  'joseon-eulmi-reform-1895': ['건양 연호', '친위대·진위대', '단발령']
 };
 
 function readJson(filePath) {
@@ -178,6 +192,8 @@ function keywordSeeds(item) {
     const key = compact(keyword);
     if (key.length < 2) return false;
     if (GENERIC_KEYWORDS.has(key)) return false;
+    if (ROYAL_NAME_KEYWORDS.has(key)) return false;
+    if (MEMORY_ONLY_KEYWORDS.has(key)) return false;
     if (blockers.some(blocker => blocker === key || (key.length > 3 && blocker.includes(key)))) {
       return false;
     }
@@ -206,20 +222,25 @@ function isUsefulTerm(value, item) {
     item.dynasty,
     item.period,
     item.king,
-    item.category
+    item.category,
+    item.title
   ].map(compact).filter(Boolean);
   return !blockers.includes(key);
 }
 
 function quizTerms(item, count = 3) {
+  if (QUIZ_TERM_OVERRIDES[item.id]) {
+    return QUIZ_TERM_OVERRIDES[item.id].slice(0, count);
+  }
   const raw = unique([
-    ...titleTerms(item),
+    ...keywordSeeds(item),
     ...(item.keywords || []),
-    ...keywordSeeds(item)
+    ...titleTerms(item)
   ]).filter(term => isUsefulTerm(term, item));
   const fallback = unique([
-    ...titleTerms(item),
-    ...(item.keywords || [])
+    ...keywordSeeds(item),
+    ...(item.keywords || []),
+    ...titleTerms(item)
   ]).filter(term => compact(term).length >= 2);
   return unique([...raw, ...fallback]).slice(0, count);
 }
