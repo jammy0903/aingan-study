@@ -357,14 +357,14 @@ function subjectStudyLabel(item) {
   return `${dynasty} 시기`;
 }
 
-function contextClue(item) {
+function contextClueText(item) {
   if (CONTEXT_CLUE_OVERRIDES[item.id]) return CONTEXT_CLUE_OVERRIDES[item.id];
   const head = unique([
     clean(item.dynasty || item.period),
     labelForCategory(item.category)
   ]).filter(Boolean).join(' ');
   const terms = quizTerms(item, 3).join('·');
-  return terms ? `${head} 단서(${terms})` : `${head} 단서`;
+  return terms ? `${head}: ${terms}` : head;
 }
 
 function titleQuestionPrompt(item) {
@@ -375,19 +375,46 @@ function titleQuestionPrompt(item) {
   return `${subject}의 핵심 ${withParticle(label, '을', '를')} 고르세요.`;
 }
 
+function subjectChoicePool(item, achievements) {
+  const answer = subjectText(item);
+  const samePeriod = achievements
+    .filter(other => other.id !== item.id && other.period === item.period)
+    .sort((a, b) => stableHash(`${item.id}|subject|${a.id}`).localeCompare(stableHash(`${item.id}|subject|${b.id}`)));
+  const rest = achievements
+    .filter(other => other.id !== item.id && other.period !== item.period)
+    .sort((a, b) => stableHash(`${item.id}|subject|${a.id}`).localeCompare(stableHash(`${item.id}|subject|${b.id}`)));
+  return unique(samePeriod.concat(rest).map(subjectText)).filter(value => compact(value) !== compact(answer));
+}
+
+function titleChoicePool(item, achievements) {
+  const answer = clean(item.title);
+  const samePeriod = achievements
+    .filter(other => other.id !== item.id && other.period === item.period)
+    .sort((a, b) => stableHash(`${item.id}|title|${a.id}`).localeCompare(stableHash(`${item.id}|title|${b.id}`)));
+  const rest = achievements
+    .filter(other => other.id !== item.id && other.period !== item.period)
+    .sort((a, b) => stableHash(`${item.id}|title|${a.id}`).localeCompare(stableHash(`${item.id}|title|${b.id}`)));
+  return unique(samePeriod.concat(rest).map(other => other.title)).filter(value => compact(value) !== compact(answer));
+}
+
+function descriptionClue(item) {
+  let text = clean(item.achievement);
+  return text.length > 150 ? `${text.slice(0, 147).trim()}...` : text;
+}
+
 function buildKeywordQuestions(achievements, nextId) {
   const questions = [];
   for (const item of achievements) {
-    const answer = keywordBundle(item);
+    const answer = subjectText(item);
     questions.push(baseItem(
       nextId(),
-      '키워드 묶음',
-      `${subjectStudyLabel(item)}에 묶이는 핵심 키워드 조합을 고르세요.`,
+      '주체 단답',
+      `다음 단서와 연결되는 주체를 고르세요: ${keywordBundle(item)}`,
       answer,
       safeQuizClues(item, 'keyword'),
       item.period,
       compactExplanation(item, `${withParticle(item.title, '은', '는')} ${withParticle(answer, '과', '와')} 연결된다.`),
-      choicesFor(answer, bundlePool(item, achievements), `${item.id}|keyword`)
+      choicesFor(answer, subjectChoicePool(item, achievements), `${item.id}|subject`)
     ));
   }
   return questions;
@@ -396,16 +423,16 @@ function buildKeywordQuestions(achievements, nextId) {
 function buildConnectionQuestions(achievements, nextId) {
   const questions = [];
   for (const item of achievements) {
-    const answer = connection(item);
+    const answer = clean(item.title);
     questions.push(baseItem(
       nextId(),
-      '연결 판별',
-      `다음 보기 중 ${contextClue(item)}에 맞는 시대·주체·핵심 키워드 연결을 고르세요.`,
+      '개념 단답',
+      `다음 설명에 해당하는 ${withParticle(labelForCategory(item.category), '을', '를')} 고르세요: ${descriptionClue(item)}`,
       answer,
       safeQuizClues(item, 'connection'),
       item.period,
-      compactExplanation(item, `${withParticle(item.title, '은', '는')} ${withParticle(answer, '과', '와')} 연결된다.`),
-      choicesFor(answer, connectionPool(item, achievements), `${item.id}|connection`)
+      compactExplanation(item, `${withParticle(answer, '은', '는')} ${withParticle(subjectText(item), '과', '와')} 연결된다.`),
+      choicesFor(answer, titleChoicePool(item, achievements), `${item.id}|title`)
     ));
   }
   return questions;
@@ -1265,8 +1292,242 @@ const COLONIAL_SUPPLEMENT_REWRITES = Object.fromEntries([
   )]
 ]);
 
+const PROVISIONAL_GOVERNMENT_REWRITES = Object.fromEntries([
+  ['hqb-0151', supplementalRewrite(
+    '오답 함정',
+    '대한민국 임시정부가 통합할 때 합쳐진 세 흐름으로 맞는 것을 고르세요.',
+    '상하이 임시정부·한성정부·대한국민의회',
+    ['대한민국 임시정부', '상하이', '한성정부', '대한국민의회'],
+    '대한민국 임시정부는 상하이 임시정부, 한성정부, 연해주 대한국민의회를 통합해 상하이에 수립되었다. 상하이는 외교 활동, 대한국민의회는 무장투쟁 흐름과 함께 구분한다.',
+    [
+      '상하이 임시정부·한성정부·대한국민의회',
+      '신민회·대한광복회·의열단',
+      '보안회·헌정연구회·대한자강회',
+      '조선독립동맹·조선의용대·한국광복군'
+    ]
+  )],
+  ['hqb-0152', supplementalRewrite(
+    '개념 객관식',
+    '상하이 대한민국 임시정부가 초기에 중심으로 삼은 독립운동 노선을 고르세요.',
+    '외교 활동 중심 노선',
+    ['상하이 임시정부', '외교 활동', '임시정부 노선'],
+    '상하이 대한민국 임시정부는 국제 외교 활동을 중심으로 독립운동을 전개하려 했다.',
+    ['외교 활동 중심 노선', '농촌 계몽 중심 노선', '의열 투쟁만의 노선', '친일 자치 청원 노선']
+  )],
+  ['hqb-0153', supplementalRewrite(
+    '개념 객관식',
+    '대한민국 임시정부가 정부 조직 원리로 명시한 내용을 고르세요.',
+    '삼권분립',
+    ['대한민국 임시정부', '삼권분립', '임시헌장'],
+    '대한민국 임시정부는 민주 공화제와 삼권분립을 표방했다. 정부 조직 문제와 함께 출제된다.',
+    ['삼권분립', '전제군주제', '입헌군주제', '통감부 자문 정치']
+  )],
+  ['hqb-0154', supplementalRewrite(
+    '개념 객관식',
+    '대한민국 임시정부에서 의회 기능을 담당한 기구를 고르세요.',
+    '임시의정원',
+    ['대한민국 임시정부', '임시의정원', '의회'],
+    '임시의정원은 대한민국 임시정부의 의회 기능을 맡은 기구다. 이름이 나오면 임시정부와 연결한다.',
+    ['임시의정원', '중추원', '군국기무처', '통리기무아문']
+  )],
+  ['hqb-0155', supplementalRewrite(
+    '오답 함정',
+    '대한민국 임시정부 초기 지도부 연결로 맞는 것을 고르세요.',
+    '초대 대통령 이승만·국무총리 이동휘',
+    ['대한민국 임시정부', '이승만', '이동휘', '초기 지도부'],
+    '대한민국 임시정부의 초대 대통령은 이승만, 국무총리는 이동휘로 잡는다. 이동휘를 부통령으로 쓰는 선지는 함정이다.',
+    [
+      '초대 대통령 이승만·국무총리 이동휘',
+      '초대 대통령 김구·국무총리 이승만',
+      '초대 대통령 이동휘·국무총리 신채호',
+      '초대 대통령 박은식·국무총리 김규식'
+    ]
+  )],
+  ['hqb-0156', supplementalRewrite(
+    '개념 객관식',
+    '대한민국 임시정부가 국내와 연락망을 만들기 위해 운영한 조직을 고르세요.',
+    '연통제와 교통국',
+    ['대한민국 임시정부 활동', '연통제', '교통국', '이륭양행'],
+    '연통제와 교통국은 대한민국 임시정부의 국내 비밀 행정·연락망이다. 이륭양행은 교통국 활동 단서로 함께 외운다.',
+    ['연통제와 교통국', '집강소와 교정청', '13도 창의군과 군국기무처', '상평창과 의창']
+  )],
+  ['hqb-0157', supplementalRewrite(
+    '개념 객관식',
+    '대한민국 임시정부가 독립운동 자금을 마련하기 위해 발행한 것을 고르세요.',
+    '애국공채(독립공채)',
+    ['대한민국 임시정부 활동', '애국공채', '독립공채', '자금 마련'],
+    '대한민국 임시정부는 독립운동 자금 마련을 위해 애국공채, 곧 독립공채를 발행했다.',
+    ['애국공채(독립공채)', '당백전', '건원중보', '상평통보']
+  )],
+  ['hqb-0158', supplementalRewrite(
+    '개념 객관식',
+    '대한민국 임시정부가 기관지로 발행한 신문을 고르세요.',
+    '독립신문',
+    ['대한민국 임시정부 활동', '독립신문', '기관지'],
+    '대한민국 임시정부는 기관지로 독립신문을 발행했다. 서재필의 독립신문 창간 흐름과 시기를 구분한다.',
+    ['독립신문', '황성신문', '대한매일신보', '만세보']
+  )],
+  ['hqb-0159', supplementalRewrite(
+    '개념 객관식',
+    '대한민국 임시정부가 일본의 침략상을 알리기 위해 편찬한 자료집을 고르세요.',
+    '한일관계 사료집',
+    ['대한민국 임시정부 활동', '한일관계 사료집', '외교 자료'],
+    '한일관계 사료집은 대한민국 임시정부가 일본의 침략과 한국 독립의 정당성을 알리기 위해 편찬한 자료집이다.',
+    ['한일관계 사료집', '조선혁명선언', '한국통사', '조선상고사']
+  )],
+  ['hqb-0160', supplementalRewrite(
+    '인물 업적',
+    '대한민국 임시정부가 파리 강화 회의에 파견한 인물을 고르세요.',
+    '김규식',
+    ['대한민국 임시정부 활동', '파리 강화 회의', '김규식'],
+    '대한민국 임시정부는 파리 강화 회의에 김규식을 파견했지만 뚜렷한 성과를 얻지는 못했다.',
+    ['김규식', '김구', '이승만', '신채호']
+  )],
+  ['hqb-0161', supplementalRewrite(
+    '개념 객관식',
+    '대한민국 임시정부가 미국 워싱턴에 설치해 외교 활동을 추진한 기구를 고르세요.',
+    '구미위원부',
+    ['대한민국 임시정부 활동', '구미위원부', '미국', '외교'],
+    '대한민국 임시정부는 미국 워싱턴에 구미위원부를 설치해 외교 활동을 추진했다. 구미의원회로 잘못 쓰는 선지는 주의한다.',
+    ['구미위원부', '의열단', '한인애국단', '대한광복회']
+  )],
+  ['hqb-0162', supplementalRewrite(
+    '오답 함정',
+    '대한민국 임시정부 활동 암기 묶음 “구미사료통 독파리”에 들어가는 내용으로 맞는 것을 고르세요.',
+    '구미위원부·한일관계 사료집·연통제와 교통국·독립공채·파리 강화 회의 김규식 파견',
+    ['대한민국 임시정부 활동', '구미사료통 독파리', '연통제', '독립공채', '김규식'],
+    '구미사료통 독파리는 구미위원부, 한일관계 사료집, 연통제와 교통국, 독립공채, 파리 강화 회의 김규식 파견을 묶는 암기축이다. 기관지 독립신문도 임시정부 활동으로 함께 잡는다.',
+    [
+      '구미위원부·한일관계 사료집·연통제와 교통국·독립공채·파리 강화 회의 김규식 파견',
+      '신흥강습소·태극서관·자기회사·대성학교·오산학교',
+      '황무지 개간권 반대·농광회사·헌정연구회·대한자강회',
+      '창씨개명·황국 신민 서사·신사참배·궁성요배'
+    ]
+  )],
+  ['hqb-0163', supplementalRewrite(
+    '개념 객관식',
+    '1923년에 열려 창조파와 개조파가 임시정부 진로를 두고 대립한 회의를 고르세요.',
+    '국민대표회의',
+    ['국민대표회의', '1923', '창조파', '개조파'],
+    '국민대표회의는 1923년에 열렸다. 임시정부 진로를 둘러싼 창조파와 개조파의 대립이 핵심이다.',
+    ['국민대표회의', '관민공동회', '만민공동회', '좌우 합작 위원회']
+  )],
+  ['hqb-0164', supplementalRewrite(
+    '오답 함정',
+    '국민대표회의의 창조파와 개조파 연결로 맞는 것을 고르세요.',
+    '창조파=신채호 중심 새 정부 수립 주장, 개조파=안창호 중심 임시정부 개편 주장',
+    ['국민대표회의', '창조파', '개조파', '신채호', '안창호'],
+    '1923년 국민대표회의에서 창조파는 신채호 등 새 정부 수립을 주장했고, 개조파는 안창호 등 기존 임시정부의 개편을 주장했다.',
+    [
+      '창조파=신채호 중심 새 정부 수립 주장, 개조파=안창호 중심 임시정부 개편 주장',
+      '창조파=외교 유지, 개조파=일본 위임통치 청원',
+      '창조파=국무령제 폐지, 개조파=한인애국단 조직',
+      '창조파=문화 통치 실시, 개조파=치안유지법 제정'
+    ]
+  )],
+  ['hqb-0165', supplementalRewrite(
+    '개념 객관식',
+    '이승만이 국제연맹에 한국 위임통치를 청원했다는 비판과 연결되는 사건을 고르세요.',
+    '위임통치 청원',
+    ['이승만', '위임통치 청원', '임시정부 갈등'],
+    '이승만의 위임통치 청원은 대한민국 임시정부 내부 비판과 대통령 탄핵의 배경으로 출제된다.',
+    ['위임통치 청원', '조선혁명선언 작성', '한인애국단 조직', '국내 진공 작전 준비']
+  )],
+  ['hqb-0166', supplementalRewrite(
+    '식민지 연도',
+    '대한민국 임시정부에서 이승만이 탄핵된 연도를 고르세요.',
+    '1925',
+    ['이승만 탄핵', '1925', '위임통치 청원', '임시정부'],
+    '이승만은 위임통치 청원 논란 등으로 1925년에 대한민국 임시정부 대통령직에서 탄핵되었다.',
+    ['1925', '1923', '1931', '1940']
+  )],
+  ['hqb-0167', supplementalRewrite(
+    '오답 함정',
+    '이승만 탄핵 이후 대한민국 임시정부의 변화로 맞는 것을 고르세요.',
+    '박은식이 2대 대통령에 취임했고 이후 대통령제에서 국무령제로 바뀌었다',
+    ['박은식', '국무령제', '임시정부 개편', '1925'],
+    '이승만 탄핵 뒤 박은식이 2대 대통령에 취임했고, 이후 대통령제가 폐지되고 국무령제로 개편되었다.',
+    [
+      '박은식이 2대 대통령에 취임했고 이후 대통령제에서 국무령제로 바뀌었다',
+      '김구가 초대 대통령이 되었고 국무령제를 대통령제로 바꾸었다',
+      '신채호가 대통령이 되어 외교 독립론을 강화했다',
+      '이동휘가 통감부 총독으로 임명되었다'
+    ]
+  )],
+  ['hqb-0168', supplementalRewrite(
+    '식민지 연도',
+    '김구가 대한민국 임시정부에 활력을 넣기 위해 한인애국단을 조직한 연도를 고르세요.',
+    '1931',
+    ['한인애국단', '김구', '1931', '아몬드봉봉 베스킨라빈스31'],
+    '한인애국단은 김구가 1931년에 조직했다. 1932년 이봉창·윤봉길 의거와 이어서 잡는다.',
+    ['1931', '1923', '1925', '1940']
+  )],
+  ['hqb-0169', supplementalRewrite(
+    '인물 업적',
+    '한인애국단원으로 일본 국왕 행렬에 폭탄을 던졌으나 실패한 인물을 고르세요.',
+    '이봉창',
+    ['한인애국단', '이봉창', '일본 국왕', '1932'],
+    '이봉창은 한인애국단원으로 일본 국왕 행렬에 폭탄을 던졌으나 실패했다.',
+    ['이봉창', '윤봉길', '나석주', '김익상']
+  )],
+  ['hqb-0170', supplementalRewrite(
+    '인물 업적',
+    '훙커우 공원 의거로 일본군 승전 축하식장에 폭탄을 던진 한인애국단원을 고르세요.',
+    '윤봉길',
+    ['한인애국단', '윤봉길', '훙커우 공원', '도시락 폭탄', '물통 폭탄'],
+    '윤봉길은 상하이 훙커우 공원에서 일본군 승전 축하식장에 폭탄을 던졌다. 이 의거 뒤 중국 국민당의 임시정부 지원이 확대되었다.',
+    ['윤봉길', '이봉창', '박상진', '신채호']
+  )],
+  ['hqb-0171', supplementalRewrite(
+    '오답 함정',
+    '윤봉길 의거 이후 대한민국 임시정부가 얻은 변화로 맞는 것을 고르세요.',
+    '중국 국민당 정부의 지원이 확대되었다',
+    ['윤봉길 의거', '중국 국민당', '임시정부 지원'],
+    '윤봉길 의거는 장제스 등 중국 국민당 정부가 대한민국 임시정부를 적극 지원하는 계기가 되었다.',
+    ['중국 국민당 정부의 지원이 확대되었다', '이승만이 위임통치 청원을 철회하고 복귀했다', '치안유지법이 폐지되었다', '상하이 임시정부가 한성정부로 흡수되었다']
+  )],
+  ['hqb-0172', supplementalRewrite(
+    '개념 객관식',
+    '1940년에 충칭에서 대한민국 임시정부가 창설한 군대를 고르세요.',
+    '한국광복군',
+    ['대한민국 임시정부', '충칭', '한국광복군', '1940'],
+    '대한민국 임시정부는 1940년 충칭에 정착했고, 여러 독립군 세력을 모아 한국광복군을 창설했다.',
+    ['한국광복군', '조선의용대', '대한 독립군', '북로 군정서군']
+  )],
+  ['hqb-0173', supplementalRewrite(
+    '인물 업적',
+    '한국광복군 창설 당시 총사령관을 고르세요.',
+    '지청천',
+    ['한국광복군', '총사령관', '지청천', '1940'],
+    '1940년 창설된 한국광복군의 총사령관은 지청천이다.',
+    ['지청천', '김원봉', '홍범도', '김좌진']
+  )],
+  ['hqb-0174', supplementalRewrite(
+    '오답 함정',
+    '한국광복군이 제2차 세계대전 중 영국군 요청으로 주로 활동한 전선과 임무를 고르세요.',
+    '인도·미얀마 전선에서 포로 심문과 암호 해독 활동',
+    ['한국광복군', '인도·미얀마 전선', '포로 심문', '암호 해독'],
+    '한국광복군 일부는 인도·미얀마 전선에 파견되어 포로 심문, 선전, 암호 해독 등 연합군 작전을 지원했다.',
+    [
+      '인도·미얀마 전선에서 포로 심문과 암호 해독 활동',
+      '만주 봉오동에서 일본 정규군 격파',
+      '상하이 훙커우 공원에서 폭탄 의거',
+      '서울 동대문 밖 30리까지 진격'
+    ]
+  )],
+  ['hqb-0175', supplementalRewrite(
+    '개념 객관식',
+    '1941년 태평양 전쟁 발발 뒤 대한민국 임시정부가 발표한 것을 고르세요.',
+    '대일 선전 포고(대일 선전 성명서)',
+    ['대한민국 임시정부', '대일 선전 포고', '대일선전성명서', '1941', '태평양 전쟁'],
+    '대한민국 임시정부는 1941년 태평양 전쟁 발발 뒤 대일 선전 포고, 곧 대일 선전 성명서를 발표했다.',
+    ['대일 선전 포고(대일 선전 성명서)', '건국 강령', '조선혁명선언', '독립 선언서']
+  )]
+]);
+
 const ADDITION_QUESTION_REWRITES = {
   ...COLONIAL_SUPPLEMENT_REWRITES,
+  ...PROVISIONAL_GOVERNMENT_REWRITES,
   'hqb-0112': {
     kind: '인물 업적',
     prompt: '대한민국 애국부인회를 조직해 독립운동 자금을 모은 여성 독립운동가를 고르세요.',
@@ -1294,8 +1555,17 @@ function rewriteBaseQuestionOutliers(base, achievements) {
   return base.map(item => {
     const rewrite = BASE_QUESTION_REWRITES[item.id];
     const rewritten = rewrite ? { ...item, ...rewrite } : rewriteVagueTitleQuestion(item, achievementByTitle, achievements);
-    return sanitizeAnJungGeunOverflow(sanitizeEraChoices(rewritten));
+    return sanitizeAnJungGeunOverflow(sanitizeEraChoices(rewriteSubjectLinkPrompt(rewritten)));
   });
+}
+
+function rewriteSubjectLinkPrompt(item) {
+  const oldPrefix = '다음 설명과 연결되는 왕·인물·항목을 고르세요.';
+  if (!String(item.prompt || '').startsWith(oldPrefix)) return item;
+  return {
+    ...item,
+    prompt: item.prompt.replace(oldPrefix, '다음 설명과 연결되는 주체를 고르세요.')
+  };
 }
 
 function rewriteAddedQuestionOutliers(additions) {
@@ -1367,7 +1637,7 @@ function rewriteVagueTitleQuestion(item, achievementByTitle, achievements) {
   if (isAutoEraQuestion) {
     return {
       ...item,
-      prompt: `다음 보기 중 ${contextClue(achievement)}에 맞는 시대·주체 연결을 고르세요.`,
+      prompt: `다음 단서와 연결되는 시대·주체를 고르세요: ${contextClueText(achievement)}`,
       clues: safeQuizClues(achievement, 'era')
     };
   }
@@ -1527,10 +1797,12 @@ function main() {
   quiz.meta.quality_1000_expansion = {
     added: finalAdditions.length,
     total_after_expansion: quiz.questions.length,
-    source: `royal-achievements.json ${achievements.length}개 항목 기반 키워드·연결형 + 큐레이션 보강`,
-    note: '기존 문제를 덮지 않고 hqb-* 310문항을 추가해 총 1000문항으로 맞춤. 안중근은 큐레이션 핵심 1문항만 유지',
+    source: `royal-achievements.json ${achievements.length}개 항목 기반 주체 단답·개념 단답 + 큐레이션 보강`,
+    note: 'hqb-* 저퀄 키워드 묶음·연결 판별을 제거하고 단답형으로 교체. 대한민국 임시정부 핵심 흐름을 큐레이션 보강. 안중근은 큐레이션 핵심 1문항만 유지',
+    low_quality_replaced: 184,
     curated_resistance_questions: resistanceQuestions.length,
-    colonial_year_questions_from_1910: colonialYearQuestions.length
+    colonial_year_questions_from_1910: colonialYearQuestions.length,
+    provisional_government_questions: Object.keys(PROVISIONAL_GOVERNMENT_REWRITES).length
   };
 
   fs.writeFileSync(QUIZ_PATH, JSON.stringify(quiz, null, 2) + '\n');
