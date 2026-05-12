@@ -74,17 +74,33 @@ const ERA_DISTRACTOR_POOLS = {
     '조선 · 박규수',
     '조선 · 고종',
     '대한제국 · 최익현',
-    '대한제국 · 안중근',
+    '대한제국 · 신돌석',
     '조선 · 정제두',
     '조선 · 홍대용'
   ],
   '대한제국': [
     '대한제국 · 최익현',
-    '대한제국 · 안중근',
+    '대한제국 · 신돌석',
+    '대한제국 · 이인영',
     '조선 · 고종',
     '조선 · 박규수'
   ]
 };
+const AN_JUNG_GEUN_CORE_PROMPT = '안중근 의거의 핵심 3단서로 맞는 것을 고르세요.';
+const PERSON_DISTRACTOR_CHOICES = [
+  '박상진',
+  '임병찬',
+  '나석주',
+  '신채호',
+  '홍범도',
+  '지청천',
+  '김좌진',
+  '이동휘',
+  '김마리아',
+  '박차정',
+  '남자현',
+  '유관순'
+];
 const QUIZ_TERM_OVERRIDES = {
   'goguryeo-sosurim-372': ['불교 수용', '태학 설립', '율령 반포'],
   'joseon-law-codes-1865': ['경국대전', '속대전', '대전통편'],
@@ -427,7 +443,7 @@ function buildResistanceQuestions(nextId) {
     q('인물 업적', '미국 샌프란시스코에서 친일 외교 고문 스티븐스를 처단한 인물 조합을 고르세요.', '장인환·전명운', ['스티븐스', '스티븐슨', '샌프란시스코', '의거'], '장인환과 전명운은 미국 샌프란시스코에서 친일 외교 고문 스티븐스를 처단했다.', ['장인환·전명운', '나철·오기호', '이준·이위종', '신돌석·민종식']),
     q('오답 함정', '을사늑약 직전 일본의 한국 지배를 국제적으로 인정한 흐름으로 맞는 것을 고르세요.', '가쓰라·태프트 밀약-제2차 영일동맹-포츠머스 조약', ['을사늑약 배경', '국제 승인', '1905'], '일본은 가쓰라·태프트 밀약, 제2차 영일동맹, 포츠머스 조약을 거치며 한국 지배를 국제적으로 인정받은 뒤 을사늑약을 강요했다.', ['가쓰라·태프트 밀약-제2차 영일동맹-포츠머스 조약', '제물포 조약-조미수호통상조약-톈진 조약', '한성 조약-청일전쟁-삼국 간섭', '기유각서-경술국치-포츠머스 조약']),
     q('오답 함정', '을사늑약, 즉 제2차 한일협약의 핵심 특징으로 맞는 것을 고르세요.', '외교권 박탈과 통감부 설치', ['을사늑약', '제2차 한일협약', '통감부'], '을사늑약은 외교권 박탈과 통감부 설치가 핵심이다. 군대 해산은 정미7조약 뒤다.', ['외교권 박탈과 통감부 설치', '차관 통치와 군대 해산', '사법권과 감옥 사무 박탈', '황무지 개간권 요구 철회']),
-    q('인물 업적', '을사늑약 무효를 알리기 위해 헤이그에 파견된 특사 3인을 고르세요.', '이준·이상설·이위종', ['헤이그 특사', '만국평화회의', '고종'], '고종은 을사늑약의 부당함을 알리기 위해 이준·이상설·이위종을 헤이그 특사로 파견했고, 일제는 이를 빌미로 고종을 강제 퇴위시켰다.', ['이준·이상설·이위종', '장인환·전명운·안중근', '신돌석·최익현·민종식', '안창호·양기탁·이승훈']),
+    q('인물 업적', '을사늑약 무효를 알리기 위해 헤이그에 파견된 특사 3인을 고르세요.', '이준·이상설·이위종', ['헤이그 특사', '만국평화회의', '고종'], '고종은 을사늑약의 부당함을 알리기 위해 이준·이상설·이위종을 헤이그 특사로 파견했고, 일제는 이를 빌미로 고종을 강제 퇴위시켰다.', ['이준·이상설·이위종', '장인환·전명운·이재명', '신돌석·최익현·민종식', '안창호·양기탁·이승훈']),
     q('오답 함정', '정미7조약을 “차군”으로 외울 때 차군이 가리키는 내용을 고르세요.', '차관 통치와 군대 해산', ['정미7조약', '한일신협약', '차군'], '정미7조약은 “차군”으로 잡는다. 차관 통치와 군대 해산이 핵심이다.', ['차관 통치와 군대 해산', '외교권 박탈과 통감부 설치', '영토 군사 기지 사용권', '관민공동회와 헌의 6조']),
     q('오답 함정', '기유각서를 경찰권 위탁과 구분할 때 먼저 잡아야 할 핵심을 고르세요.', '사법권과 감옥 사무 박탈', ['기유각서', '사법권', '경찰권 위탁'], '기유각서는 사법권과 감옥 사무 박탈이 정확한 핵심이다. 경찰권 박탈은 1910년 경찰권 위탁으로 이어지는 흐름과 구분한다.', ['사법권과 감옥 사무 박탈', '외교권 박탈과 통감부 설치', '차관 통치와 군대 해산', '의병 해산 권고와 단발령 철회']),
     q('인물 업적', '1910년 한일병합조약 체결 인물 조합으로 맞는 것을 고르세요.', '이완용·데라우치', ['한일병합조약', '1910', '경술국치'], '1910년 한일병합조약은 이완용과 통감 데라우치가 체결했다.', ['이완용·데라우치', '박제순·이토 히로부미', '이준·이상설', '장인환·전명운']),
@@ -436,14 +452,14 @@ function buildResistanceQuestions(nextId) {
     q('오답 함정', '을미의병의 직접 원인과 특징으로 맞는 것을 고르세요.', '을미사변과 단발령을 계기로 유생층이 주도했고 고종의 해산 권고 뒤 상당수 해산', ['을미의병', '단발령', '유생', '고종 해산 권고'], '을미의병은 을미사변과 단발령을 계기로 유생층이 주도했고, 고종의 해산 권고 뒤 상당수가 해산했다.', ['을미사변과 단발령을 계기로 유생층이 주도했고 고종의 해산 권고 뒤 상당수 해산', '을사늑약을 계기로 해산 군인이 합류해 서울 진공 작전 전개', '기유각서를 계기로 신민회가 대성학교를 설립', '한일병합조약 뒤 국채보상운동으로 전환']),
     q('오답 함정', '을사의병에서 시험에 자주 나오는 인물 연결로 맞는 것을 고르세요.', '신돌석=최초 평민 의병장, 최익현=태인 봉기·쓰시마 순국, 민종식=홍주성 전투', ['을사의병', '신돌석', '최익현', '민종식'], '을사의병은 빈출이다. 신돌석은 최초 평민 의병장, 최익현은 태인 봉기와 쓰시마 순국, 민종식은 홍주성 전투로 잡는다.', ['신돌석=최초 평민 의병장, 최익현=태인 봉기·쓰시마 순국, 민종식=홍주성 전투', '신돌석=헤이그 특사, 최익현=오적암살단, 민종식=대성학교', '신돌석=홍주성 전투, 최익현=군대 해산, 민종식=샌프란시스코 의거', '신돌석=입헌군주제, 최익현=농광회사, 민종식=신흥강습소']),
     q('인물 업적', '최초의 평민 출신 의병장으로 을사의병에서 자주 출제되는 인물을 고르세요.', '신돌석', ['을사의병', '평민 의병장', '빈출'], '신돌석은 최초의 평민 출신 의병장으로 을사의병 단골 선지다.', ['신돌석', '최익현', '민종식', '이인영']),
-    q('인물 업적', '태인에서 의병을 일으키고 대마도, 즉 쓰시마에서 순국한 인물을 고르세요.', '최익현', ['태인 봉기', '대마도', '쓰시마', '을사의병'], '최익현은 태인에서 의병을 일으켰고 체포 뒤 쓰시마에 유배되어 순국했다.', ['최익현', '신돌석', '민종식', '안중근']),
+    q('인물 업적', '태인에서 의병을 일으키고 대마도, 즉 쓰시마에서 순국한 인물을 고르세요.', '최익현', ['태인 봉기', '대마도', '쓰시마', '을사의병'], '최익현은 태인에서 의병을 일으켰고 체포 뒤 쓰시마에 유배되어 순국했다.', ['최익현', '신돌석', '민종식', '이인영']),
     q('인물 업적', '을사의병 때 홍주성 전투와 연결되는 인물을 고르세요.', '민종식', ['홍주성 전투', '을사의병'], '민종식은 을사의병 시기 홍주성 전투와 연결해 출제된다.', ['민종식', '이인영', '양기탁', '오기호']),
     q('오답 함정', '정미의병의 전투력이 강해진 이유로 맞는 것을 고르세요.', '정미7조약 뒤 해산 군인이 의병에 가담했기 때문', ['정미의병', '군대 해산', '해산 군인'], '정미7조약 뒤 대한제국 군대가 해산되자 해산 군인들이 의병에 합류해 정미의병의 전투력이 커졌다.', ['정미7조약 뒤 해산 군인이 의병에 가담했기 때문', '독립협회가 중추원 개편을 추진했기 때문', '메가타가 금 본위제를 실시했기 때문', '보안회가 황무지 개간권을 철회시켰기 때문']),
     q('오답 함정', '13도 창의군의 서울 진공 작전 단서로 맞는 것을 고르세요.', '총대장 이인영, 동대문 밖 30리까지 진격', ['13도 창의군', '서울 진공 작전', '이인영', '동대문 밖 30리'], '정미의병은 13도 창의군을 결성해 서울 진공 작전을 추진했고, 총대장 이인영과 동대문 밖 30리 단서가 중요하다.', ['총대장 이인영, 동대문 밖 30리까지 진격', '총대장 안창호, 삼원보 신흥강습소 설치', '총대장 나철, 오적암살단 조직', '총대장 장인환, 샌프란시스코 의거']),
     q('오답 함정', '서울 진공 작전이 약화된 단서로 맞는 것을 고르세요.', '총대장 이인영이 부친상으로 이탈', ['이인영', '부친상', '아버지상', '서울 진공 작전'], '13도 창의군 총대장 이인영은 부친상으로 전열에서 이탈했고, 서울 진공 작전은 제대로 전개되지 못했다.', ['총대장 이인영이 부친상으로 이탈', '신돌석이 헤이그 특사로 파견', '안창호가 스티븐스를 처단', '장지연이 군대 해산을 지휘']),
     q('오답 함정', '정미의병이 강해진 뒤 일제가 반격한 탄압 작전을 고르세요.', '남한대토벌작전', ['정미의병', '남한대토벌', '1909'], '해산 군인 합류로 정미의병이 강해지자 일제는 남한대토벌작전으로 의병 세력을 크게 약화시켰다.', ['남한대토벌작전', '105인 사건', '황국협회 보부상 습격', '갑오개혁 2차']),
     q('인물 업적', '오적암살단을 조직했고 훗날 단군을 모시는 대종교와 연결되는 인물 조합을 고르세요.', '나철·오기호', ['오적암살단', '대종교', '단군'], '나철·오기호는 오적암살단을 조직했다. 나철은 단군을 모시는 대종교와도 연결된다.', ['나철·오기호', '장인환·전명운', '이준·이상설', '신돌석·민종식']),
-    q('인물 업적', '명동 성당 앞에서 이완용을 칼로 찌른 인물을 고르세요.', '이재명', ['이재명', '이완용', '의거'], '이재명은 명동 성당 앞에서 이완용을 칼로 찔렀으나 사망시키지는 못했다.', ['이재명', '안중근', '장인환', '나철']),
+    q('인물 업적', '명동 성당 앞에서 이완용을 칼로 찌른 인물을 고르세요.', '이재명', ['이재명', '이완용', '의거'], '이재명은 명동 성당 앞에서 이완용을 칼로 찔렀으나 사망시키지는 못했다.', ['이재명', '박상진', '장인환', '나철']),
     q('인물 업적', '안중근 의거의 핵심 3단서로 맞는 것을 고르세요.', '하얼빈에서 이토 히로부미 사살, 뤼순 감옥 순국, 동양평화론', ['안중근', '하얼빈', '이토 히로부미', '동양평화론'], '안중근은 하얼빈에서 이토 히로부미를 사살했고, 뤼순 감옥에서 순국했으며, 동양평화론을 남겼다.', ['하얼빈에서 이토 히로부미 사살, 뤼순 감옥 순국, 동양평화론', '샌프란시스코에서 스티븐스 처단, 대종교 중광, 105인 사건', '명동 성당에서 이완용 처단 성공, 헤이그 특사 파견, 공화정 주장', '홍주성 전투, 태인 봉기, 동대문 밖 30리 진격']),
     q('오답 함정', '보안회의 활동으로 맞는 것을 고르세요.', '1904년 일본의 황무지 개간권 요구 반대와 농광회사 설립', ['보안회', '황무지 개간권', '농광회사'], '보안회는 1904년 일본의 황무지 개간권 요구에 반대했고, 농광회사 설립 흐름과 함께 출제된다.', ['1904년 일본의 황무지 개간권 요구 반대와 농광회사 설립', '1907년 비밀 결사로 공화정 수립 주장', '을사늑약 무효를 알리려 헤이그 특사 파견', '정미7조약 뒤 해산 군인을 모아 서울 진공 작전']),
     q('오답 함정', '헌정연구회의 정치 목표로 맞는 것을 고르세요.', '입헌군주제', ['헌정연구회', '입헌군주제'], '헌정연구회는 입헌군주제를 주장했다. 신민회의 공화정 목표와 구분한다.', ['입헌군주제', '공화정', '전제군주제', '군정 통치']),
@@ -454,7 +470,7 @@ function buildResistanceQuestions(nextId) {
     q('오답 함정', '신민회가 만주 삼원보에 세운 독립군 양성 기관으로 맞는 것을 고르세요.', '신흥강습소(신흥무관학교)', ['신민회', '삼원보', '신흥강습소', '신흥무관학교'], '신민회는 만주 삼원보에 신흥강습소를 세웠고, 이는 신흥무관학교로 이어진다.', ['신흥강습소(신흥무관학교)', '육영공원', '원산학사', '한성사범학교']),
     q('오답 함정', '105인 사건의 성격으로 맞는 것을 고르세요.', '데라우치 총독 암살 음모 조작을 통한 신민회 탄압', ['105인 사건', '데라우치', '신민회 탄압'], '105인 사건은 일제가 데라우치 총독 암살 음모를 조작해 신민회 계열을 탄압한 사건이다.', ['데라우치 총독 암살 음모 조작을 통한 신민회 탄압', '고종이 황국협회를 동원해 독립협회를 해산한 사건', '일본이 대한제국 군대를 해산한 조약', '러시아가 용암포 조차를 요구한 사건']),
     q('오답 함정', '헌정연구회와 신민회 목표를 구분한 것으로 맞는 것을 고르세요.', '헌정연구회=입헌군주제, 신민회=공화정', ['헌정연구회', '신민회', '입헌군주제', '공화정'], '헌정연구회는 입헌군주제, 신민회는 공화정으로 구분한다.', ['헌정연구회=입헌군주제, 신민회=공화정', '헌정연구회=공화정, 신민회=입헌군주제', '헌정연구회=전제군주제, 신민회=황무지 개간권', '헌정연구회=군대 해산, 신민회=기유각서']),
-    q('오답 함정', '다음 중 의병·의거·실력양성운동의 예시 연결로 맞는 것을 고르세요.', '의병=13도 창의군, 의거=안중근, 실력양성운동=신민회', ['저항운동 비교', '의병', '의거', '신민회'], '의병은 부대 단위 무장 투쟁, 의거는 개인·소수 직접 행동, 실력양성운동은 교육·산업·출판으로 힘을 기르는 흐름이다.', ['의병=13도 창의군, 의거=안중근, 실력양성운동=신민회', '의병=태극서관, 의거=대성학교, 실력양성운동=홍주성 전투', '의병=신민회, 의거=보안회, 실력양성운동=안중근', '의병=헌정연구회, 의거=대한자강회, 실력양성운동=동대문 밖 30리'])
+    q('오답 함정', '다음 중 의병·의거·실력양성운동의 예시 연결로 맞는 것을 고르세요.', '의병=13도 창의군, 의거=나석주, 실력양성운동=신민회', ['저항운동 비교', '의병', '의거', '신민회'], '의병은 부대 단위 무장 투쟁, 의거는 개인·소수 직접 행동, 실력양성운동은 교육·산업·출판으로 힘을 기르는 흐름이다. 나석주는 동양척식주식회사와 조선식산은행을 공격한 의열단 계열 의거 인물이다.', ['의병=13도 창의군, 의거=나석주, 실력양성운동=신민회', '의병=태극서관, 의거=대성학교, 실력양성운동=홍주성 전투', '의병=신민회, 의거=보안회, 실력양성운동=이재명', '의병=헌정연구회, 의거=대한자강회, 실력양성운동=동대문 밖 30리'])
   ];
 }
 
@@ -526,6 +542,56 @@ function buildColonialYearQuestions(nextId) {
 }
 
 const BASE_QUESTION_REWRITES = {
+  'hq-0013': {
+    kind: '인물 업적',
+    prompt: '고조선을 건국했다고 전해지는 인물을 고르세요.',
+    answer: '단군왕검',
+    aliases: [],
+    clues: ['고조선', '기원전 2333년', '홍익인간', '삼국유사'],
+    era: '선사·고대',
+    explanation: '단군왕검은 고조선을 건국했다고 전해지는 인물이다. 삼국유사와 홍익인간 단서를 함께 잡는다.',
+    choices: ['단군왕검', '주몽', '박혁거세', '김수로']
+  },
+  'hq-0049': {
+    kind: '인물 업적',
+    prompt: '완도 청해진을 설치하고 해상 무역 세력을 이끈 인물을 고르세요.',
+    answer: '장보고',
+    aliases: ['궁복'],
+    clues: ['장보고', '청해진', '완도', '해상 무역'],
+    era: '삼국·남북국',
+    explanation: '장보고는 완도에 청해진을 설치하고 해상 무역 세력을 장악했다. 독서삼품과는 원성왕의 제도이므로 분리해 외운다.',
+    choices: ['장보고', '최치원', '김헌창', '궁예']
+  },
+  'hq-0207': {
+    kind: '인물 업적',
+    prompt: '대한광복회를 조직하고 공화정 지향의 군대식 비밀 결사를 이끈 인물을 고르세요.',
+    answer: '박상진',
+    aliases: [],
+    clues: ['박상진', '대한광복회', '1915', '공화정', '군대식 비밀 결사'],
+    era: '일제 강점기',
+    explanation: '박상진은 1915년 대한광복회를 조직해 공화정 지향의 군대식 비밀 결사를 이끌었다.',
+    choices: ['박상진', '임병찬', '나석주', '지청천']
+  },
+  'hq-0211': {
+    kind: '인물 업적',
+    prompt: '고종의 밀지를 받아 독립의군부를 조직한 인물을 고르세요.',
+    answer: '임병찬',
+    aliases: [],
+    clues: ['임병찬', '독립의군부', '고종 밀지', '복벽주의'],
+    era: '일제 강점기',
+    explanation: '임병찬은 고종의 밀지를 받아 독립의군부를 조직했다. 공화정 계열 단체와 달리 복벽주의 성격으로 구분한다.',
+    choices: ['임병찬', '박상진', '이동휘', '이상설']
+  },
+  'hq-0270': {
+    kind: '인물 업적',
+    prompt: '1971년 대선에서 박정희와 접전을 벌인 야당 후보를 고르세요.',
+    answer: '김대중',
+    aliases: [],
+    clues: ['1971년 대선', '김대중', '10월 유신', '박정희'],
+    era: '현대',
+    explanation: '1971년 대선에서 김대중이 박정희와 접전을 벌인 뒤, 박정희 정권은 장기 집권을 위해 10월 유신을 선포했다.',
+    choices: ['김대중', '김영삼', '장면', '윤보선']
+  },
   'hq-0003': {
     kind: '왕 업적',
     prompt: '고구려 소수림왕의 중앙집권 세트로 맞는 것을 고르세요.',
@@ -663,6 +729,79 @@ const BASE_QUESTION_REWRITES = {
       '임진왜란 때 조선 수군이 일본군을 격파한 해전',
       '정미의병이 서울 진공 작전으로 동대문 밖 30리까지 진격한 전투'
     ]
+  },
+  'hqa-0313': {
+    kind: '인물 업적',
+    prompt: '동양척식주식회사와 조선식산은행을 공격한 의열단 계열 의거 인물을 고르세요.',
+    answer: '나석주',
+    aliases: [],
+    clues: ['나석주', '동양척식주식회사', '조선식산은행', '의열단'],
+    era: '일제 강점기',
+    explanation: '나석주는 의열단 계열 인물로 동양척식주식회사와 조선식산은행을 공격했다.',
+    choices: ['나석주', '박상진', '임병찬', '지청천']
+  },
+  'hqa-0314': {
+    kind: '인물 업적',
+    prompt: '연해주 대한광복군정부 수립과 연결되는 인물 조합을 고르세요.',
+    answer: '이상설·이동휘',
+    aliases: [],
+    clues: ['대한광복군정부', '연해주', '이상설', '이동휘', '1914'],
+    era: '일제 강점기',
+    explanation: '대한광복군정부는 1914년 연해주에서 이상설·이동휘 등이 수립한 독립운동 조직이다.',
+    choices: ['이상설·이동휘', '박상진·김좌진', '나철·오기호', '안창호·양기탁']
+  },
+  'hqa-0315': {
+    kind: '인물 업적',
+    prompt: '봉오동 전투 승리와 직접 연결되는 독립군 지휘관을 고르세요.',
+    answer: '홍범도',
+    aliases: [],
+    clues: ['홍범도', '봉오동 전투', '1920', '대한 독립군'],
+    era: '일제 강점기',
+    explanation: '홍범도는 대한 독립군을 이끌고 1920년 봉오동 전투 승리와 연결된다. 청산리 전투의 김좌진과 자주 비교된다.',
+    choices: ['홍범도', '김좌진', '지청천', '김원봉']
+  },
+  'hm-0021': {
+    kind: '인물 업적',
+    prompt: '헤이그 특사 3인 조합으로 맞는 것을 고르세요.',
+    answer: '이준·이상설·이위종',
+    aliases: [],
+    clues: ['헤이그 특사', '고종', '만국평화회의', '을사늑약'],
+    era: '근대',
+    explanation: '고종은 을사늑약의 부당함을 알리기 위해 이준·이상설·이위종을 헤이그 특사로 파견했다.',
+    choices: ['이준·이상설·이위종', '장인환·전명운·이재명', '안창호·양기탁·이승훈', '신돌석·최익현·민종식']
+  },
+  'ht-0059': {
+    kind: '인물 업적',
+    prompt: '조선혁명선언을 작성하고 민족주의 사학을 전개한 인물을 고르세요.',
+    answer: '신채호',
+    aliases: [],
+    clues: ['신채호', '조선혁명선언', '민족주의 사학', '낭가사상'],
+    era: '일제 강점기',
+    explanation: '신채호는 조선혁명선언을 작성했고 민족주의 사학을 전개했다. 박은식의 한국통사·한국독립운동지혈사와 구분한다.',
+    choices: ['신채호', '박은식', '정인보', '김원봉']
+  }
+};
+
+const ADDITION_QUESTION_REWRITES = {
+  'hqb-0112': {
+    kind: '인물 업적',
+    prompt: '대한민국 애국부인회를 조직해 독립운동 자금을 모은 여성 독립운동가를 고르세요.',
+    answer: '김마리아',
+    aliases: [],
+    clues: ['김마리아', '대한민국 애국부인회', '여성 독립운동', '독립운동 자금'],
+    era: '일제 강점기',
+    explanation: '김마리아는 대한민국 애국부인회를 조직해 독립운동 자금을 모으는 활동과 연결된다.',
+    choices: ['김마리아', '남자현', '유관순', '박차정']
+  },
+  'hqb-0224': {
+    kind: '인물 업적',
+    prompt: '한국 독립군을 이끌고 대전자령 전투에서 승리한 인물을 고르세요.',
+    answer: '지청천',
+    aliases: [],
+    clues: ['지청천', '한국 독립군', '대전자령 전투'],
+    era: '일제 강점기',
+    explanation: '지청천은 한국 독립군을 이끌고 대전자령 전투에서 승리한 인물로 출제된다.',
+    choices: ['지청천', '홍범도', '김좌진', '이동휘']
   }
 };
 
@@ -671,7 +810,15 @@ function rewriteBaseQuestionOutliers(base, achievements) {
   return base.map(item => {
     const rewrite = BASE_QUESTION_REWRITES[item.id];
     const rewritten = rewrite ? { ...item, ...rewrite } : rewriteVagueTitleQuestion(item, achievementByTitle);
-    return sanitizeEraChoices(rewritten);
+    return sanitizeAnJungGeunOverflow(sanitizeEraChoices(rewritten));
+  });
+}
+
+function rewriteAddedQuestionOutliers(additions) {
+  return additions.map(item => {
+    const rewrite = ADDITION_QUESTION_REWRITES[item.id];
+    const rewritten = rewrite ? { ...item, ...rewrite } : item;
+    return sanitizeAnJungGeunOverflow(rewritten);
   });
 }
 
@@ -724,6 +871,50 @@ function sanitizeEraChoices(item) {
   return { ...item, choices };
 }
 
+function isAnJungGeunCoreQuestion(item) {
+  return clean(item.prompt) === AN_JUNG_GEUN_CORE_PROMPT;
+}
+
+function sanitizeAnJungGeunOverflow(item) {
+  if (isAnJungGeunCoreQuestion(item)) return item;
+  const choicesHaveName = Array.isArray(item.choices) && item.choices.some(choice => String(choice).includes('안중근'));
+  const cluesHaveName = Array.isArray(item.clues) && item.clues.some(clue => String(clue).includes('안중근'));
+  if (!choicesHaveName && !cluesHaveName) return item;
+  const choices = Array.isArray(item.choices)
+    ? ensureFourChoices(item, item.choices.map(replaceAnJungGeunChoice))
+    : item.choices;
+  const clues = Array.isArray(item.clues)
+    ? item.clues.filter(clue => !String(clue).includes('안중근'))
+    : item.clues;
+  return { ...item, choices, clues };
+}
+
+function replaceAnJungGeunChoice(choice) {
+  return clean(choice)
+    .replace(/대한제국 안중근: 이토 히로부미 · 뤼순 · 뤼순 감옥/g, '대한제국 이재명: 이완용 · 명동 성당 · 의거')
+    .replace(/대한제국 · 안중근/g, '대한제국 · 신돌석')
+    .replace(/장인환·전명운·안중근/g, '장인환·전명운·이재명')
+    .replace(/안중근/g, '박상진');
+}
+
+function ensureFourChoices(item, choices) {
+  const answerKey = compact(item.answer);
+  const answerChoice = choices.find(choice => compact(choice) === answerKey) || item.answer;
+  const pool = item.kind === '시대 연결'
+    ? [
+        ...(ERA_DISTRACTOR_POOLS[item.era] || ERA_DISTRACTOR_POOLS[item.period] || []),
+        '대한제국 · 박상진',
+        '대한제국 · 김마리아',
+        '일제 강점기 · 지청천'
+      ]
+    : PERSON_DISTRACTOR_CHOICES;
+  const rest = unique([
+    ...choices.filter(choice => compact(choice) !== answerKey),
+    ...pool
+  ]).filter(choice => compact(choice) !== answerKey);
+  return [answerChoice, ...rest].slice(0, 4);
+}
+
 function replacementEraChoice(item, used) {
   const pool = ERA_DISTRACTOR_POOLS[item.era] || ERA_DISTRACTOR_POOLS[item.period] || ERA_DISTRACTOR_POOLS[item.dynasty] || [];
   const sorted = [...pool].sort((a, b) => stableHash(`${item.id}|${a}`).localeCompare(stableHash(`${item.id}|${b}`)));
@@ -771,17 +962,18 @@ function main() {
   ));
   additions.push(...resistanceQuestions);
   additions.push(...colonialYearQuestions);
+  const finalAdditions = rewriteAddedQuestionOutliers(additions);
 
-  if (additions.length !== TARGET_ADDED) {
-    throw new Error(`Expected ${TARGET_ADDED} additions, got ${additions.length}`);
+  if (finalAdditions.length !== TARGET_ADDED) {
+    throw new Error(`Expected ${TARGET_ADDED} additions, got ${finalAdditions.length}`);
   }
-  if (base.length + additions.length !== TARGET_TOTAL) {
-    throw new Error(`Expected total ${TARGET_TOTAL}, got ${base.length + additions.length}`);
+  if (base.length + finalAdditions.length !== TARGET_TOTAL) {
+    throw new Error(`Expected total ${TARGET_TOTAL}, got ${base.length + finalAdditions.length}`);
   }
 
   const ids = new Set(base.map(item => item.id));
   const prompts = new Set(base.map(item => compact(`${item.prompt}|${item.answer}`)));
-  for (const item of additions) {
+  for (const item of finalAdditions) {
     if (ids.has(item.id)) throw new Error(`Duplicate id: ${item.id}`);
     ids.add(item.id);
     const promptKey = compact(`${item.prompt}|${item.answer}`);
@@ -795,15 +987,23 @@ function main() {
     }
   }
 
-  quiz.questions = [...base, ...additions];
+  const allQuestions = [...base, ...finalAdditions];
+  const extraAnJungGeun = allQuestions
+    .filter(item => !isAnJungGeunCoreQuestion(item) && JSON.stringify(item).includes('안중근'))
+    .map(item => item.id);
+  if (extraAnJungGeun.length) {
+    throw new Error(`Unexpected extra 안중근 mentions: ${extraAnJungGeun.join(', ')}`);
+  }
+
+  quiz.questions = allQuestions;
   quiz.meta.generated_at = '2026-05-12';
   quiz.meta.quiz_count = quiz.questions.length;
   quiz.meta.kinds = recalcKinds(quiz.questions);
   quiz.meta.quality_1000_expansion = {
-    added: additions.length,
+    added: finalAdditions.length,
     total_after_expansion: quiz.questions.length,
     source: `royal-achievements.json ${achievements.length}개 항목 기반 키워드·연결형 + 큐레이션 보강`,
-    note: '기존 문제를 덮지 않고 hqb-* 310문항을 추가해 총 1000문항으로 맞춤',
+    note: '기존 문제를 덮지 않고 hqb-* 310문항을 추가해 총 1000문항으로 맞춤. 안중근은 큐레이션 핵심 1문항만 유지',
     curated_resistance_questions: resistanceQuestions.length,
     colonial_year_questions_from_1910: colonialYearQuestions.length
   };
