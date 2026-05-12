@@ -38,7 +38,7 @@ button{cursor:pointer}
 .stat-label{font-size:.75rem;color:var(--muted);font-weight:700;margin-bottom:.22rem}
 .stat-value{font-size:1.32rem;font-weight:800;letter-spacing:0;color:#111827}
 .toolbar{display:grid;grid-template-columns:1fr;gap:.55rem;background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:.75rem;margin-bottom:.9rem;box-shadow:0 1px 2px rgba(30,41,59,.03)}
-@media(min-width:760px){.toolbar{grid-template-columns:1.5fr repeat(3,minmax(8rem,.8fr)) auto auto}}
+@media(min-width:760px){.toolbar{grid-template-columns:minmax(12rem,1.5fr) repeat(3,minmax(8rem,.8fr)) auto auto auto}}
 .search,.select{height:2.55rem;border:1px solid var(--line);border-radius:7px;background:#fff;color:var(--ink);padding:0 .75rem;outline:none;min-width:0}
 .search:focus,.select:focus{border-color:var(--blue);box-shadow:0 0 0 3px #1a73e81a}
 .btn{height:2.55rem;border:1px solid var(--line);border-radius:7px;background:#fff;color:#202124;padding:0 .85rem;font-weight:800;white-space:nowrap}
@@ -122,6 +122,7 @@ button{cursor:pointer}
     <select class="select" id="kind-filter" aria-label="유형 필터"></select>
     <select class="select" id="round-filter" aria-label="회차 필터"></select>
     <button class="btn" id="wrong-toggle" type="button">오답만</button>
+    <button class="btn" id="unanswered-toggle" type="button">안 푼 문제만</button>
     <button class="btn" id="shuffle-btn" type="button">섞기</button>
   </section>
 
@@ -192,6 +193,7 @@ button{cursor:pointer}
 <script>
 const PROGRESS_API = '/api/hankuksa-quiz-progress';
 const LOCAL_PROGRESS_KEY = 'aingan.hankuksa.quiz.progress.v1';
+const FILTER_STATE_KEY = 'aingan.hankuksa.quiz.filters.v1';
 
 const state = {
   bank: [],
@@ -199,6 +201,7 @@ const state = {
   index: 0,
   checked: false,
   wrongOnly: false,
+  unansweredOnly: false,
   stats: { byId: {} },
   progressMode: 'db'
 };
@@ -214,6 +217,7 @@ const els = {
   kindFilter: document.getElementById('kind-filter'),
   roundFilter: document.getElementById('round-filter'),
   wrongToggle: document.getElementById('wrong-toggle'),
+  unansweredToggle: document.getElementById('unanswered-toggle'),
   shuffleBtn: document.getElementById('shuffle-btn'),
   quizCard: document.getElementById('quiz-card'),
   empty: document.getElementById('empty'),
@@ -265,6 +269,25 @@ function resultOf(id) {
 
 function setSaveStatus(text) {
   els.saveText.textContent = text;
+}
+
+function saveFilterState() {
+  try {
+    localStorage.setItem(FILTER_STATE_KEY, JSON.stringify({
+      wrongOnly: state.wrongOnly,
+      unansweredOnly: state.unansweredOnly
+    }));
+  } catch (_) {}
+}
+
+function loadFilterState() {
+  try {
+    const data = JSON.parse(localStorage.getItem(FILTER_STATE_KEY) || '{}');
+    state.wrongOnly = Boolean(data.wrongOnly);
+    state.unansweredOnly = Boolean(data.unansweredOnly);
+    els.wrongToggle.classList.toggle('toggle-on', state.wrongOnly);
+    els.unansweredToggle.classList.toggle('toggle-on', state.unansweredOnly);
+  } catch (_) {}
 }
 
 function normalizeProgress(data) {
@@ -389,6 +412,7 @@ function applyFilters({ keepOrder = false } = {}) {
       && (!kind || item.kind === kind)
       && (!round || roundLabel === round)
       && (!state.wrongOnly || resultOf(item.id) === 'wrong')
+      && (!state.unansweredOnly || !resultOf(item.id))
       && matchesSearch(item, query);
   });
   if (!keepOrder) next = shuffle(next);
@@ -507,7 +531,10 @@ function jumpToQuestion(id) {
   els.kindFilter.value = '';
   els.roundFilter.value = '';
   state.wrongOnly = false;
+  state.unansweredOnly = false;
   els.wrongToggle.classList.remove('toggle-on');
+  els.unansweredToggle.classList.remove('toggle-on');
+  saveFilterState();
   state.pool = [...state.bank];
   state.index = index;
   render();
@@ -610,7 +637,18 @@ els.kindFilter.addEventListener('change', () => applyFilters());
 els.roundFilter.addEventListener('change', () => applyFilters());
 els.wrongToggle.addEventListener('click', () => {
   state.wrongOnly = !state.wrongOnly;
+  if (state.wrongOnly) state.unansweredOnly = false;
   els.wrongToggle.classList.toggle('toggle-on', state.wrongOnly);
+  els.unansweredToggle.classList.toggle('toggle-on', state.unansweredOnly);
+  saveFilterState();
+  applyFilters();
+});
+els.unansweredToggle.addEventListener('click', () => {
+  state.unansweredOnly = !state.unansweredOnly;
+  if (state.unansweredOnly) state.wrongOnly = false;
+  els.unansweredToggle.classList.toggle('toggle-on', state.unansweredOnly);
+  els.wrongToggle.classList.toggle('toggle-on', state.wrongOnly);
+  saveFilterState();
   applyFilters();
 });
 els.shuffleBtn.addEventListener('click', () => applyFilters());
@@ -642,6 +680,7 @@ fetch('questions.json', { cache: 'no-store' })
     state.bank = data.questions || [];
     await loadStats();
     initFilters(data.meta || {});
+    loadFilterState();
     applyFilters();
   })
   .catch(err => {

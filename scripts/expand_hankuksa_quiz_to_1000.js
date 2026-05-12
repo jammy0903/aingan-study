@@ -344,7 +344,6 @@ const CONTEXT_CLUE_OVERRIDES = {
 function safeQuizClues(item, mode = 'concept') {
   const clues = [
     item.dynasty || item.period,
-    quizYear(item),
     labelForCategory(item.category)
   ];
   if (mode === 'concept') clues.push(item.king);
@@ -362,7 +361,6 @@ function contextClue(item) {
   if (CONTEXT_CLUE_OVERRIDES[item.id]) return CONTEXT_CLUE_OVERRIDES[item.id];
   const pieces = unique([
     clean(item.dynasty || item.period),
-    quizYear(item),
     labelForCategory(item.category)
   ]).filter(Boolean);
   return `${pieces.join(' · ')} 단서`;
