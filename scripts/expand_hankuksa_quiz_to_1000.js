@@ -330,11 +330,50 @@ function labelForCategory(category) {
   return '사건·업적';
 }
 
-function titleQuestionPrompt(item) {
+const CONTEXT_CLUE_OVERRIDES = {
+  'joseon-seongjong-1485': '기본 법전 완성, 경연·언론 기구 정비, 사림 등용, 편찬 사업 단서',
+  'joseon-myeongjong-1555': '왜구 침입 뒤 국방 회의 기구가 상시 운영되는 흐름',
+  'joseon-sejo-1453': '왕위 찬탈 뒤 왕권 강화, 토지·군역 제도 정비, 학문 기관 폐지 단서',
+  'joseon-sejong-jiphyeonjeon-1420': '학문 연구 기관을 기반으로 새 문자 창제와 편찬 사업을 추진한 흐름',
+  'joseon-law-codes-1865': '조선 법전 정리 순서와 왕대 구분 단서',
+  'goryeo-central-system': '고려 중앙 관제와 회계 기구, 왕명 출납 기구 구분 단서',
+  'joseon-central-system-1485': '의정부·6조·삼사의 기능 구분 단서',
+  'joseon-gojong-1897': '환구단 황제 즉위, 대한국 국제, 지계 발급·양전 사업 단서'
+};
+
+function safeQuizClues(item, mode = 'concept') {
+  const clues = [
+    item.dynasty || item.period,
+    quizYear(item),
+    labelForCategory(item.category)
+  ];
+  if (mode === 'concept') clues.push(item.king);
+  return unique(clues).filter(Boolean);
+}
+
+function subjectStudyLabel(item) {
   const subject = subjectText(item);
-  const terms = quizTerms(item, 3).join('·');
+  const dynasty = clean(item.dynasty || item.period);
+  if (subject) return `${subject} 시기`;
+  return `${dynasty} 시기`;
+}
+
+function contextClue(item) {
+  if (CONTEXT_CLUE_OVERRIDES[item.id]) return CONTEXT_CLUE_OVERRIDES[item.id];
+  const pieces = unique([
+    clean(item.dynasty || item.period),
+    quizYear(item),
+    labelForCategory(item.category)
+  ]).filter(Boolean);
+  return `${pieces.join(' · ')} 단서`;
+}
+
+function titleQuestionPrompt(item) {
   const label = labelForCategory(item.category);
-  return `${subject}의 ${withParticle(terms, '과', '와')} 직접 연결되는 ${withParticle(label, '을', '를')} 고르세요.`;
+  const subject = subjectStudyLabel(item);
+  const clue = CONTEXT_CLUE_OVERRIDES[item.id];
+  if (clue) return `${subject}의 ${withParticle(clue, '과', '와')} 맞는 ${withParticle(label, '을', '를')} 고르세요.`;
+  return `${subject}의 핵심 ${withParticle(label, '을', '를')} 고르세요.`;
 }
 
 function buildKeywordQuestions(achievements, nextId) {
@@ -344,9 +383,9 @@ function buildKeywordQuestions(achievements, nextId) {
     questions.push(baseItem(
       nextId(),
       '키워드 묶음',
-      `${withParticle(item.title, '과', '와')} 직접 연결되는 키워드 묶음으로 맞는 것을 고르세요.`,
+      `${subjectStudyLabel(item)}에 묶이는 핵심 키워드 조합을 고르세요.`,
       answer,
-      unique([item.period, item.king, quizYear(item), item.category, item.title]).filter(Boolean),
+      safeQuizClues(item, 'keyword'),
       item.period,
       compactExplanation(item, `${withParticle(item.title, '은', '는')} ${withParticle(answer, '과', '와')} 연결된다.`),
       choicesFor(answer, bundlePool(item, achievements), `${item.id}|keyword`)
@@ -362,9 +401,9 @@ function buildConnectionQuestions(achievements, nextId) {
     questions.push(baseItem(
       nextId(),
       '연결 판별',
-      `${withParticle(item.title, '과', '와')} 직접 연결되는 보기로 맞는 것을 고르세요.`,
+      `다음 보기 중 ${contextClue(item)}에 맞는 시대·주체·핵심 키워드 연결을 고르세요.`,
       answer,
-      unique([item.title, quizYear(item), item.category, ...quizTerms(item, 3)]),
+      safeQuizClues(item, 'connection'),
       item.period,
       compactExplanation(item, `${withParticle(item.title, '은', '는')} ${withParticle(answer, '과', '와')} 연결된다.`),
       choicesFor(answer, connectionPool(item, achievements), `${item.id}|connection`)
@@ -439,7 +478,7 @@ function buildResistanceQuestions(nextId) {
     q('순서 배열', '일본이 조약과 국제 합의로 대한제국 국권을 빼앗는 흐름으로 맞는 것을 고르세요.', '용암포 사건-러일전쟁-한일의정서-제1차 한일협약-가쓰라·태프트 밀약/2차 영일동맹/포츠머스 조약-을사늑약-한일신협약-기유각서-한일병합조약', ['국권 피탈', '조약 순서', '용암포', '을사늑약', '한일병합'], '국권 피탈 흐름은 용암포 사건에서 러일전쟁, 한일의정서, 제1차 한일협약, 국제 승인 흐름, 을사늑약, 정미7조약, 기유각서, 한일병합조약으로 이어진다.', ['용암포 사건-러일전쟁-한일의정서-제1차 한일협약-가쓰라·태프트 밀약/2차 영일동맹/포츠머스 조약-을사늑약-한일신협약-기유각서-한일병합조약', '러일전쟁-을사늑약-한일의정서-제1차 한일협약-기유각서-한일병합조약', '용암포 사건-제1차 한일협약-한일의정서-을사늑약-포츠머스 조약-한일신협약', '을사늑약-가쓰라·태프트 밀약-러일전쟁-한일의정서-한일병합조약']),
     q('오답 함정', '한일의정서의 핵심을 고르세요.', '대한제국 영토를 일본군 군사 기지로 사용', ['한일의정서', '러일전쟁', '군사기지'], '한일의정서는 러일전쟁 중 일본이 대한제국의 군사 요지를 마음대로 사용할 수 있게 만든 조약이다.', ['대한제국 영토를 일본군 군사 기지로 사용', '외교권 박탈과 통감부 설치', '각 부처 일본인 차관 임명', '사법권과 감옥 사무 박탈']),
     q('오답 함정', '제1차 한일협약의 핵심으로 맞는 것을 고르세요.', '외교 고문 스티븐스와 재정 고문 메가타를 둔 고문 통치', ['제1차 한일협약', '고문통치', '스티븐스', '메가타'], '제1차 한일협약은 고문 통치의 시작이다. 외교 고문 스티븐스, 재정 고문 메가타를 구분한다.', ['외교 고문 스티븐스와 재정 고문 메가타를 둔 고문 통치', '통감부 설치와 외교권 박탈', '차관 통치와 군대 해산', '중추원 관제 반포와 헌의 6조 채택']),
-    q('오답 함정', '메가타가 실시한 화폐정리사업과 직접 연결되는 키워드를 고르세요.', '금 본위제', ['메가타', '화폐정리사업', '백동화', '제일은행권'], '재정 고문 메가타는 화폐정리사업을 실시해 백동화를 정리하고 금 본위제 중심의 화폐 질서를 강요했다.', ['금 본위제', '지계 발급', '은 본위제', '도량형 통일']),
+    q('오답 함정', '메가타의 화폐정리사업에서 강요된 화폐 제도 키워드를 고르세요.', '금 본위제', ['메가타', '화폐정리사업', '백동화', '제일은행권'], '재정 고문 메가타는 화폐정리사업을 실시해 백동화를 정리하고 금 본위제 중심의 화폐 질서를 강요했다.', ['금 본위제', '지계 발급', '은 본위제', '도량형 통일']),
     q('인물 업적', '미국 샌프란시스코에서 친일 외교 고문 스티븐스를 처단한 인물 조합을 고르세요.', '장인환·전명운', ['스티븐스', '스티븐슨', '샌프란시스코', '의거'], '장인환과 전명운은 미국 샌프란시스코에서 친일 외교 고문 스티븐스를 처단했다.', ['장인환·전명운', '나철·오기호', '이준·이위종', '신돌석·민종식']),
     q('오답 함정', '을사늑약 직전 일본의 한국 지배를 국제적으로 인정한 흐름으로 맞는 것을 고르세요.', '가쓰라·태프트 밀약-제2차 영일동맹-포츠머스 조약', ['을사늑약 배경', '국제 승인', '1905'], '일본은 가쓰라·태프트 밀약, 제2차 영일동맹, 포츠머스 조약을 거치며 한국 지배를 국제적으로 인정받은 뒤 을사늑약을 강요했다.', ['가쓰라·태프트 밀약-제2차 영일동맹-포츠머스 조약', '제물포 조약-조미수호통상조약-톈진 조약', '한성 조약-청일전쟁-삼국 간섭', '기유각서-경술국치-포츠머스 조약']),
     q('오답 함정', '을사늑약, 즉 제2차 한일협약의 핵심 특징으로 맞는 것을 고르세요.', '외교권 박탈과 통감부 설치', ['을사늑약', '제2차 한일협약', '통감부'], '을사늑약은 외교권 박탈과 통감부 설치가 핵심이다. 군대 해산은 정미7조약 뒤다.', ['외교권 박탈과 통감부 설치', '차관 통치와 군대 해산', '사법권과 감옥 사무 박탈', '황무지 개간권 요구 철회']),
@@ -592,6 +631,16 @@ const BASE_QUESTION_REWRITES = {
     explanation: '1971년 대선에서 김대중이 박정희와 접전을 벌인 뒤, 박정희 정권은 장기 집권을 위해 10월 유신을 선포했다.',
     choices: ['김대중', '김영삼', '장면', '윤보선']
   },
+  'ht-0030': {
+    kind: '오답 함정',
+    prompt: '보국안민·제폭구민을 구호로 내세운 사건을 고르세요.',
+    answer: '동학 농민 운동',
+    aliases: ['동학농민운동'],
+    clues: ['보국안민', '제폭구민', '전봉준', '고부 민란', '집강소'],
+    era: '근대',
+    explanation: '보국안민과 제폭구민은 동학 농민 운동의 구호로 잡는다. 갑신정변이나 의병 구호와 섞지 않는다.',
+    choices: ['동학 농민 운동', '갑신정변', '을미의병', '홍경래의 난']
+  },
   'hq-0003': {
     kind: '왕 업적',
     prompt: '고구려 소수림왕의 중앙집권 세트로 맞는 것을 고르세요.',
@@ -609,7 +658,7 @@ const BASE_QUESTION_REWRITES = {
   },
   'hq-0007': {
     kind: '개념 객관식',
-    prompt: '고구려 소수림왕 때 불교 수용과 직접 연결되는 나라를 고르세요.',
+    prompt: '고구려 소수림왕 때 불교를 전해 준 나라를 고르세요.',
     answer: '전진',
     aliases: [],
     clues: ['고구려', '소수림왕', '불교 수용', '중앙집권'],
@@ -667,7 +716,7 @@ const BASE_QUESTION_REWRITES = {
   },
   'hqa-0162': {
     kind: '오답 함정',
-    prompt: '부석사 무량수전과 직접 연결되는 설명을 고르세요.',
+    prompt: '부석사 무량수전에 대한 설명으로 맞는 것을 고르세요.',
     answer: '고려 시대 주심포 양식 목조 건축',
     clues: ['고려 문화', '부석사 무량수전', '주심포', '목조 건축'],
     explanation: '부석사 무량수전은 고려 시대 주심포 양식 목조 건축으로 자주 출제된다. 다보탑·석가탑은 통일신라 불국사 석탑과 구분한다.',
@@ -680,7 +729,7 @@ const BASE_QUESTION_REWRITES = {
   },
   'hqa-0174': {
     kind: '오답 함정',
-    prompt: '경천사지 10층 석탑과 직접 연결되는 설명을 고르세요.',
+    prompt: '경천사지 10층 석탑에 대한 설명으로 맞는 것을 고르세요.',
     answer: '원 영향이 반영된 고려 후기 대리석 석탑',
     clues: ['고려 문화', '경천사지 10층 석탑', '원 영향', '대리석'],
     explanation: '경천사지 10층 석탑은 고려 후기 원의 영향을 받은 대리석 석탑이다. 조선 세조 때의 원각사지 10층 석탑과 이름을 바꿔 내기 쉽다.',
@@ -730,6 +779,26 @@ const BASE_QUESTION_REWRITES = {
       '정미의병이 서울 진공 작전으로 동대문 밖 30리까지 진격한 전투'
     ]
   },
+  'hqa-0307': {
+    kind: '개념 객관식',
+    prompt: '고종이 환구단에서 황제로 즉위하고 대한국 국제로 전제 군주권을 제도화한 뒤 추진한 개혁 흐름을 고르세요.',
+    answer: '대한제국 선포·광무개혁',
+    aliases: [],
+    clues: ['대한제국', '고종', '환구단', '대한국 국제', '광무개혁', '지계'],
+    era: '근대',
+    explanation: '고종은 대한제국을 선포하고 대한국 국제를 반포했으며, 광무개혁에서 양전 사업과 지계 발급 등을 추진했다.',
+    choices: ['대한제국 선포·광무개혁', '갑오개혁 1차', '을사늑약 반대 의병·대마도 순국', '독립신문·독립협회·만민공동회']
+  },
+  'hqa-0309': {
+    kind: '시대 연결',
+    prompt: '환구단 황제 즉위, 대한국 국제, 지계 발급·양전 사업 단서에 맞는 시대·주체 연결을 고르세요.',
+    answer: '대한제국 · 고종',
+    aliases: [],
+    clues: ['대한제국', '1897~1904', '개혁', '고종', '광무개혁'],
+    era: '근대',
+    explanation: '대한제국 선포와 광무개혁은 고종의 대한제국 시기 흐름이다. 조선 말 갑오·을미개혁과 구분한다.',
+    choices: ['대한제국 · 고종', '조선 · 고종', '대한제국 · 최익현', '조선 · 박규수']
+  },
   'hqa-0313': {
     kind: '인물 업적',
     prompt: '동양척식주식회사와 조선식산은행을 공격한 의열단 계열 의거 인물을 고르세요.',
@@ -752,7 +821,7 @@ const BASE_QUESTION_REWRITES = {
   },
   'hqa-0315': {
     kind: '인물 업적',
-    prompt: '봉오동 전투 승리와 직접 연결되는 독립군 지휘관을 고르세요.',
+    prompt: '봉오동 전투 승리를 이끈 독립군 지휘관을 고르세요.',
     answer: '홍범도',
     aliases: [],
     clues: ['홍범도', '봉오동 전투', '1920', '대한 독립군'],
@@ -809,7 +878,7 @@ function rewriteBaseQuestionOutliers(base, achievements) {
   const achievementByTitle = new Map(achievements.map(item => [compact(item.title), item]));
   return base.map(item => {
     const rewrite = BASE_QUESTION_REWRITES[item.id];
-    const rewritten = rewrite ? { ...item, ...rewrite } : rewriteVagueTitleQuestion(item, achievementByTitle);
+    const rewritten = rewrite ? { ...item, ...rewrite } : rewriteVagueTitleQuestion(item, achievementByTitle, achievements);
     return sanitizeAnJungGeunOverflow(sanitizeEraChoices(rewritten));
   });
 }
@@ -822,22 +891,59 @@ function rewriteAddedQuestionOutliers(additions) {
   });
 }
 
-function rewriteVagueTitleQuestion(item, achievementByTitle) {
-  const achievement = achievementByTitle.get(compact(item.answer));
+function titleFromEraPrompt(prompt) {
+  const match = clean(prompt).match(/시대·주체 연결로 맞는 것을 고르세요:\s*(.+)$/);
+  return match ? match[1].trim() : '';
+}
+
+function achievementFromEraQuestion(item, achievements) {
+  if (!String(item.id || '').startsWith('hqa-') || item.kind !== '시대 연결') return null;
+  const [dynastyPart, subjectPart] = clean(item.answer).split('·').map(value => value.trim());
+  if (!dynastyPart || !subjectPart) return null;
+  const clueKeys = new Set((item.clues || []).map(compact));
+  const candidates = achievements.filter(achievement => {
+    const sameDynasty = [achievement.dynasty, achievement.period].map(compact).includes(compact(dynastyPart));
+    const sameSubject = compact(achievement.king) === compact(subjectPart);
+    if (!sameDynasty || !sameSubject) return false;
+    const year = compact(quizYear(achievement));
+    const category = compact(labelForCategory(achievement.category));
+    return (!year || clueKeys.has(year)) && (!category || clueKeys.has(category) || clueKeys.has(compact(achievement.category)));
+  });
+  return candidates[0] || null;
+}
+
+function rewriteVagueTitleQuestion(item, achievementByTitle, achievements) {
+  const promptTitle = titleFromEraPrompt(item.prompt);
+  const achievement = achievementByTitle.get(compact(item.answer))
+    || achievementByTitle.get(compact(promptTitle))
+    || achievementFromEraQuestion(item, achievements);
+  const isAutoEraQuestion = Boolean(
+    achievement
+    && String(item.id || '').startsWith('hqa-')
+    && item.kind === '시대 연결'
+  );
   const shouldRewrite = item.kind === '핵심 항목'
     || item.prompt === '다음 단서들이 가리키는 핵심 항목을 고르세요.'
-    || (achievement && String(item.id || '').startsWith('hqa-') && item.kind === '개념 객관식');
+    || (achievement && String(item.id || '').startsWith('hqa-') && item.kind === '개념 객관식')
+    || isAutoEraQuestion;
 
   if (!shouldRewrite) {
     return item;
   }
 
   if (!achievement) {
-    const clues = (item.clues || []).filter(Boolean).slice(0, 3).join('·');
     return {
       ...item,
       kind: '개념 객관식',
-      prompt: `${withParticle(clues || item.era || '제시된 단서', '과', '와')} 직접 연결되는 항목을 고르세요.`
+      prompt: '다음 설명과 맞는 항목을 고르세요.'
+    };
+  }
+
+  if (isAutoEraQuestion) {
+    return {
+      ...item,
+      prompt: `다음 보기 중 ${contextClue(achievement)}에 맞는 시대·주체 연결을 고르세요.`,
+      clues: safeQuizClues(achievement, 'era')
     };
   }
 
@@ -845,13 +951,7 @@ function rewriteVagueTitleQuestion(item, achievementByTitle) {
     ...item,
     kind: '개념 객관식',
     prompt: titleQuestionPrompt(achievement),
-    clues: unique([
-      achievement.period,
-      quizYear(achievement),
-      achievement.category,
-      achievement.king,
-      ...quizTerms(achievement, 3)
-    ]).filter(Boolean)
+    clues: safeQuizClues(achievement, 'concept')
   };
 }
 
