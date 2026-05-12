@@ -86,12 +86,14 @@ const ERA_DISTRACTOR_POOLS = {
   ]
 };
 const QUIZ_TERM_OVERRIDES = {
+  'goguryeo-sosurim-372': ['불교 수용', '태학 설립', '율령 반포'],
   'joseon-law-codes-1865': ['경국대전', '속대전', '대전통편'],
   'joseon-ganghwa-treaty-1876': ['조일수호조규', '최초 근대적 조약', '영사재판권'],
   'joseon-gabo-reform-1st-1894': ['군국기무처', '의정부·8아문', '탁지아문'],
   'joseon-gabo-reform-2nd-1894': ['홍범 14조', '7부·23부', '재판소'],
   'joseon-eulmi-reform-1895': ['건양 연호', '친위대·진위대', '단발령']
 };
+const YEAR_CLUE_BLOCKLIST = new Set(['goguryeo-sosurim-372']);
 
 function readJson(filePath) {
   return JSON.parse(fs.readFileSync(filePath, 'utf8'));
@@ -295,6 +297,10 @@ function compactExplanation(item, prefix) {
   return `${prefix} ${short}`;
 }
 
+function quizYear(item) {
+  return YEAR_CLUE_BLOCKLIST.has(item.id) ? '' : item.year;
+}
+
 function labelForCategory(category) {
   const key = compact(category);
   if (key.includes('개혁')) return '개혁';
@@ -312,7 +318,7 @@ function titleQuestionPrompt(item) {
   const subject = subjectText(item);
   const terms = quizTerms(item, 3).join('·');
   const label = labelForCategory(item.category);
-  return `${subject}의 ${withParticle(terms, '과', '와')} 직접 연결되는 ${label}을 고르세요.`;
+  return `${subject}의 ${withParticle(terms, '과', '와')} 직접 연결되는 ${withParticle(label, '을', '를')} 고르세요.`;
 }
 
 function buildKeywordQuestions(achievements, nextId) {
@@ -324,7 +330,7 @@ function buildKeywordQuestions(achievements, nextId) {
       '키워드 묶음',
       `${withParticle(item.title, '과', '와')} 직접 연결되는 키워드 묶음으로 맞는 것을 고르세요.`,
       answer,
-      unique([item.period, item.king, item.year, item.category, item.title]).filter(Boolean),
+      unique([item.period, item.king, quizYear(item), item.category, item.title]).filter(Boolean),
       item.period,
       compactExplanation(item, `${withParticle(item.title, '은', '는')} ${withParticle(answer, '과', '와')} 연결된다.`),
       choicesFor(answer, bundlePool(item, achievements), `${item.id}|keyword`)
@@ -342,7 +348,7 @@ function buildConnectionQuestions(achievements, nextId) {
       '연결 판별',
       `${withParticle(item.title, '과', '와')} 직접 연결되는 보기로 맞는 것을 고르세요.`,
       answer,
-      unique([item.title, item.year, item.category, ...quizTerms(item, 3)]),
+      unique([item.title, quizYear(item), item.category, ...quizTerms(item, 3)]),
       item.period,
       compactExplanation(item, `${withParticle(item.title, '은', '는')} ${withParticle(answer, '과', '와')} 연결된다.`),
       choicesFor(answer, connectionPool(item, achievements), `${item.id}|connection`)
@@ -520,6 +526,66 @@ function buildColonialYearQuestions(nextId) {
 }
 
 const BASE_QUESTION_REWRITES = {
+  'hq-0003': {
+    kind: '왕 업적',
+    prompt: '고구려 소수림왕의 중앙집권 세트로 맞는 것을 고르세요.',
+    answer: '불교 수용·태학 설립·율령 반포',
+    aliases: [],
+    clues: ['고구려', '소수림왕', '중앙집권', '전진', '태학'],
+    era: '삼국·남북국',
+    explanation: '소수림왕은 전진에서 불교를 수용하고 태학을 설립했으며 율령을 반포해 중앙집권 체제와 인재 양성 기반을 정비했다.',
+    choices: [
+      '불교 수용·태학 설립·율령 반포',
+      '평양 천도·남진 정책·한성 함락',
+      '진대법 실시·을파소 등용·부자 상속 강화',
+      '서안평 점령·낙랑군 축출·대방군 공격'
+    ]
+  },
+  'hq-0007': {
+    kind: '개념 객관식',
+    prompt: '고구려 소수림왕 때 불교 수용과 직접 연결되는 나라를 고르세요.',
+    answer: '전진',
+    aliases: [],
+    clues: ['고구려', '소수림왕', '불교 수용', '중앙집권'],
+    era: '삼국·남북국',
+    explanation: '고구려 소수림왕은 전진에서 불교를 수용했다. 백제 침류왕의 불교 수용은 동진의 마라난타와 연결된다.',
+    choices: ['전진', '동진', '당', '일본']
+  },
+  'hq-0011': {
+    kind: '개념 객관식',
+    prompt: '소수림왕이 태학을 설립한 목적과 가장 가까운 것을 고르세요.',
+    answer: '유교 교육 기관을 세워 인재 양성 기반을 정비',
+    aliases: [],
+    clues: ['고구려', '소수림왕', '태학', '교육', '중앙집권'],
+    era: '삼국·남북국',
+    explanation: '태학은 고구려의 유교 교육 기관이다. 소수림왕의 불교 수용·태학 설립·율령 반포는 중앙집권 체제 정비 세트로 잡는다.',
+    choices: [
+      '유교 교육 기관을 세워 인재 양성 기반을 정비',
+      '불교 교단을 정비해 승려 시험을 시행',
+      '지방 호족에게 토지 수조권을 지급',
+      '당의 3성 6부제를 그대로 수용'
+    ]
+  },
+  'hqa-0023': {
+    kind: '주체 연결',
+    prompt: '고구려에서 불교 수용·태학 설립·율령 반포로 중앙집권 체제를 정비한 왕을 고르세요.',
+    answer: '소수림왕',
+    aliases: [],
+    clues: ['고구려', '불교 수용', '태학 설립', '율령 반포', '중앙집권'],
+    era: '삼국·남북국',
+    explanation: '소수림왕은 전진에서 불교를 수용하고 태학을 설립했으며 율령을 반포해 중앙집권 체제와 인재 양성 기반을 정비했다.',
+    choices: ['소수림왕', '장수왕', '미천왕', '고국천왕']
+  },
+  'hqa-0024': {
+    kind: '왕 업적',
+    prompt: '고구려에서 불교 수용·태학 설립·율령 반포를 한 왕을 고르세요.',
+    answer: '소수림왕',
+    aliases: [],
+    clues: ['고구려', '불교 수용', '태학 설립', '율령 반포', '중앙집권'],
+    era: '삼국·남북국',
+    explanation: '소수림왕은 불교 수용, 태학 설립, 율령 반포를 통해 고구려 중앙집권 체제를 정비했다.',
+    choices: ['소수림왕', '장수왕', '미천왕', '고국천왕']
+  },
   'hqa-0135': {
     kind: '오답 함정',
     prompt: '고려 중앙 관제의 연결로 맞는 것을 고르세요.',
@@ -634,7 +700,7 @@ function rewriteVagueTitleQuestion(item, achievementByTitle) {
     prompt: titleQuestionPrompt(achievement),
     clues: unique([
       achievement.period,
-      achievement.year,
+      quizYear(achievement),
       achievement.category,
       achievement.king,
       ...quizTerms(achievement, 3)
