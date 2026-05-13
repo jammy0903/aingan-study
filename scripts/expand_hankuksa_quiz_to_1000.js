@@ -17,6 +17,7 @@ const TARGET_TOTAL = 1000;
 const CURATED_RESISTANCE_COUNT = 35;
 const CURATED_COLONIAL_YEAR_COUNT = 51;
 const MODERN_INSTITUTION_COUNT = 34;
+const MOVEMENT_1920S_COUNT = 32;
 
 const GENERIC_KEYWORDS = new Set([
   '왕', '왕권', '정치', '문화', '제도', '개혁', '정책', '사건', '흐름',
