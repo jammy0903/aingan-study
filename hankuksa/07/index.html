@@ -1904,13 +1904,11 @@ function escHtml(str) {
 function splitMnemonic(text) {
   return (text || '')
     .replace(/\r\n/g, '\n')
+    .replace(/\s*【/g, '\n【')
     .replace(/\s+\/\s+/g, '\n')
     .replace(/\s+vs\.\s+/gi, '\n')
     .replace(/\s+→\s+/g, ' → ')
     .replace(/\s+↔\s+/g, ' ↔ ')
-    .replace(/\.\s+/g, '.\n')
-    .replace(/다\.\s+/g, '다.\n')
-    .replace(/됨\.\s+/g, '됨.\n')
     .split(/\n+/)
     .map(line => line.trim())
     .filter(Boolean);
